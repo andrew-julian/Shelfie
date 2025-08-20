@@ -497,8 +497,7 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
               </div>
             </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+        </DialogContent>
+      </Dialog>
+    );
 }
