@@ -38,6 +38,24 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
     let depth = dim2; 
     let height = dim3;
     
+    // Detect coffee table books and handle their landscape orientation
+    const isCoffeeTableBook = title && (
+      title.toLowerCase().includes('coffee') ||
+      title.toLowerCase().includes('art') ||
+      title.toLowerCase().includes('photography') ||
+      title.toLowerCase().includes('design') ||
+      title.toLowerCase().includes('architecture') ||
+      title.toLowerCase().includes('westography') // Specific case
+      // Note: Removed general aspect ratio detection as it was too broad
+      // Most regular books naturally have height > width
+    );
+    
+    // For coffee table books, swap width and height to achieve width > height
+    if (isCoffeeTableBook && height > width) {
+      console.log(`☕ Coffee table book detected: ${title}, swapping width/height from w:${width}, h:${height} to w:${height}, h:${width}`);
+      [width, height] = [height, width]; // Swap to make width > height
+    }
+    
     // Round to 2 decimal places
     return {
       width: Math.round(width * 100) / 100,
@@ -718,6 +736,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to refresh books" });
     }
   });
+
 
   // Delete book
   app.delete("/api/books/:id", async (req, res) => {
