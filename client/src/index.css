@@ -180,30 +180,8 @@
     top: 1px;
     width: calc(var(--book-depth, 15px) * 1.8);
     height: calc(100% - 2px);
-    transform: translateX(calc(100% - var(--book-depth, 15px))) rotateY(90deg);
-    background: linear-gradient(90deg, 
-      #fff 0%,
-      #f9f9f9 5%,
-      #fff 10%,
-      #f9f9f9 15%,
-      #fff 20%,
-      #f9f9f9 25%,
-      #fff 30%,
-      #f9f9f9 35%,
-      #fff 40%,
-      #f9f9f9 45%,
-      #fff 50%,
-      #f9f9f9 55%,
-      #fff 60%,
-      #f9f9f9 65%,
-      #fff 70%,
-      #f9f9f9 75%,
-      #fff 80%,
-      #f9f9f9 85%,
-      #fff 90%,
-      #f9f9f9 95%,
-      #fff 100%
-      );
+    transform: translateX(calc(100% - var(--book-depth, 15px) - 1px)) rotateY(90deg);
+    background: red; /* Temporary debug - should be white gradient */
   }
 
   .book::after {
