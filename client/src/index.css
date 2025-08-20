@@ -175,13 +175,13 @@
 
   .book::before {
     position: absolute;
-    content: ' ';
-    left: 0;
-    top: 1px;
-    width: 28px;
-    height: calc(100% - 2px);
-    transform: translateX(calc(100% - 15px)) rotateY(90deg);
-    background: red; /* Temporary debug - should be white gradient */
+    content: '';
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    background: red;
+    z-index: 10;
   }
 
   .book::after {
