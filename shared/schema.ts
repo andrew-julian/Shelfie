@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -17,6 +17,9 @@ export const books = pgTable("books", {
   language: text("language"),
   pages: integer("pages"),
   dimensions: text("dimensions"),
+  width: decimal("width", { precision: 5, scale: 2 }),
+  height: decimal("height", { precision: 5, scale: 2 }),
+  depth: decimal("depth", { precision: 5, scale: 2 }),
   weight: text("weight"),
   rating: text("rating"),
   ratingsTotal: integer("ratings_total"),

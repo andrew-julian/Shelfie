@@ -6,14 +6,31 @@ import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 // Utility to parse book dimensions and convert to CSS dimensions
-function parseBookDimensions(dimensions: string | null): { width: number; height: number; depth: number } {
+function parseBookDimensions(book: Book): { width: number; height: number; depth: number } {
   const defaultDimensions = { width: 140, height: 200, depth: 15 };
   
-  if (!dimensions) return defaultDimensions;
+  // Use parsed dimensions if available (from backend intelligent parsing)
+  if (book.width && book.height && book.depth) {
+    const width = parseFloat(book.width);
+    const height = parseFloat(book.height);
+    const depth = parseFloat(book.depth);
+    
+    // Scale dimensions for visual display (22px per inch base scale)
+    const baseScale = 22;
+    
+    return {
+      width: Math.round(width * baseScale),
+      height: Math.round(height * baseScale),
+      depth: Math.max(Math.round(depth * baseScale * 0.7), 10) // Slightly thicker depth effect
+    };
+  }
+  
+  // Fallback to parsing dimensions string for backwards compatibility
+  if (!book.dimensions) return defaultDimensions;
   
   try {
     // Parse various dimension formats like "8.5 x 5.5 x 1.2 inches", "21.6 x 14 x 2.8 cm", etc.
-    const matches = dimensions.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
+    const matches = book.dimensions.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
     if (!matches) return defaultDimensions;
     
     let [, widthStr, heightStr, depthStr] = matches;
@@ -38,7 +55,7 @@ function parseBookDimensions(dimensions: string | null): { width: number; height
       depth: Math.max(Math.round(depth * baseScale * 0.7), 10) // Slightly thicker depth effect
     };
   } catch (error) {
-    console.warn('Failed to parse book dimensions:', dimensions, error);
+    console.warn('Failed to parse book dimensions:', book.dimensions, error);
     return defaultDimensions;
   }
 }
@@ -77,7 +94,7 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
   const { toast } = useToast();
   
   // Calculate book dimensions based on real-world data
-  const rawDimensions = parseBookDimensions(book.dimensions);
+  const rawDimensions = parseBookDimensions(book);
   const bookDimensions = constrainBookDimensions(rawDimensions);
 
   const updateStatusMutation = useMutation({

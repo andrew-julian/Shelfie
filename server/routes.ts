@@ -1,6 +1,77 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+
+// Intelligent dimension parsing utility
+function parseAndAssignDimensions(dimensionText: string | null, title?: string): {
+  width: number | null;
+  height: number | null;
+  depth: number | null;
+} {
+  if (!dimensionText) {
+    return { width: null, height: null, depth: null };
+  }
+
+  try {
+    // Parse various dimension formats like "8.5 x 5.5 x 1.2 inches", "21.6 x 14 x 2.8 cm", etc.
+    const matches = dimensionText.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
+    if (!matches) {
+      return { width: null, height: null, depth: null };
+    }
+    
+    let [, dim1Str, dim2Str, dim3Str] = matches;
+    let dim1 = parseFloat(dim1Str);
+    let dim2 = parseFloat(dim2Str);
+    let dim3 = parseFloat(dim3Str);
+    
+    // Convert to inches if needed (assuming cm if any dimension > 15)
+    if (dim1 > 15 || dim2 > 15 || dim3 > 15) {
+      dim1 = dim1 / 2.54; // cm to inches
+      dim2 = dim2 / 2.54;
+      dim3 = dim3 / 2.54;
+    }
+    
+    // Sort dimensions to identify them logically
+    const dimensions = [dim1, dim2, dim3].sort((a, b) => b - a); // largest to smallest
+    const [largest, middle, smallest] = dimensions;
+    
+    // Detect coffee table books or art books (usually wider than tall)
+    const isCoffeeTableBook = title && (
+      title.toLowerCase().includes('coffee') ||
+      title.toLowerCase().includes('art') ||
+      title.toLowerCase().includes('photography') ||
+      title.toLowerCase().includes('design') ||
+      title.toLowerCase().includes('architecture') ||
+      // Look for patterns that suggest landscape orientation
+      (largest / middle > 1.3 && largest > 8) // significantly wider than tall and large
+    );
+    
+    let width: number, height: number, depth: number;
+    
+    if (isCoffeeTableBook) {
+      // For coffee table books: width > height is expected
+      width = largest;  // widest dimension
+      height = middle;  // second largest
+      depth = smallest; // thinnest
+    } else {
+      // For regular books: height should be the largest dimension
+      height = largest; // tallest dimension
+      width = middle;   // second largest
+      depth = smallest; // thinnest
+    }
+    
+    // Round to 2 decimal places
+    return {
+      width: Math.round(width * 100) / 100,
+      height: Math.round(height * 100) / 100,
+      depth: Math.round(depth * 100) / 100
+    };
+    
+  } catch (error) {
+    console.warn('Failed to parse book dimensions:', dimensionText, error);
+    return { width: null, height: null, depth: null };
+  }
+}
 import { insertBookSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -464,7 +535,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      console.log(`Refreshing book ${existingBook.title}: dimensions = ${extractedDimensions}, author = ${author}, categories = ${categories}`);
+      // Parse individual dimensions intelligently
+      const finalDimensions = extractedDimensions || product.dimensions || existingBook.dimensions;
+      const parsedDimensions = parseAndAssignDimensions(finalDimensions, existingBook.title);
+      
+      console.log(`Refreshing book ${existingBook.title}: dimensions = ${finalDimensions}, parsed = w:${parsedDimensions.width}, h:${parsedDimensions.height}, d:${parsedDimensions.depth}, author = ${author}`);
 
       // Update the book with fresh data
       const updatedBook = await storage.updateBookData(id, {
@@ -476,7 +551,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         publisher: product.publisher || existingBook.publisher,
         language: product.language || existingBook.language,
         pages: product.pages || product.number_of_pages || existingBook.pages,
-        dimensions: extractedDimensions || product.dimensions || existingBook.dimensions,
+        dimensions: finalDimensions,
+        width: parsedDimensions.width?.toString() || null,
+        height: parsedDimensions.height?.toString() || null,
+        depth: parsedDimensions.depth?.toString() || null,
         weight: product.weight || existingBook.weight,
         rating: product.rating?.toString() || product.average_rating?.toString() || existingBook.rating,
         ratingsTotal: product.ratings_total || product.rating_breakdown?.total || existingBook.ratingsTotal,
@@ -606,6 +684,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 featureBullets = product.feature_bullets.filter((bullet: any) => typeof bullet === 'string' && bullet.trim());
               }
               
+              // Parse individual dimensions intelligently
+              const finalDimensions = extractedDimensions || book.dimensions;
+              const parsedDimensions = parseAndAssignDimensions(finalDimensions, book.title);
+              
               const updateData = {
                 title: product.title || book.title,
                 author: author,
@@ -619,13 +701,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 ratingsTotal: product.rating_breakdown?.five_star?.count || book.ratingsTotal,
                 categories: categories.length > 0 ? categories : book.categories,
                 featureBullets: featureBullets.length > 0 ? featureBullets : book.featureBullets,
-                dimensions: extractedDimensions || book.dimensions
+                dimensions: finalDimensions,
+                width: parsedDimensions.width?.toString() || null,
+                height: parsedDimensions.height?.toString() || null,
+                depth: parsedDimensions.depth?.toString() || null,
               };
               
               const updatedBook = await storage.updateBookData(book.id, updateData);
               if (updatedBook) {
                 refreshedBooks.push(updatedBook);
-                console.log(`Refreshed: ${book.title} -> dimensions: ${extractedDimensions}, author: ${author}`);
+                console.log(`Refreshed: ${book.title} -> dimensions: ${finalDimensions}, parsed: w:${parsedDimensions.width}, h:${parsedDimensions.height}, d:${parsedDimensions.depth}, author: ${author}`);
               }
             } else {
               // Keep original book if no product data
