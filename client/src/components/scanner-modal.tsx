@@ -9,9 +9,26 @@ import { useToast } from "@/hooks/use-toast";
 
 declare global {
   interface Window {
-    Quagga: any;
+    ScanbotSDK: any;
   }
 }
+
+const LICENSE_KEY =
+  "Tu3s2Bzp5RnZNZJmKHbry5Y32pUWdf" +
+  "dumS5FCKm8gGFUDdS46kSS9L19WGtW" +
+  "mLc7+TkeT6Vkj1U2R+sCZC7Mn7ySOz" +
+  "WNKCWyJlM3O7cbiE3tpir7Aq94p7v2" +
+  "bkyJEIZMCP62faX30EXS/VrJPirfWf" +
+  "XOAdUtuXKGNb2tX/rWnUzngyE9MDFh" +
+  "RAqmumfSgZJ7UA72vRGPVA9tLpOKR6" +
+  "LxAa5it5RZSm8WsUgcxraRWxy+2VNW" +
+  "FjPOBlOPfu8OdEZUV7hAuZOPj9paw8" +
+  "JOKuvPT2ahcw9n8sca45J0muhtvb2H" +
+  "cLbB1wfAcLRR9xR+82dT6U1uw87E/i" +
+  "al9FO6NSPg7g==\nU2NhbmJvdFNESw" +
+  "psb2NhbGhvc3R8dmFuYWhlaW0uY29t" +
+  "LmF1CjE3NTYzMzkxOTkKODM4ODYwNw" +
+  "o4\n";
 
 interface ScannerModalProps {
   isOpen: boolean;
@@ -22,7 +39,9 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   const [manualIsbn, setManualIsbn] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [isLookingUp, setIsLookingUp] = useState(false);
-  const videoRef = useRef<HTMLDivElement>(null);
+  const [isSDKLoaded, setIsSDKLoaded] = useState(false);
+  const scannerRef = useRef<HTMLDivElement>(null);
+  const scanbotSDK = useRef<any>(null);
   const { toast } = useToast();
 
   const lookupMutation = useMutation({
@@ -69,59 +88,63 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
     },
   });
 
-  const startScanner = () => {
-    if (!videoRef.current || !window.Quagga) {
+  const startScanner = async () => {
+    if (!scanbotSDK.current || !isSDKLoaded) {
       toast({
         title: "Scanner Error",
-        description: "Camera scanner is not available. Please enter ISBN manually.",
+        description: "Scanner SDK is not loaded. Please enter ISBN manually.",
         variant: "destructive",
       });
       return;
     }
 
-    setIsScanning(true);
-
-    window.Quagga.init({
-      inputStream: {
-        name: "Live",
-        type: "LiveStream",
-        target: videoRef.current,
-        constraints: {
-          width: 640,
-          height: 480,
-          facingMode: "environment"
+    try {
+      setIsScanning(true);
+      
+      const config = {
+        containerId: 'scanbot-camera-container',
+        text: {
+          hint: 'Position barcode in the frame to scan',
+          loadingText: 'Loading camera...',
         },
-      },
-      decoder: {
-        readers: ["ean_reader", "ean_8_reader", "code_128_reader"]
-      },
-    }, (err: any) => {
-      if (err) {
-        console.log(err);
-        toast({
-          title: "Camera Error",
-          description: "Could not access camera. Please enter ISBN manually.",
-          variant: "destructive",
-        });
-        setIsScanning(false);
-        return;
-      }
-      window.Quagga.start();
-    });
+        overlay: {
+          visible: true,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        },
+        formats: [
+          'EAN_8', 'EAN_13', 'UPC_A', 'UPC_E',
+          'CODE_39', 'CODE_93', 'CODE_128',
+          'ITF', 'RSS_14', 'RSS_EXPANDED'
+        ],
+      };
 
-    window.Quagga.onDetected((data: any) => {
-      const isbn = data.codeResult.code;
-      if (isbn && isbn.length >= 10) {
-        window.Quagga.stop();
+      const result = await scanbotSDK.current.createBarcodeScanner(config);
+      
+      if (result && result.items && result.items.length > 0) {
+        const scannedCode = result.items[0].text;
         setIsScanning(false);
-        lookupMutation.mutate(isbn);
+        if (scannedCode && scannedCode.length >= 10) {
+          lookupMutation.mutate(scannedCode);
+        }
       }
-    });
+    } catch (error) {
+      console.error('Scanbot scanning error:', error);
+      setIsScanning(false);
+      toast({
+        title: "Camera Error",
+        description: "Could not access camera. Please enter ISBN manually.",
+        variant: "destructive",
+      });
+    }
   };
 
   const stopScanner = () => {
-    if (window.Quagga) {
-      window.Quagga.stop();
+    if (scanbotSDK.current) {
+      try {
+        scanbotSDK.current.dispose();
+      } catch (error) {
+        console.error('Error stopping scanner:', error);
+      }
     }
     setIsScanning(false);
   };
@@ -146,19 +169,46 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   };
 
   useEffect(() => {
-    if (isOpen) {
-      // Load QuaggaJS dynamically
-      const script = document.createElement('script');
-      script.src = 'https://unpkg.com/quagga@0.12.1/dist/quagga.min.js';
-      script.onload = () => {
-        // QuaggaJS loaded
+    if (isOpen && !isSDKLoaded) {
+      const loadScanbotSDK = async () => {
+        try {
+          // Load Scanbot SDK dynamically
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/scanbot-web-sdk@7.2.0/bundle/ScanbotSDK.ui2.min.js';
+          script.onload = async () => {
+            try {
+              // Initialize the SDK
+              const sdk = await window.ScanbotSDK.initialize({
+                licenseKey: LICENSE_KEY,
+                enginePath: 'https://cdn.jsdelivr.net/npm/scanbot-web-sdk@7.2.0/bundle/bin/complete/',
+              });
+              scanbotSDK.current = sdk;
+              setIsSDKLoaded(true);
+            } catch (error) {
+              console.error('Failed to initialize Scanbot SDK:', error);
+              toast({
+                title: "Scanner Initialization Error",
+                description: "Failed to initialize barcode scanner. Please enter ISBN manually.",
+                variant: "destructive",
+              });
+            }
+          };
+          script.onerror = () => {
+            console.error('Failed to load Scanbot SDK script');
+            toast({
+              title: "Scanner Load Error",
+              description: "Failed to load barcode scanner. Please enter ISBN manually.",
+              variant: "destructive",
+            });
+          };
+          document.head.appendChild(script);
+        } catch (error) {
+          console.error('Error loading Scanbot SDK:', error);
+        }
       };
-      document.head.appendChild(script);
-
-      return () => {
-        document.head.removeChild(script);
-      };
-    } else {
+      
+      loadScanbotSDK();
+    } else if (!isOpen) {
       stopScanner();
     }
   }, [isOpen]);
@@ -178,27 +228,36 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
         <div className="space-y-6">
           {/* Camera Preview */}
           <div className="relative bg-gray-900 rounded-lg overflow-hidden" style={{ aspectRatio: '4/3' }}>
-            <div ref={videoRef} className="w-full h-full" data-testid="camera-preview" />
+            <div 
+              id="scanbot-camera-container" 
+              ref={scannerRef} 
+              className="w-full h-full" 
+              data-testid="camera-preview" 
+            />
             {!isScanning && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <Button onClick={startScanner} className="bg-primary text-white" data-testid="button-start-scanner">
+                <Button 
+                  onClick={startScanner} 
+                  className="primary-button" 
+                  disabled={!isSDKLoaded}
+                  data-testid="button-start-scanner"
+                >
                   <Camera className="w-4 h-4 mr-2" />
-                  Start Camera
+                  {isSDKLoaded ? 'Start Scanner' : 'Loading Scanner...'}
                 </Button>
               </div>
             )}
             {isScanning && (
               <>
-                <div className="scanner-overlay absolute inset-0">
-                  <div className="absolute inset-4 border-2 border-white border-opacity-30 rounded"></div>
-                  <div className="scan-line"></div>
-                </div>
-                <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded">
-                  Position barcode in frame
+                <div className="absolute top-4 left-4 bg-black bg-opacity-75 text-white text-sm px-3 py-2 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-coral-red rounded-full animate-pulse"></div>
+                    <span>Scanning for barcodes...</span>
+                  </div>
                 </div>
                 <Button
                   onClick={stopScanner}
-                  className="absolute top-4 right-4 bg-black bg-opacity-50 text-white"
+                  className="absolute top-4 right-4 bg-coral-red text-white hover:bg-red-600"
                   size="sm"
                   data-testid="button-stop-scanner"
                 >
