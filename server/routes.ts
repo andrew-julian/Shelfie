@@ -61,49 +61,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Extract categories properly
-      let categories = [];
+      let categories: string[] = [];
       if (product.categories && Array.isArray(product.categories)) {
-        categories = product.categories.map(cat => {
+        categories = product.categories.map((cat: any) => {
           if (typeof cat === 'string') return cat;
           if (cat && cat.name) return cat.name;
           if (cat && cat.category) return cat.category;
           return null;
         }).filter(Boolean);
       } else if (product.category_path && Array.isArray(product.category_path)) {
-        categories = product.category_path.map(cat => cat.name || cat).filter(Boolean);
+        categories = product.category_path.map((cat: any) => cat.name || cat).filter(Boolean);
       }
       
       // Extract feature bullets
-      let featureBullets = [];
+      let featureBullets: string[] = [];
       if (product.feature_bullets && Array.isArray(product.feature_bullets)) {
-        featureBullets = product.feature_bullets.filter(bullet => typeof bullet === 'string' && bullet.trim());
+        featureBullets = product.feature_bullets.filter((bullet: any) => typeof bullet === 'string' && bullet.trim());
       }
       
       // Extract dimensions and weight more reliably
-      let dimensions = null;
-      let weight = null;
+      let dimensions: string | null = null;
+      let weight: string | null = null;
       
       if (product.specifications) {
-        const specs = product.specifications;
-        if (specs.dimensions) dimensions = specs.dimensions;
-        if (specs.weight) weight = specs.weight;
+        const specs = product.specifications as any;
+        if (specs.dimensions) dimensions = String(specs.dimensions);
+        if (specs.weight) weight = String(specs.weight);
         
         // Also check in other common spec locations
-        Object.values(specs).forEach(spec => {
+        Object.values(specs).forEach((spec: any) => {
           if (typeof spec === 'object' && spec) {
-            if (spec.dimensions && !dimensions) dimensions = spec.dimensions;
-            if (spec.weight && !weight) weight = spec.weight;
+            if (spec.dimensions && !dimensions) dimensions = String(spec.dimensions);
+            if (spec.weight && !weight) weight = String(spec.weight);
           }
         });
       }
       
       // Check product details for additional info
       if (product.product_details) {
-        const details = product.product_details;
+        const details = product.product_details as any;
         Object.entries(details).forEach(([key, value]) => {
           const lowerKey = key.toLowerCase();
-          if (lowerKey.includes('dimension') && !dimensions) dimensions = value;
-          if (lowerKey.includes('weight') && !weight) weight = value;
+          if (lowerKey.includes('dimension') && !dimensions) dimensions = String(value);
+          if (lowerKey.includes('weight') && !weight) weight = String(value);
         });
       }
       
@@ -137,7 +137,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(bookData);
     } catch (error) {
       console.error("ISBN lookup error:", error);
-      res.status(500).json({ message: "Failed to lookup book", error: error.message });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ message: "Failed to lookup book", error: errorMessage });
     }
   });
 
