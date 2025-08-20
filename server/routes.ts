@@ -40,14 +40,13 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
     
     // Detect coffee table books and handle their landscape orientation
     const isCoffeeTableBook = title && (
-      title.toLowerCase().includes('coffee') ||
-      title.toLowerCase().includes('art') ||
-      title.toLowerCase().includes('photography') ||
-      title.toLowerCase().includes('design') ||
-      title.toLowerCase().includes('architecture') ||
-      title.toLowerCase().includes('westography') // Specific case
-      // Note: Removed general aspect ratio detection as it was too broad
-      // Most regular books naturally have height > width
+      /\bcoffee\b/i.test(title) ||
+      /\bart\b/i.test(title) ||
+      /\bphotography\b/i.test(title) ||
+      /\bdesign\b/i.test(title) ||
+      /\barchitecture\b/i.test(title) ||
+      title.toLowerCase().includes('westography') // Specific case (keep as substring)
+      // Note: Using word boundaries (\b) to avoid false positives like "Illustrated" containing "art"
     );
     
     // For coffee table books, swap width and height to achieve width > height
