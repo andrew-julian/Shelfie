@@ -69,16 +69,16 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
       onMouseLeave={() => setIsHovered(false)}
       data-testid={`card-book-${book.id}`}
     >
-      <div className="book-container mb-3">
-        <div className="book-3d">
+      <div className="book-container mb-3" onClick={() => onSelect(book)}>
+        <div className="book">
           {book.coverImage ? (
             <img 
               src={book.coverImage} 
               alt={`${book.title} book cover`}
-              className="book-cover w-full h-48 object-cover" 
+              className="object-cover w-full h-full"
             />
           ) : (
-            <div className="book-cover w-full h-48 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white font-medium">
+            <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white font-medium">
               <span className="text-sm text-center px-2">No Cover Available</span>
             </div>
           )}
