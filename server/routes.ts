@@ -422,6 +422,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // If no dimensions found and product is digital (audiobook/ebook), check physical variants
+      if (!extractedDimensions && product.variants && Array.isArray(product.variants)) {
+        const physicalFormats = ['hardcover', 'paperback', 'mass market paperback', 'library binding'];
+        
+        for (const variant of product.variants) {
+          if (variant && variant.title) {
+            const variantTitle = variant.title.toLowerCase();
+            if (physicalFormats.some(format => variantTitle.includes(format))) {
+              console.log(`Found physical variant: ${variant.title} (ASIN: ${variant.asin})`);
+              
+              // Make API call to get variant's detailed specifications
+              try {
+                const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=amazon.com`;
+                const variantResponse = await fetch(variantUrl);
+                
+                if (variantResponse.ok) {
+                  const variantData = await variantResponse.json();
+                  
+                  if (variantData.product && variantData.product.specifications) {
+                    for (const spec of variantData.product.specifications) {
+                      if (spec && typeof spec === 'object' && spec.name && spec.value) {
+                        const name = String(spec.name).toLowerCase();
+                        if (name.includes('dimension')) {
+                          extractedDimensions = String(spec.value);
+                          console.log(`Found dimensions in ${variant.title}: ${extractedDimensions}`);
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+              } catch (variantError) {
+                console.error(`Failed to fetch variant ${variant.asin}:`, variantError);
+              }
+              
+              // If we found dimensions, break out of variant loop
+              if (extractedDimensions) break;
+            }
+          }
+        }
+      }
+
       console.log(`Refreshing book ${existingBook.title}: dimensions = ${extractedDimensions}, author = ${author}, categories = ${categories}`);
 
       // Update the book with fresh data
@@ -511,6 +553,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
                         extractedDimensions = String(spec.value);
                         break;
                       }
+                    }
+                  }
+                }
+              }
+              
+              // If no dimensions found and product is digital (audiobook/ebook), check physical variants
+              if (!extractedDimensions && product.variants && Array.isArray(product.variants)) {
+                const physicalFormats = ['hardcover', 'paperback', 'mass market paperback', 'library binding'];
+                
+                for (const variant of product.variants) {
+                  if (variant && variant.title) {
+                    const variantTitle = variant.title.toLowerCase();
+                    if (physicalFormats.some(format => variantTitle.includes(format))) {
+                      console.log(`Found physical variant: ${variant.title} (ASIN: ${variant.asin})`);
+                      
+                      // Make API call to get variant's detailed specifications
+                      try {
+                        const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=amazon.com`;
+                        const variantResponse = await fetch(variantUrl);
+                        
+                        if (variantResponse.ok) {
+                          const variantData = await variantResponse.json();
+                          
+                          if (variantData.product && variantData.product.specifications) {
+                            for (const spec of variantData.product.specifications) {
+                              if (spec && typeof spec === 'object' && spec.name && spec.value) {
+                                const name = String(spec.name).toLowerCase();
+                                if (name.includes('dimension')) {
+                                  extractedDimensions = String(spec.value);
+                                  console.log(`Found dimensions in ${variant.title}: ${extractedDimensions}`);
+                                  break;
+                                }
+                              }
+                            }
+                          }
+                        }
+                      } catch (variantError) {
+                        console.error(`Failed to fetch variant ${variant.asin}:`, variantError);
+                      }
+                      
+                      // If we found dimensions, break out of variant loop
+                      if (extractedDimensions) break;
                     }
                   }
                 }
