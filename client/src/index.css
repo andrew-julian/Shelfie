@@ -106,8 +106,8 @@
   }
 
   .book {
-    width: 200px;
-    height: 300px;
+    width: 120px;
+    height: 180px;
     position: relative;
     transform-style: preserve-3d;
     transform: rotateY(-30deg);
@@ -124,9 +124,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    background-color: red;
-    width: 200px;
-    height: 300px;
+    width: 120px;
+    height: 180px;
     transform: translateZ(15px);
     background-color: #01060f;
     border-radius: 0 2px 2px 0;
@@ -136,12 +135,11 @@
   .book::before {
     position: absolute;
     content: ' ';
-    background-color: blue;
     left: 0;
     top: 1px;
-    width: 28px;
-    height: 298px;
-    transform: translateX(184px) rotateY(90deg);
+    width: 17px;
+    height: 178px;
+    transform: translateX(110px) rotateY(90deg);
     background: linear-gradient(90deg, 
       #fff 0%,
       #f9f9f9 5%,
@@ -172,8 +170,8 @@
     top: 0;
     left: 0;
     content: ' ';
-    width: 200px;
-    height: 300px;
+    width: 120px;
+    height: 180px;
     transform: translateZ(-15px);
     background-color: #01060f;
     border-radius: 0 2px 2px 0;
