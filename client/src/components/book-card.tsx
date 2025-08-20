@@ -12,9 +12,9 @@ interface BookCardProps {
 }
 
 const statusConfig = {
-  'want-to-read': { label: 'Want to Read', className: 'bg-blue-100 text-blue-800' },
-  'reading': { label: 'Reading', className: 'bg-amber-100 text-amber-800' },
-  'read': { label: 'Read', className: 'bg-green-100 text-green-800' },
+  'want-to-read': { label: 'Want to Read', className: 'bg-gray-100 text-monochrome-black border border-gray-300' },
+  'reading': { label: 'Reading', className: 'bg-sky-blue text-white' },
+  'read': { label: 'Read', className: 'bg-coral-red text-white' },
 };
 
 export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
@@ -63,7 +63,7 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
 
   return (
     <div 
-      className="book-card bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-4 border border-gray-200 cursor-pointer"
+      className="book-card bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 cursor-pointer"
       onClick={() => onSelect(book)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -85,24 +85,24 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
         </div>
       </div>
       
-      <h3 className="font-medium text-sm text-gray-900 mb-1 line-clamp-2" data-testid={`text-book-title-${book.id}`}>
+      <h3 className="font-bold text-sm text-monochrome-black mb-2 line-clamp-2 leading-tight" data-testid={`text-book-title-${book.id}`}>
         {book.title}
       </h3>
-      <p className="text-xs text-gray-600 mb-2" data-testid={`text-book-author-${book.id}`}>
+      <p className="text-xs text-gray-600 mb-3 font-medium" data-testid={`text-book-author-${book.id}`}>
         {book.author}
       </p>
       
       <div className="flex items-center justify-between">
         <button
           onClick={handleStatusClick}
-          className={`text-xs px-2 py-1 rounded-full transition-colors ${statusInfo.className} hover:opacity-80`}
+          className={`text-xs px-3 py-1.5 rounded-lg transition-all font-medium ${statusInfo.className} hover:scale-105`}
           disabled={updateStatusMutation.isPending}
           data-testid={`button-status-${book.id}`}
         >
           {updateStatusMutation.isPending ? 'Updating...' : statusInfo.label}
         </button>
         <button 
-          className="text-gray-400 hover:text-primary transition-colors"
+          className="text-gray-400 hover:text-coral-red transition-colors p-1 rounded-lg hover:bg-gray-50"
           onClick={(e) => {
             e.stopPropagation();
             onSelect(book);

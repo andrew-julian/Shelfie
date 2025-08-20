@@ -13,17 +13,21 @@ export default {
       },
       colors: {
         primary: {
-          DEFAULT: 'hsl(203, 88%, 53%)',
-          foreground: 'hsl(0, 0%, 100%)',
+          DEFAULT: '#111111',
+          foreground: '#FFFFFF',
         },
         secondary: {
-          DEFAULT: 'hsl(0, 0%, 26%)',
-          foreground: 'hsl(0, 0%, 100%)',
+          DEFAULT: '#F8F9FA',
+          foreground: '#111111',
         },
         accent: {
-          DEFAULT: 'hsl(36, 100%, 58%)',
-          foreground: 'hsl(0, 0%, 100%)',
+          DEFAULT: '#FF3B5F',
+          foreground: '#FFFFFF',
         },
+        'coral-red': '#FF3B5F',
+        'sky-blue': '#449CFF',
+        'monochrome-black': '#111111',
+        'monochrome-white': '#FFFFFF',
         background: "var(--background)",
         foreground: "var(--foreground)",
         card: {

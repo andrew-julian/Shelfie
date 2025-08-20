@@ -30,15 +30,15 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Header booksCount={books.length} />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-light text-gray-900 mb-2">Your Digital Library</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Scan barcodes to instantly add books to your collection. Browse, organize, and discover your reading journey.
+      <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
+        {/* Hero Section */}
+        <div className="mb-16 text-center">
+          <h2 className="text-5xl font-bold text-monochrome-black mb-6 tracking-tight leading-tight">Your Digital Library</h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Scan barcodes to instantly add books to your collection. Browse, organize, and discover your reading journey with modern simplicity.
           </p>
         </div>
 
@@ -79,10 +79,10 @@ export default function Home() {
             </div>
             <button
               onClick={() => setIsScannerOpen(true)}
-              className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="primary-button inline-flex items-center text-lg font-semibold"
               data-testid="button-scan-first-book"
             >
-              <Camera className="w-4 h-4 mr-2" />
+              <Camera className="w-5 h-5 mr-3" />
               Scan Your First Book
             </button>
           </div>
@@ -95,7 +95,7 @@ export default function Home() {
         className="floating-action-button"
         data-testid="button-floating-scan"
       >
-        <Camera className="w-5 h-5" />
+        <Camera className="w-6 h-6" />
       </button>
 
       {/* Modals */}
