@@ -89,7 +89,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   });
 
   const startScanner = async () => {
-    if (!scanbotSDK.current || !isSDKLoaded) {
+    if (!window.ScanbotSDK || !isSDKLoaded) {
       toast({
         title: "Scanner Error",
         description: "Scanner SDK is not loaded. Please enter ISBN manually.",
@@ -101,31 +101,40 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
     try {
       setIsScanning(true);
       
-      const config = {
-        containerId: 'scanbot-camera-container',
-        text: {
-          hint: 'Position barcode in the frame to scan',
-          loadingText: 'Loading camera...',
-        },
-        overlay: {
-          visible: true,
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-        },
-        formats: [
-          'EAN_8', 'EAN_13', 'UPC_A', 'UPC_E',
-          'CODE_39', 'CODE_93', 'CODE_128',
-          'ITF', 'RSS_14', 'RSS_EXPANDED'
-        ],
-      };
-
-      const result = await scanbotSDK.current.createBarcodeScanner(config);
+      // Create proper Scanbot SDK configuration
+      const config = new window.ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration();
+      
+      // Configure barcode formats
+      config.scannerConfiguration.barcodeFormats = [
+        'EAN_8', 'EAN_13', 'UPC_A', 'UPC_E',
+        'CODE_39', 'CODE_93', 'CODE_128',
+        'ITF', 'RSS_14', 'RSS_EXPANDED'
+      ];
+      
+      // Configure UI
+      config.topBarConfiguration.title = 'Scan Book Barcode';
+      config.userGuidanceConfiguration.title = 'Position barcode in the frame';
+      config.userGuidanceConfiguration.background.fillColor = '#000000CC';
+      
+      // Create and present the scanner
+      const result = await window.ScanbotSDK.UI.createBarcodeScanner(config);
+      
+      setIsScanning(false);
       
       if (result && result.items && result.items.length > 0) {
-        const scannedCode = result.items[0].text;
-        setIsScanning(false);
+        const scannedCode = result.items[0].barcode.text;
         if (scannedCode && scannedCode.length >= 10) {
           lookupMutation.mutate(scannedCode);
+        } else {
+          toast({
+            title: "Invalid Barcode",
+            description: "Please scan a valid ISBN barcode (10-13 digits).",
+            variant: "destructive",
+          });
         }
+      } else {
+        // User cancelled or no barcode found
+        console.log('Scanner cancelled or no barcode detected');
       }
     } catch (error) {
       console.error('Scanbot scanning error:', error);
@@ -139,13 +148,8 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   };
 
   const stopScanner = () => {
-    if (scanbotSDK.current) {
-      try {
-        scanbotSDK.current.dispose();
-      } catch (error) {
-        console.error('Error stopping scanner:', error);
-      }
-    }
+    // Scanbot SDK handles scanner lifecycle automatically
+    // No need to manually dispose when using UI components
     setIsScanning(false);
   };
 
@@ -178,11 +182,10 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
           script.onload = async () => {
             try {
               // Initialize the SDK
-              const sdk = await window.ScanbotSDK.initialize({
+              await window.ScanbotSDK.initialize({
                 licenseKey: LICENSE_KEY,
                 enginePath: 'https://cdn.jsdelivr.net/npm/scanbot-web-sdk@7.2.0/bundle/bin/complete/',
               });
-              scanbotSDK.current = sdk;
               setIsSDKLoaded(true);
             } catch (error) {
               console.error('Failed to initialize Scanbot SDK:', error);
@@ -229,7 +232,6 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
           {/* Camera Preview */}
           <div className="relative bg-gray-900 rounded-lg overflow-hidden" style={{ aspectRatio: '4/3' }}>
             <div 
-              id="scanbot-camera-container" 
               ref={scannerRef} 
               className="w-full h-full" 
               data-testid="camera-preview" 
