@@ -137,25 +137,32 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
 
   const statusInfo = statusConfig[book.status as keyof typeof statusConfig] || statusConfig['want-to-read'];
 
+  // Calculate cover color from book properties
+  const getCoverColor = () => {
+    if (!book.coverImage) return '#4a5568'; // Default gray
+    // You could extract dominant color from cover image here if needed
+    return '#2d3748'; // Default dark gray for books with covers
+  };
+
   return (
     <div className="group relative">
       <div 
-        className="book-container cursor-pointer"
+        className="book-3d cursor-pointer"
         onClick={() => onSelect(book)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         data-testid={`card-book-${book.id}`}
+        style={{
+          '--book-thickness': `${bookDimensions.depth}px`,
+          '--cover-color': getCoverColor(),
+          width: `${bookDimensions.width}px`,
+          height: `${bookDimensions.height}px`
+        } as React.CSSProperties}
       >
-        <div 
-          className="book"
-          style={{
-            width: `${bookDimensions.width}px`,
-            height: `${bookDimensions.height}px`
-          }}
-        >
-          {/* Book Cover */}
+        <div className="book-3d__inner">
           {book.coverImage ? (
             <img 
+              className="book-3d__cover"
               src={book.coverImage} 
               alt={`${book.title} book cover`}
               style={{
@@ -165,7 +172,7 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
             />
           ) : (
             <div 
-              className="bg-gradient-to-br from-gray-300 to-gray-400 flex flex-col items-center justify-center text-white"
+              className="book-3d__placeholder"
               style={{
                 width: `${bookDimensions.width}px`,
                 height: `${bookDimensions.height}px`
@@ -175,16 +182,6 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
               <span className="text-xs font-medium text-center px-2 leading-tight">{book.title}</span>
             </div>
           )}
-          
-          {/* White Spine */}
-          <div 
-            className="book-spine"
-            style={{
-              width: `${bookDimensions.depth * 3.5}px`,
-              height: `${bookDimensions.height - 2}px`,
-              transform: `translateX(${bookDimensions.width}px) rotateY(90deg)`
-            }}
-          />
         </div>
         
         {/* Status Tag */}
