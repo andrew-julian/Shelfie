@@ -141,8 +141,7 @@
   }
 
   .book {
-    width: 140px;
-    height: 200px;
+    /* Dynamic dimensions set via style prop */
     position: relative;
     transform-style: preserve-3d;
     transform: rotateY(-30deg);
@@ -159,9 +158,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 140px;
-    height: 200px;
-    transform: translateZ(15px);
+    /* Dynamic dimensions set via style prop */
+    transform: translateZ(var(--book-depth, 15px));
     background-color: #01060f;
     border-radius: 0 2px 2px 0;
     box-shadow: 5px 5px 20px #666;
@@ -180,9 +178,9 @@
     content: ' ';
     left: 0;
     top: 1px;
-    width: 28px;
-    height: 198px;
-    transform: translateX(126px) rotateY(90deg);
+    width: calc(var(--book-depth, 15px) * 1.8);
+    height: calc(100% - 2px);
+    transform: translateX(calc(100% - var(--book-depth, 15px))) rotateY(90deg);
     background: linear-gradient(90deg, 
       #fff 0%,
       #f9f9f9 5%,
@@ -213,9 +211,9 @@
     top: 0;
     left: 0;
     content: ' ';
-    width: 140px;
-    height: 200px;
-    transform: translateZ(-15px);
+    width: 100%;
+    height: 100%;
+    transform: translateZ(calc(-1 * var(--book-depth, 15px)));
     background-color: #01060f;
     border-radius: 0 2px 2px 0;
     box-shadow: -10px 0 50px 10px #666;

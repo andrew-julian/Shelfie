@@ -60,6 +60,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         author = product.brand;
       }
       
+      // Enhanced dimensions extraction
+      let extractedDimensions: string | null = null;
+      
+      // Check multiple possible locations for dimensions
+      if (product.details && product.details.dimensions) {
+        extractedDimensions = String(product.details.dimensions);
+      } else if (product.product_details) {
+        // Check product details for dimension entries
+        Object.entries(product.product_details as any).forEach(([key, value]) => {
+          const lowerKey = key.toLowerCase();
+          if ((lowerKey.includes('dimension') || lowerKey.includes('size')) && value && !extractedDimensions) {
+            extractedDimensions = String(value);
+          }
+        });
+      }
+      
+      // Check specifications for dimensions
+      if (!extractedDimensions && product.specifications) {
+        const specs = product.specifications as any;
+        if (specs.dimensions) {
+          extractedDimensions = String(specs.dimensions);
+        } else {
+          // Look through all spec values for dimension-like data
+          Object.entries(specs).forEach(([key, value]) => {
+            const lowerKey = key.toLowerCase();
+            if ((lowerKey.includes('dimension') || lowerKey.includes('size')) && value && !extractedDimensions) {
+              extractedDimensions = String(value);
+            }
+          });
+        }
+      }
+      
+      console.log('Extracted dimensions:', extractedDimensions);
+      
       // Extract categories properly
       let categories: string[] = [];
       if (product.categories && Array.isArray(product.categories)) {
@@ -119,7 +153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         publisher: product.publisher || null,
         language: product.language || null,
         pages: product.pages || product.number_of_pages || null,
-        dimensions: dimensions || product.dimensions || null,
+        dimensions: extractedDimensions || dimensions || product.dimensions || null,
         weight: weight || product.weight || null,
         rating: product.rating?.toString() || product.average_rating?.toString() || null,
         ratingsTotal: product.ratings_total || product.rating_breakdown?.total || null,

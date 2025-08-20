@@ -5,6 +5,59 @@ import { BookOpen } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
+// Utility to parse book dimensions and convert to CSS dimensions
+function parseBookDimensions(dimensions: string | null): { width: number; height: number; depth: number } {
+  const defaultDimensions = { width: 140, height: 200, depth: 15 };
+  
+  if (!dimensions) return defaultDimensions;
+  
+  try {
+    // Parse various dimension formats like "8.5 x 5.5 x 1.2 inches", "21.6 x 14 x 2.8 cm", etc.
+    const matches = dimensions.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
+    if (!matches) return defaultDimensions;
+    
+    let [, widthStr, heightStr, depthStr] = matches;
+    let width = parseFloat(widthStr);
+    let height = parseFloat(heightStr); 
+    let depth = parseFloat(depthStr);
+    
+    // Convert to inches if needed (assuming cm if > 15)
+    if (width > 15) {
+      width = width / 2.54; // cm to inches
+      height = height / 2.54;
+      depth = depth / 2.54;
+    }
+    
+    // Scale to reasonable CSS pixels (multiply by ~28 for good visual scale)
+    const scale = 28;
+    
+    return {
+      width: Math.round(width * scale),
+      height: Math.round(height * scale), 
+      depth: Math.max(Math.round(depth * scale * 0.5), 8) // Minimum depth for 3D effect
+    };
+  } catch (error) {
+    console.warn('Failed to parse book dimensions:', dimensions, error);
+    return defaultDimensions;
+  }
+}
+
+// Calculate aspect ratio constraints for realistic proportions
+function constrainBookDimensions(dims: { width: number; height: number; depth: number }) {
+  const minWidth = 100;
+  const maxWidth = 180;
+  const minHeight = 140;
+  const maxHeight = 280;
+  const minDepth = 8;
+  const maxDepth = 25;
+  
+  return {
+    width: Math.max(minWidth, Math.min(maxWidth, dims.width)),
+    height: Math.max(minHeight, Math.min(maxHeight, dims.height)),
+    depth: Math.max(minDepth, Math.min(maxDepth, dims.depth))
+  };
+}
+
 interface BookCardProps {
   book: Book;
   onSelect: (book: Book) => void;
@@ -20,6 +73,10 @@ const statusConfig = {
 export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { toast } = useToast();
+  
+  // Calculate book dimensions based on real-world data
+  const rawDimensions = parseBookDimensions(book.dimensions);
+  const bookDimensions = constrainBookDimensions(rawDimensions);
 
   const updateStatusMutation = useMutation({
     mutationFn: async (newStatus: string) => {
@@ -70,8 +127,20 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
         onMouseLeave={() => setIsHovered(false)}
         data-testid={`card-book-${book.id}`}
       >
-        <div className="book">
-          <div>
+        <div 
+          className="book"
+          style={{
+            width: `${bookDimensions.width}px`,
+            height: `${bookDimensions.height}px`,
+            '--book-depth': `${bookDimensions.depth}px`
+          } as React.CSSProperties & { '--book-depth': string }}
+        >
+          <div
+            style={{
+              width: `${bookDimensions.width}px`,
+              height: `${bookDimensions.height}px`
+            }}
+          >
             {book.coverImage ? (
               <img 
                 src={book.coverImage} 
