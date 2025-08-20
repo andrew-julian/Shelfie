@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { X, Camera, Search } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 declare global {
   interface Window {
@@ -57,29 +58,48 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       return response.json();
     },
     onSuccess: async (bookData) => {
-      // Add book to library
-      const addResponse = await fetch('/api/books', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookData),
-      });
-      
-      if (addResponse.ok) {
-        queryClient.invalidateQueries({ queryKey: ['/api/books'] });
-        toast({
-          title: "Success!",
-          description: "Book added to your library",
+      try {
+        // Add book to library
+        const addResponse = await fetch('/api/books', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bookData),
         });
-        handleClose();
-      } else {
-        const error = await addResponse.json();
-        throw new Error(error.message || 'Failed to add book');
+        
+        if (addResponse.ok) {
+          queryClient.invalidateQueries({ queryKey: ['/api/books'] });
+          toast({
+            title: "Success!",
+            description: "Book added to your library",
+          });
+          handleClose();
+        } else {
+          const error = await addResponse.json();
+          throw new Error(error.message || 'Failed to add book');
+        }
+      } catch (error) {
+        console.error('Error in book addition:', error);
+        throw error; // Re-throw to be handled by onError
       }
     },
     onError: (error: Error) => {
+      console.error('Book lookup/add error:', error);
+      
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to add book. Please try again.",
         variant: "destructive",
       });
     },
@@ -133,7 +153,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       setIsScanning(false);
       toast({
         title: "Camera Error",
-        description: `Could not access camera: ${error.message}. Please enter ISBN manually.`,
+        description: `Could not access camera: ${(error as Error).message}. Please enter ISBN manually.`,
         variant: "destructive",
       });
     }
@@ -185,7 +205,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
               console.error('Failed to initialize Scanbot SDK:', error);
               toast({
                 title: "Scanner Initialization Error",
-                description: `Failed to initialize barcode scanner: ${error.message}. Please enter ISBN manually.`,
+                description: `Failed to initialize barcode scanner: ${(error as Error).message}. Please enter ISBN manually.`,
                 variant: "destructive",
               });
             }
