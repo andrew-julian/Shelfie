@@ -116,6 +116,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Enhanced data extraction
       console.log("Raw Rainforest API response:", JSON.stringify(data, null, 2));
       
+      // Extract all available cover images
+      let coverImages: string[] = [];
+      
+      // Add main image first if available
+      if (product.main_image?.link) {
+        coverImages.push(product.main_image.link);
+      }
+      
+      // Add all other images from the images array
+      if (product.images && Array.isArray(product.images)) {
+        const additionalImages = product.images
+          .map((img: any) => img.link || img)
+          .filter((link: string) => link && !coverImages.includes(link)); // Avoid duplicates
+        coverImages.push(...additionalImages);
+      }
+      
+      console.log("Extracted cover images:", coverImages);
+      
       // Extract author more comprehensively
       let author = "Unknown Author";
       if (product.authors && product.authors.length > 0) {
@@ -259,7 +277,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: product.title || "Unknown Title",
         author: author,
         description: product.description || featureBullets.join(". ") || "",
-        coverImage: product.main_image?.link || product.images?.[0]?.link || "",
+        coverImage: coverImages[0] || "",
+        coverImages: coverImages,
+        selectedCoverIndex: 0,
         publishYear: product.publication_date ? new Date(product.publication_date).getFullYear() : null,
         publishDate: product.publication_date || null,
         publisher: product.publisher || null,
@@ -358,6 +378,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update selected cover image
+  app.patch("/api/books/:id/cover", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { selectedCoverIndex } = req.body;
+      
+      if (typeof selectedCoverIndex !== 'number' || selectedCoverIndex < 0) {
+        return res.status(400).json({ message: "Invalid cover index" });
+      }
+      
+      const book = await storage.getBook(id);
+      if (!book) {
+        return res.status(404).json({ message: "Book not found" });
+      }
+      
+      if (!book.coverImages || selectedCoverIndex >= book.coverImages.length) {
+        return res.status(400).json({ message: "Cover index out of range" });
+      }
+      
+      const updatedBook = await storage.updateBookData(id, {
+        selectedCoverIndex,
+        coverImage: book.coverImages[selectedCoverIndex] // Update the main coverImage too
+      });
+      
+      res.json(updatedBook);
+    } catch (error) {
+      console.error("Cover update error:", error);
+      res.status(500).json({ message: "Failed to update cover selection" });
+    }
+  });
+
   // Refresh book data from API
   app.patch("/api/books/:id/refresh", async (req, res) => {
     try {
@@ -386,6 +437,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const product = data.product;
+      
+      // Extract all available cover images
+      let coverImages: string[] = [];
+      
+      // Add main image first if available
+      if (product.main_image?.link) {
+        coverImages.push(product.main_image.link);
+      }
+      
+      // Add all other images from the images array
+      if (product.images && Array.isArray(product.images)) {
+        const additionalImages = product.images
+          .map((img: any) => img.link || img)
+          .filter((link: string) => link && !coverImages.includes(link)); // Avoid duplicates
+        coverImages.push(...additionalImages);
+      }
+      
+      console.log("Extracted cover images for refresh:", coverImages);
       
       // Apply the same enhanced extraction logic
       let author = "Unknown Author";
@@ -540,7 +609,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedBook = await storage.updateBookData(id, {
         author,
         description: product.description || product.feature_bullets?.join(". ") || existingBook.description,
-        coverImage: product.main_image?.link || product.images?.[0]?.link || existingBook.coverImage,
+        coverImage: coverImages[0] || existingBook.coverImage,
+        coverImages: coverImages.length > 0 ? coverImages : existingBook.coverImages,
+        selectedCoverIndex: existingBook.selectedCoverIndex, // Keep user's selection
         publishYear: product.publication_date ? new Date(product.publication_date).getFullYear() : existingBook.publishYear,
         publishDate: product.publication_date || existingBook.publishDate,
         publisher: product.publisher || existingBook.publisher,
@@ -589,6 +660,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             if (data.product) {
               const product = data.product;
+              
+              // Extract all available cover images
+              let coverImages: string[] = [];
+              
+              // Add main image first if available
+              if (product.main_image?.link) {
+                coverImages.push(product.main_image.link);
+              }
+              
+              // Add all other images from the images array
+              if (product.images && Array.isArray(product.images)) {
+                const additionalImages = product.images
+                  .map((img: any) => img.link || img)
+                  .filter((link: string) => link && !coverImages.includes(link)); // Avoid duplicates
+                coverImages.push(...additionalImages);
+              }
+              
+              console.log("Extracted cover images for refresh-all:", coverImages);
               
               // Apply the same enhanced extraction logic
               let author = "Unknown Author";
@@ -687,7 +776,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 title: product.title || book.title,
                 author: author,
                 description: product.description || featureBullets.join(". ") || book.description,
-                coverImage: product.main_image?.link || product.images?.[0]?.link || book.coverImage,
+                coverImage: coverImages[0] || book.coverImage,
+                coverImages: coverImages.length > 0 ? coverImages : book.coverImages,
+                selectedCoverIndex: book.selectedCoverIndex, // Keep user's selection
                 publishYear: product.publication_date ? new Date(product.publication_date).getFullYear() : book.publishYear,
                 publishDate: product.publication_date || book.publishDate,
                 publisher: product.publisher || book.publisher,

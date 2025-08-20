@@ -11,6 +11,8 @@ export const books = pgTable("books", {
   author: text("author").notNull(),
   description: text("description"),
   coverImage: text("cover_image"),
+  coverImages: text("cover_images").array(),
+  selectedCoverIndex: integer("selected_cover_index").default(0),
   publishYear: integer("publish_year"),
   publishDate: text("publish_date"),
   publisher: text("publisher"),

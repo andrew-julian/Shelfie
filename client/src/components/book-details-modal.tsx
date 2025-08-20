@@ -57,6 +57,39 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
     },
   });
 
+  const updateCoverMutation = useMutation({
+    mutationFn: async (selectedCoverIndex: number) => {
+      if (!book) return;
+      
+      const response = await fetch(`/api/books/${book.id}/cover`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ selectedCoverIndex }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update book cover');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/books'] });
+      onUpdate();
+      toast({
+        title: "Success",
+        description: "Book cover updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update book cover",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async () => {
       if (!book) return;
@@ -121,6 +154,61 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
     }
   };
 
+  // Cover selection component
+  const CoverSelector = ({ className = "" }: { className?: string }) => {
+    if (!book?.coverImages || book.coverImages.length <= 1) {
+      return null;
+    }
+
+    const currentIndex = book.selectedCoverIndex || 0;
+
+    return (
+      <div className={`${className}`}>
+        <div className="flex items-center gap-2 mb-3">
+          <Package className="w-4 h-4 text-sky-blue" />
+          <span className="text-sm font-semibold text-gray-700">Choose Cover</span>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {book.coverImages.map((coverUrl, index) => (
+            <button
+              key={index}
+              onClick={() => updateCoverMutation.mutate(index)}
+              disabled={updateCoverMutation.isPending}
+              className={`
+                relative aspect-[3/4] rounded-lg overflow-hidden border-2 transition-all duration-200
+                ${index === currentIndex 
+                  ? 'border-sky-blue shadow-lg scale-105' 
+                  : 'border-gray-200 hover:border-sky-blue/50 hover:scale-102'
+                }
+                ${updateCoverMutation.isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+              `}
+              data-testid={`button-cover-option-${index}`}
+            >
+              <img
+                src={coverUrl}
+                alt={`${book.title} cover option ${index + 1}`}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              {index === currentIndex && (
+                <div className="absolute inset-0 bg-sky-blue/20 flex items-center justify-center">
+                  <div className="w-6 h-6 bg-sky-blue rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">✓</span>
+                  </div>
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+        {book.coverImages.length > 1 && (
+          <p className="text-xs text-gray-500 mt-2">
+            {book.coverImages.length} cover options available • Tap to select
+          </p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-screen overflow-y-auto" data-testid="modal-book-details">
@@ -178,6 +266,9 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
               )}
             </div>
           </div>
+          
+          {/* Cover Selection - Mobile */}
+          <CoverSelector className="md:hidden mt-4" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -199,6 +290,9 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
                   </div>
                 </div>
               )}
+              
+              {/* Cover Selection - Desktop */}
+              <CoverSelector className="mt-6" />
               
               {/* Price Section */}
               {(book.price || book.originalPrice) && (
