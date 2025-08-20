@@ -66,16 +66,16 @@ export default function Home() {
 
         {/* Books Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-            {[...Array(8)].map((_, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 justify-items-center">
+            {[...Array(6)].map((_, i) => (
               <div key={i} className="group">
-                <div className="relative aspect-[3/4] bg-gray-200 rounded-lg mb-2 animate-pulse" />
+                <div className="relative w-36 h-48 bg-gray-200 rounded-lg mb-2 animate-pulse" />
                 <div className="absolute bottom-2 right-2 w-6 h-6 bg-gray-300 rounded-full animate-pulse" />
               </div>
             ))}
           </div>
         ) : books.length > 0 ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4" data-testid="books-grid">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 justify-items-center" data-testid="books-grid">
             {books.map((book) => (
               <BookCard
                 key={book.id}

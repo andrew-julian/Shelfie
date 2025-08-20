@@ -28,13 +28,14 @@ function parseBookDimensions(dimensions: string | null): { width: number; height
       depth = depth / 2.54;
     }
     
-    // Scale to reasonable CSS pixels (multiply by ~28 for good visual scale)
-    const scale = 28;
+    // More realistic scaling - typical paperback is about 4.25" x 6.87" = 120x190px
+    // So roughly 28px per inch, but adjust for better visual balance
+    const baseScale = 22;
     
     return {
-      width: Math.round(width * scale),
-      height: Math.round(height * scale), 
-      depth: Math.max(Math.round(depth * scale * 0.5), 8) // Minimum depth for 3D effect
+      width: Math.round(width * baseScale),
+      height: Math.round(height * baseScale), 
+      depth: Math.max(Math.round(depth * baseScale * 0.7), 10) // Slightly thicker depth effect
     };
   } catch (error) {
     console.warn('Failed to parse book dimensions:', dimensions, error);
@@ -44,12 +45,13 @@ function parseBookDimensions(dimensions: string | null): { width: number; height
 
 // Calculate aspect ratio constraints for realistic proportions
 function constrainBookDimensions(dims: { width: number; height: number; depth: number }) {
-  const minWidth = 100;
-  const maxWidth = 180;
-  const minHeight = 140;
-  const maxHeight = 280;
-  const minDepth = 8;
-  const maxDepth = 25;
+  // More reasonable book size constraints
+  const minWidth = 90;   // Very narrow books
+  const maxWidth = 200;  // Wide textbooks
+  const minHeight = 130; // Short books
+  const maxHeight = 260; // Tall books
+  const minDepth = 8;    // Thin books
+  const maxDepth = 30;   // Very thick books
   
   return {
     width: Math.max(minWidth, Math.min(maxWidth, dims.width)),
