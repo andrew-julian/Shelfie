@@ -454,6 +454,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Refresh all books
+  app.post("/api/books/refresh-all", async (req, res) => {
+    try {
+      const allBooks = await storage.getAllBooks();
+      const refreshedBooks = [];
+      const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
+      
+      console.log(`Starting refresh of ${allBooks.length} books...`);
+      
+      for (const book of allBooks) {
+        try {
+          // Call Rainforest API for fresh data
+          const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${book.isbn}&amazon_domain=amazon.com`;
+          const response = await fetch(rainforestUrl);
+          
+          if (response.ok) {
+            const data = await response.json();
+            
+            if (data.product) {
+              const product = data.product;
+              
+              // Apply the same enhanced extraction logic
+              let author = "Unknown Author";
+              if (product.authors && product.authors.length > 0) {
+                author = product.authors[0].name || product.authors[0];
+              } else if (product.by_line && typeof product.by_line === 'string') {
+                author = product.by_line.replace(/^by\s+/i, '').trim();
+              } else if (product.brand && !product.brand.includes('Amazon') && !product.brand.includes('Publication')) {
+                author = product.brand;
+              }
+              
+              // Extract categories properly
+              let categories: string[] = [];
+              if (product.categories && Array.isArray(product.categories)) {
+                categories = product.categories.map((cat: any) => {
+                  if (typeof cat === 'string') return cat;
+                  if (cat && cat.name) return cat.name;
+                  if (cat && cat.category) return cat.category;
+                  return null;
+                }).filter(Boolean);
+              } else if (product.category_path && Array.isArray(product.category_path)) {
+                categories = product.category_path.map((cat: any) => cat.name || cat).filter(Boolean);
+              }
+              
+              // Enhanced dimensions extraction - check multiple locations
+              let extractedDimensions: string | null = null;
+              
+              // Check specifications array (main location for dimensions)
+              if (!extractedDimensions && product.specifications && Array.isArray(product.specifications)) {
+                for (const spec of product.specifications) {
+                  if (spec && typeof spec === 'object') {
+                    if (spec.name && spec.value) {
+                      const name = String(spec.name).toLowerCase();
+                      if (name.includes('dimension')) {
+                        extractedDimensions = String(spec.value);
+                        break;
+                      }
+                    }
+                  }
+                }
+              }
+              
+              // Extract feature bullets
+              let featureBullets: string[] = [];
+              if (product.feature_bullets && Array.isArray(product.feature_bullets)) {
+                featureBullets = product.feature_bullets.filter((bullet: any) => typeof bullet === 'string' && bullet.trim());
+              }
+              
+              const updateData = {
+                title: product.title || book.title,
+                author: author,
+                description: product.description || featureBullets.join(". ") || book.description,
+                coverImage: product.main_image?.link || product.images?.[0]?.link || book.coverImage,
+                publishYear: product.publication_date ? new Date(product.publication_date).getFullYear() : book.publishYear,
+                publishDate: product.publication_date || book.publishDate,
+                publisher: product.publisher || book.publisher,
+                language: product.language || book.language,
+                rating: product.rating?.toString() || book.rating,
+                ratingsTotal: product.rating_breakdown?.five_star?.count || book.ratingsTotal,
+                categories: categories.length > 0 ? categories : book.categories,
+                featureBullets: featureBullets.length > 0 ? featureBullets : book.featureBullets,
+                dimensions: extractedDimensions || book.dimensions
+              };
+              
+              const updatedBook = await storage.updateBookData(book.id, updateData);
+              if (updatedBook) {
+                refreshedBooks.push(updatedBook);
+                console.log(`Refreshed: ${book.title} -> dimensions: ${extractedDimensions}, author: ${author}`);
+              }
+            } else {
+              // Keep original book if no product data
+              refreshedBooks.push(book);
+              console.log(`No product data for: ${book.title}`);
+            }
+          } else {
+            // Keep original book if API call fails
+            refreshedBooks.push(book);
+            console.log(`API call failed for: ${book.title}`);
+          }
+        } catch (error) {
+          console.error(`Failed to refresh book ${book.title}:`, error);
+          // Keep original book if refresh fails
+          refreshedBooks.push(book);
+        }
+      }
+      
+      console.log(`Completed refresh of ${refreshedBooks.length} books`);
+      
+      res.json({ 
+        message: `Refreshed ${refreshedBooks.length} books`,
+        books: refreshedBooks
+      });
+    } catch (error) {
+      console.error('Failed to refresh all books:', error);
+      res.status(500).json({ message: "Failed to refresh books" });
+    }
+  });
+
   // Delete book
   app.delete("/api/books/:id", async (req, res) => {
     try {

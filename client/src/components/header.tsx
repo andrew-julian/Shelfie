@@ -1,10 +1,12 @@
-import { BookOpen, Search, Filter } from "lucide-react";
+import { BookOpen, Search, Filter, RefreshCw } from "lucide-react";
 
 interface HeaderProps {
   booksCount: number;
+  onRefreshAll?: () => void;
+  isRefreshing?: boolean;
 }
 
-export default function Header({ booksCount }: HeaderProps) {
+export default function Header({ booksCount, onRefreshAll, isRefreshing = false }: HeaderProps) {
   return (
     <header className="bg-white shadow-sm border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
@@ -17,6 +19,17 @@ export default function Header({ booksCount }: HeaderProps) {
             <span className="text-sm text-gray-600 font-medium" data-testid="text-books-count">
               {booksCount} {booksCount === 1 ? 'book' : 'books'}
             </span>
+            {onRefreshAll && booksCount > 0 && (
+              <button 
+                onClick={onRefreshAll}
+                disabled={isRefreshing}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-coral-red hover:bg-gray-50 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
+                data-testid="button-refresh-all"
+              >
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Refreshing...' : 'Refresh All'}
+              </button>
+            )}
             <button className="p-3 text-gray-600 hover:text-coral-red hover:bg-gray-50 rounded-lg transition-all" data-testid="button-search">
               <Search className="w-5 h-5" />
             </button>

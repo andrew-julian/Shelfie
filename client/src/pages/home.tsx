@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/header";
 import BookCard from "@/components/book-card";
 import ScannerModal from "@/components/scanner-modal";
 import BookDetailsModal from "@/components/book-details-modal";
+import { useToast } from "@/hooks/use-toast";
 import { Book } from "@shared/schema";
 import { BookOpen, Camera, Book as BookIcon, Eye, CheckCircle } from "lucide-react";
 
@@ -11,8 +12,39 @@ export default function Home() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
   const { data: books = [], isLoading, refetch } = useQuery<Book[]>({
     queryKey: ['/api/books'],
+  });
+  
+  const refreshAllMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/books/refresh-all', {
+        method: 'POST',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to refresh books');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/books"] });
+      toast({
+        title: "Success",
+        description: data.message || "All books have been refreshed with latest data",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to refresh books. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   const handleBookSelect = (book: Book) => {
@@ -30,7 +62,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header booksCount={books.length} />
+      <Header 
+        booksCount={books.length} 
+        onRefreshAll={() => refreshAllMutation.mutate()}
+        isRefreshing={refreshAllMutation.isPending}
+      />
       
       <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
         {/* Hero Section */}
