@@ -8,6 +8,7 @@ export interface IStorage {
   createBook(book: InsertBook): Promise<Book>;
   getAllBooks(): Promise<Book[]>;
   updateBookStatus(id: string, status: string): Promise<Book | undefined>;
+  updateBookData(id: string, data: Partial<Omit<Book, 'id' | 'isbn' | 'addedAt'>>): Promise<Book | undefined>;
   deleteBook(id: string): Promise<boolean>;
 }
 
@@ -42,6 +43,15 @@ export class DatabaseStorage implements IStorage {
     const [updatedBook] = await db
       .update(books)
       .set({ status })
+      .where(eq(books.id, id))
+      .returning();
+    return updatedBook || undefined;
+  }
+
+  async updateBookData(id: string, data: Partial<Omit<Book, 'id' | 'isbn' | 'addedAt'>>): Promise<Book | undefined> {
+    const [updatedBook] = await db
+      .update(books)
+      .set(data)
       .where(eq(books.id, id))
       .returning();
     return updatedBook || undefined;
