@@ -47,35 +47,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const product = data.product;
       
+      // Enhanced data extraction
+      console.log("Raw Rainforest API response:", JSON.stringify(data, null, 2));
+      
+      // Extract author more comprehensively
+      let author = "Unknown Author";
+      if (product.authors && product.authors.length > 0) {
+        author = product.authors[0].name || product.authors[0];
+      } else if (product.by_line && typeof product.by_line === 'string') {
+        author = product.by_line.replace(/^by\s+/i, '').trim();
+      } else if (product.brand && !product.brand.includes('Amazon') && !product.brand.includes('Publication')) {
+        author = product.brand;
+      }
+      
+      // Extract categories properly
+      let categories = [];
+      if (product.categories && Array.isArray(product.categories)) {
+        categories = product.categories.map(cat => {
+          if (typeof cat === 'string') return cat;
+          if (cat && cat.name) return cat.name;
+          if (cat && cat.category) return cat.category;
+          return null;
+        }).filter(Boolean);
+      } else if (product.category_path && Array.isArray(product.category_path)) {
+        categories = product.category_path.map(cat => cat.name || cat).filter(Boolean);
+      }
+      
+      // Extract feature bullets
+      let featureBullets = [];
+      if (product.feature_bullets && Array.isArray(product.feature_bullets)) {
+        featureBullets = product.feature_bullets.filter(bullet => typeof bullet === 'string' && bullet.trim());
+      }
+      
+      // Extract dimensions and weight more reliably
+      let dimensions = null;
+      let weight = null;
+      
+      if (product.specifications) {
+        const specs = product.specifications;
+        if (specs.dimensions) dimensions = specs.dimensions;
+        if (specs.weight) weight = specs.weight;
+        
+        // Also check in other common spec locations
+        Object.values(specs).forEach(spec => {
+          if (typeof spec === 'object' && spec) {
+            if (spec.dimensions && !dimensions) dimensions = spec.dimensions;
+            if (spec.weight && !weight) weight = spec.weight;
+          }
+        });
+      }
+      
+      // Check product details for additional info
+      if (product.product_details) {
+        const details = product.product_details;
+        Object.entries(details).forEach(([key, value]) => {
+          const lowerKey = key.toLowerCase();
+          if (lowerKey.includes('dimension') && !dimensions) dimensions = value;
+          if (lowerKey.includes('weight') && !weight) weight = value;
+        });
+      }
+      
       const bookData = {
         isbn,
         asin: product.asin || null,
         title: product.title || "Unknown Title",
-        author: product.brand || product.by_line || "Unknown Author",
-        description: product.description || product.feature_bullets?.join(" ") || "",
-        coverImage: product.main_image?.link || "",
+        author: author,
+        description: product.description || featureBullets.join(". ") || "",
+        coverImage: product.main_image?.link || product.images?.[0]?.link || "",
         publishYear: product.publication_date ? new Date(product.publication_date).getFullYear() : null,
         publishDate: product.publication_date || null,
         publisher: product.publisher || null,
         language: product.language || null,
-        pages: product.pages || null,
-        dimensions: product.dimensions || null,
-        weight: product.weight || null,
-        rating: product.rating?.toString() || null,
-        ratingsTotal: product.ratings_total || null,
+        pages: product.pages || product.number_of_pages || null,
+        dimensions: dimensions || product.dimensions || null,
+        weight: weight || product.weight || null,
+        rating: product.rating?.toString() || product.average_rating?.toString() || null,
+        ratingsTotal: product.ratings_total || product.rating_breakdown?.total || null,
         reviewsTotal: product.reviews_total || null,
-        price: product.price?.raw || product.price || null,
-        originalPrice: product.original_price?.raw || product.original_price || null,
-        categories: product.categories || [],
-        featureBullets: product.feature_bullets || [],
-        availability: product.availability?.raw || product.availability || null,
+        price: product.price?.raw || product.price?.value || product.price || null,
+        originalPrice: product.original_price?.raw || product.original_price?.value || product.original_price || null,
+        categories: categories,
+        featureBullets: featureBullets,
+        availability: product.availability?.raw || product.availability || product.in_stock ? "In Stock" : null,
         status: "want-to-read"
       };
+      
+      console.log("Processed book data:", JSON.stringify(bookData, null, 2));
 
       res.json(bookData);
     } catch (error) {
       console.error("ISBN lookup error:", error);
-      res.status(500).json({ message: "Failed to lookup book" });
+      res.status(500).json({ message: "Failed to lookup book", error: error.message });
     }
   });
 
