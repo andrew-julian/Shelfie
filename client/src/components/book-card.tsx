@@ -21,7 +21,7 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
     return {
       width: Math.round(width * baseScale),
       height: Math.round(height * baseScale),
-      depth: Math.max(Math.round(depth * baseScale * 0.7), 10) // Slightly thicker depth effect
+      depth: Math.max(Math.round(depth * baseScale * 1.2), 10) // More realistic depth effect
     };
   }
   
@@ -52,7 +52,7 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
     return {
       width: Math.round(width * baseScale),
       height: Math.round(height * baseScale), 
-      depth: Math.max(Math.round(depth * baseScale * 0.7), 10) // Slightly thicker depth effect
+      depth: Math.max(Math.round(depth * baseScale * 1.2), 10) // More realistic depth effect
     };
   } catch (error) {
     console.warn('Failed to parse book dimensions:', book.dimensions, error);
@@ -67,8 +67,8 @@ function constrainBookDimensions(dims: { width: number; height: number; depth: n
   const maxWidth = 200;  // Wide textbooks
   const minHeight = 130; // Short books
   const maxHeight = 260; // Tall books
-  const minDepth = 8;    // Thin books
-  const maxDepth = 30;   // Very thick books
+  const minDepth = 8;    // Thin books  
+  const maxDepth = 50;   // Very thick books
   
   return {
     width: Math.max(minWidth, Math.min(maxWidth, dims.width)),
@@ -180,7 +180,7 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
           <div 
             className="book-spine"
             style={{
-              width: `${bookDimensions.depth * 8}px`,
+              width: `${bookDimensions.depth * 3.5}px`,
               height: `${bookDimensions.height - 2}px`,
               transform: `translateX(${bookDimensions.width}px) rotateY(90deg)`
             }}
