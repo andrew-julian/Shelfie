@@ -22,14 +22,13 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
         // Draw image on canvas
         ctx.drawImage(img, 0, 0);
         
-        // Sample pixels from the right edge (spine area) of the image
+        // Sample pixels from all four edges to get consensus color
         const samples: number[] = [];
-        const edgeWidth = Math.min(10, img.width * 0.1); // Sample 10px or 10% of width
-        const startX = img.width - edgeWidth;
+        const edgeThickness = Math.min(8, Math.min(img.width, img.height) * 0.05); // 5% of smallest dimension
         
-        // Sample every 5th pixel vertically to avoid too many samples
-        for (let y = 0; y < img.height; y += 5) {
-          for (let x = startX; x < img.width; x += 2) {
+        // Sample top edge
+        for (let x = 0; x < img.width; x += 3) {
+          for (let y = 0; y < edgeThickness; y += 2) {
             try {
               const pixel = ctx.getImageData(x, y, 1, 1).data;
               const r = pixel[0];
@@ -44,6 +43,66 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
               if (r > 240 && g > 240 && b > 240) continue;
               
               // Convert to single number for frequency counting
+              samples.push((r << 16) | (g << 8) | b);
+            } catch (e) {
+              // Ignore sampling errors
+            }
+          }
+        }
+        
+        // Sample bottom edge
+        for (let x = 0; x < img.width; x += 3) {
+          for (let y = img.height - edgeThickness; y < img.height; y += 2) {
+            try {
+              const pixel = ctx.getImageData(x, y, 1, 1).data;
+              const r = pixel[0];
+              const g = pixel[1];
+              const b = pixel[2];
+              const a = pixel[3];
+              
+              if (a < 128) continue;
+              if (r > 240 && g > 240 && b > 240) continue;
+              
+              samples.push((r << 16) | (g << 8) | b);
+            } catch (e) {
+              // Ignore sampling errors
+            }
+          }
+        }
+        
+        // Sample left edge
+        for (let y = 0; y < img.height; y += 3) {
+          for (let x = 0; x < edgeThickness; x += 2) {
+            try {
+              const pixel = ctx.getImageData(x, y, 1, 1).data;
+              const r = pixel[0];
+              const g = pixel[1];
+              const b = pixel[2];
+              const a = pixel[3];
+              
+              if (a < 128) continue;
+              if (r > 240 && g > 240 && b > 240) continue;
+              
+              samples.push((r << 16) | (g << 8) | b);
+            } catch (e) {
+              // Ignore sampling errors
+            }
+          }
+        }
+        
+        // Sample right edge
+        for (let y = 0; y < img.height; y += 3) {
+          for (let x = img.width - edgeThickness; x < img.width; x += 2) {
+            try {
+              const pixel = ctx.getImageData(x, y, 1, 1).data;
+              const r = pixel[0];
+              const g = pixel[1];
+              const b = pixel[2];
+              const a = pixel[3];
+              
+              if (a < 128) continue;
+              if (r > 240 && g > 240 && b > 240) continue;
+              
               samples.push((r << 16) | (g << 8) | b);
             } catch (e) {
               // Ignore sampling errors
