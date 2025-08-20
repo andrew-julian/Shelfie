@@ -31,12 +31,12 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
       dim3 = dim3 / 2.54;
     }
     
-    // Amazon dimensions are typically in Width x Depth x Height format for books
-    // Based on user feedback, assign dimensions in original order:
-    // dim1 = width, dim2 = depth, dim3 = height
-    let width = dim1;
+    // Amazon dimensions for books are typically in Height x Depth x Width format
+    // For example: "23.5 x 3 x 15.2 cm" = Height x Depth x Width
+    // dim1 = height (tallest), dim2 = depth (spine), dim3 = width  
+    let height = dim1;
     let depth = dim2; 
-    let height = dim3;
+    let width = dim3;
     
     // Detect coffee table books and handle their landscape orientation
     const isCoffeeTableBook = title && (
