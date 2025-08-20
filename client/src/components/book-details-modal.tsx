@@ -133,9 +133,56 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
           </DialogTitle>
         </DialogHeader>
         
+        {/* Mobile Header Section */}
+        <div className="md:hidden mb-6">
+          <div className="flex gap-4">
+            {/* Mobile Book Cover - Smaller */}
+            <div className="flex-shrink-0 w-24 sm:w-32">
+              {book.coverImage ? (
+                <img 
+                  src={book.coverImage} 
+                  alt={`${book.title} book cover`}
+                  className="w-full rounded-lg shadow-lg"
+                  data-testid="img-book-cover-mobile"
+                />
+              ) : (
+                <div className="w-full aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg shadow-lg flex items-center justify-center">
+                  <BookOpen className="w-8 h-8 text-gray-400" />
+                </div>
+              )}
+            </div>
+            
+            {/* Mobile Title and Author */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-monochrome-black mb-2 leading-tight" data-testid="text-book-title-mobile">
+                {book.title}
+              </h1>
+              <div className="flex items-center text-base text-gray-700 mb-3" data-testid="text-book-author-mobile">
+                <Users className="w-4 h-4 mr-2 text-sky-blue flex-shrink-0" />
+                <span className="font-semibold truncate">{book.author}</span>
+              </div>
+              
+              {/* Mobile Rating */}
+              {book.rating && (
+                <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-lg w-fit">
+                  <div className="flex text-yellow-400 mr-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className={`w-3 h-3 ${i < Math.floor(Number(book.rating) || 0) ? 'fill-current' : ''}`} 
+                      />
+                    ))}
+                  </div>
+                  <span className="font-bold text-sm text-gray-800">{book.rating}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Cover Image */}
-          <div className="lg:col-span-1">
+          {/* Left Column - Cover Image (Desktop Only) */}
+          <div className="lg:col-span-1 hidden md:block">
             <div className="sticky top-4">
               {book.coverImage ? (
                 <img 
@@ -194,9 +241,9 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
           </div>
           
           {/* Right Columns - Book Information */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Title and Author */}
-            <div className="pb-6 border-b border-gray-200">
+          <div className="md:lg:col-span-2 lg:col-span-2 space-y-6 md:space-y-8">
+            {/* Title and Author (Desktop Only) */}
+            <div className="hidden md:block pb-6 border-b border-gray-200">
               <h1 className="text-4xl font-bold text-monochrome-black mb-4 leading-tight" data-testid="text-book-title">
                 {book.title}
               </h1>
@@ -205,7 +252,7 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
                 <span className="font-semibold">{book.author}</span>
               </div>
               
-              {/* Rating and Reviews */}
+              {/* Rating and Reviews (Desktop) */}
               <div className="flex items-center space-x-6 mb-6">
                 {book.rating && (
                   <div className="flex items-center bg-yellow-50 px-4 py-2 rounded-lg">
@@ -227,6 +274,19 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
                   <span className="text-gray-600 font-medium">{book.reviewsTotal.toLocaleString()} reviews</span>
                 )}
               </div>
+            </div>
+            
+            {/* Rating and Reviews for Mobile */}
+            <div className="md:hidden mb-6">
+              <div className="flex flex-wrap items-center gap-3">
+                {book.ratingsTotal && (
+                  <span className="text-gray-600 text-sm">({book.ratingsTotal.toLocaleString()} ratings)</span>
+                )}
+                {book.reviewsTotal && (
+                  <span className="text-gray-600 text-sm">{book.reviewsTotal.toLocaleString()} reviews</span>
+                )}
+              </div>
+            </div>
               
               {/* Categories */}
               {book.categories && book.categories.length > 0 && (
@@ -245,22 +305,22 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
               )}
               
               {/* Basic Info Always Shown */}
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
                   <div className="flex items-center mb-2">
                     <BookOpen className="w-4 h-4 text-gray-600 mr-2" />
                     <span className="text-sm font-semibold text-gray-700">ISBN</span>
                   </div>
-                  <span className="font-mono text-sm text-gray-900" data-testid="text-book-isbn">{book.isbn}</span>
+                  <span className="font-mono text-xs md:text-sm text-gray-900 break-all" data-testid="text-book-isbn">{book.isbn}</span>
                 </div>
                 
                 {(book.publishYear || book.publishDate) && (
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <Calendar className="w-4 h-4 text-gray-600 mr-2" />
                       <span className="text-sm font-semibold text-gray-700">Published</span>
                     </div>
-                    <span className="text-sm text-gray-900" data-testid="text-book-year">
+                    <span className="text-xs md:text-sm text-gray-900" data-testid="text-book-year">
                       {book.publishDate ? formatDate(book.publishDate) : book.publishYear}
                     </span>
                   </div>
@@ -400,10 +460,10 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
             )}
             
             {/* Controls Section */}
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-xl border-t border-gray-200 mt-8">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center space-x-4">
-                  <label htmlFor="status" className="text-base font-bold text-gray-800">
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 md:p-6 rounded-xl border-t border-gray-200 mt-6 md:mt-8">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                  <label htmlFor="status" className="text-sm md:text-base font-bold text-gray-800 flex-shrink-0">
                     Reading Status:
                   </label>
                   <Select 
@@ -411,12 +471,12 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
                     onValueChange={handleStatusChange}
                     disabled={updateStatusMutation.isPending}
                   >
-                    <SelectTrigger className="w-52 h-12 text-lg font-medium" data-testid="select-book-status">
+                    <SelectTrigger className="w-full sm:w-52 h-10 md:h-12 text-sm md:text-lg font-medium" data-testid="select-book-status">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.entries(statusConfig).map(([value, label]) => (
-                        <SelectItem key={value} value={value} className="text-lg py-3">
+                        <SelectItem key={value} value={value} className="text-sm md:text-lg py-2 md:py-3">
                           {label}
                         </SelectItem>
                       ))}
@@ -428,10 +488,10 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
                   variant="destructive"
                   onClick={handleDelete}
                   disabled={deleteMutation.isPending}
-                  className="bg-coral-red hover:bg-red-600 h-12 px-6 text-base font-semibold"
+                  className="bg-coral-red hover:bg-red-600 h-10 md:h-12 px-4 md:px-6 text-sm md:text-base font-semibold w-full sm:w-auto"
                   data-testid="button-delete-book"
                 >
-                  <Trash2 className="w-5 h-5 mr-2" />
+                  <Trash2 className="w-4 md:w-5 h-4 md:h-5 mr-2" />
                   {deleteMutation.isPending ? 'Removing...' : 'Remove from Library'}
                 </Button>
               </div>
