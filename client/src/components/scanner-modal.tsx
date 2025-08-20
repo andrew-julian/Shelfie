@@ -14,21 +14,21 @@ declare global {
 }
 
 const LICENSE_KEY =
-  "Tu3s2Bzp5RnZNZJmKHbry5Y32pUWdf" +
-  "dumS5FCKm8gGFUDdS46kSS9L19WGtW" +
-  "mLc7+TkeT6Vkj1U2R+sCZC7Mn7ySOz" +
-  "WNKCWyJlM3O7cbiE3tpir7Aq94p7v2" +
-  "bkyJEIZMCP62faX30EXS/VrJPirfWf" +
-  "XOAdUtuXKGNb2tX/rWnUzngyE9MDFh" +
-  "RAqmumfSgZJ7UA72vRGPVA9tLpOKR6" +
-  "LxAa5it5RZSm8WsUgcxraRWxy+2VNW" +
-  "FjPOBlOPfu8OdEZUV7hAuZOPj9paw8" +
-  "JOKuvPT2ahcw9n8sca45J0muhtvb2H" +
-  "cLbB1wfAcLRR9xR+82dT6U1uw87E/i" +
-  "al9FO6NSPg7g==\nU2NhbmJvdFNESw" +
-  "psb2NhbGhvc3R8dmFuYWhlaW0uY29t" +
-  "LmF1CjE3NTYzMzkxOTkKODM4ODYwNw" +
-  "o4\n";
+  "Mpyhq9Yxr3GGf71QkTvpTbBG6PIXby" +
+  "GOpm3xLZKbBoXQb0nzg7kFsrOj1p6j" +
+  "62fXcgBHMXh4c8qGHH+b8enoC7C1Gz" +
+  "aLjmDGkNnW5TrFcrxc/gSzGROlwx7M" +
+  "UZBnTpsNKeFKTBbBDlC1EDcTG2xsMZ" +
+  "KWHZD3SDINOsZBgnDLKpk2LtV8ChX5" +
+  "lns/8kVnLNOkXE/TddX6zHIBc+iGH5" +
+  "QrsR97c/WXMkAn5YdPaiPvKgdiwAp/" +
+  "pszIOcrGRZDTkUUmGm4l4oWClQriue" +
+  "AL0z/H7feafqbQ435IZcAwd6AIRhUc" +
+  "IHDSpexl7qk+o1n7OuCD/ZuU9wPjQ2" +
+  "GjtJ/k6+/XZQ==\nU2NhbmJvdFNESw" +
+  "psb2NhbGhvc3R8Ym9va3NjYW4udmFu" +
+  "YWhlaW0uY29tLmF1CjE3NTYzMzkxOT" +
+  "kKODM4ODYwNwo4\n";
 
 interface ScannerModalProps {
   isOpen: boolean;
