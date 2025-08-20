@@ -31,34 +31,12 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
       dim3 = dim3 / 2.54;
     }
     
-    // Sort dimensions to identify them logically
-    const dimensions = [dim1, dim2, dim3].sort((a, b) => b - a); // largest to smallest
-    const [largest, middle, smallest] = dimensions;
-    
-    // Detect coffee table books or art books (usually wider than tall)
-    const isCoffeeTableBook = title && (
-      title.toLowerCase().includes('coffee') ||
-      title.toLowerCase().includes('art') ||
-      title.toLowerCase().includes('photography') ||
-      title.toLowerCase().includes('design') ||
-      title.toLowerCase().includes('architecture') ||
-      // Look for patterns that suggest landscape orientation
-      (largest / middle > 1.3 && largest > 8) // significantly wider than tall and large
-    );
-    
-    let width: number, height: number, depth: number;
-    
-    if (isCoffeeTableBook) {
-      // For coffee table books: width > height is expected
-      width = largest;  // widest dimension
-      height = middle;  // second largest
-      depth = smallest; // thinnest
-    } else {
-      // For regular books: height should be the largest dimension
-      height = largest; // tallest dimension
-      width = middle;   // second largest
-      depth = smallest; // thinnest
-    }
+    // Amazon dimensions are typically in Width x Depth x Height format for books
+    // Based on user feedback, assign dimensions in original order:
+    // dim1 = width, dim2 = depth, dim3 = height
+    let width = dim1;
+    let depth = dim2; 
+    let height = dim3;
     
     // Round to 2 decimal places
     return {
