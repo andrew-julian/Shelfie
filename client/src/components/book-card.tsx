@@ -154,24 +154,27 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
             '--book-depth': `${bookDimensions.depth}px`
           } as React.CSSProperties & { '--book-depth': string }}
         >
-          <div
-            style={{
-              width: `${bookDimensions.width}px`,
-              height: `${bookDimensions.height}px`
-            }}
-          >
-            {book.coverImage ? (
-              <img 
-                src={book.coverImage} 
-                alt={`${book.title} book cover`}
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex flex-col items-center justify-center text-white">
-                <BookOpen className="w-10 h-10 mb-2" />
-                <span className="text-xs font-medium text-center px-2 leading-tight">{book.title}</span>
-              </div>
-            )}
-          </div>
+          {book.coverImage ? (
+            <img 
+              src={book.coverImage} 
+              alt={`${book.title} book cover`}
+              style={{
+                width: `${bookDimensions.width}px`,
+                height: `${bookDimensions.height}px`
+              }}
+            />
+          ) : (
+            <div 
+              className="bg-gradient-to-br from-gray-300 to-gray-400 flex flex-col items-center justify-center text-white"
+              style={{
+                width: `${bookDimensions.width}px`,
+                height: `${bookDimensions.height}px`
+              }}
+            >
+              <BookOpen className="w-10 h-10 mb-2" />
+              <span className="text-xs font-medium text-center px-2 leading-tight">{book.title}</span>
+            </div>
+          )}
         </div>
         
         {/* Status Tag */}
