@@ -150,9 +150,9 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
           className="book"
           style={{
             width: `${bookDimensions.width}px`,
-            height: `${bookDimensions.height}px`,
-            '--book-depth': `${bookDimensions.depth}px`
-          } as React.CSSProperties & { '--book-depth': string }}
+            height: `${bookDimensions.height}px`
+          }}
+          data-depth={bookDimensions.depth}
         >
           {book.coverImage ? (
             <img 
