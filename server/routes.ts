@@ -448,10 +448,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const book = await storage.createBook({ ...validatedData, userId });
       res.status(201).json(book);
     } catch (error) {
+      console.error("Error adding book to library:", error);
+      console.error("Request body:", JSON.stringify(req.body, null, 2));
+      console.error("User ID:", req.user?.claims?.sub);
+      
       if (error instanceof z.ZodError) {
+        console.error("Zod validation errors:", error.errors);
         res.status(400).json({ message: "Invalid book data", errors: error.errors });
       } else {
-        res.status(500).json({ message: "Failed to add book" });
+        console.error("Non-Zod error:", error);
+        res.status(500).json({ message: "Failed to add book", error: error.message });
       }
     }
   });
