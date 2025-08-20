@@ -69,19 +69,20 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
       onMouseLeave={() => setIsHovered(false)}
       data-testid={`card-book-${book.id}`}
     >
-      <div className={`book-3d relative mb-3 ${isHovered ? 'transform perspective-1000 rotate-y-[-10deg] rotate-x-[5deg]' : ''}`}>
-        {book.coverImage ? (
-          <img 
-            src={book.coverImage} 
-            alt={`${book.title} book cover`}
-            className="w-full h-48 object-cover rounded shadow-sm" 
-          />
-        ) : (
-          <div className="w-full h-48 bg-gray-200 rounded shadow-sm flex items-center justify-center">
-            <span className="text-gray-400 text-sm text-center px-2">No Cover Available</span>
-          </div>
-        )}
-        <div className="book-spine"></div>
+      <div className="book-container mb-3">
+        <div className="book-3d">
+          {book.coverImage ? (
+            <img 
+              src={book.coverImage} 
+              alt={`${book.title} book cover`}
+              className="book-cover w-full h-48 object-cover" 
+            />
+          ) : (
+            <div className="book-cover w-full h-48 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white font-medium">
+              <span className="text-sm text-center px-2">No Cover Available</span>
+            </div>
+          )}
+        </div>
       </div>
       
       <h3 className="font-medium text-sm text-gray-900 mb-1 line-clamp-2" data-testid={`text-book-title-${book.id}`}>
