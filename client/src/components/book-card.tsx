@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Book } from "@shared/schema";
 import { BookOpen } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { getCachedDominantColor } from "@/utils/color-extractor";
 
 // Utility to parse book dimensions and convert to CSS dimensions
 function parseBookDimensions(book: Book): { width: number; height: number; depth: number } {
@@ -137,12 +138,18 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
 
   const statusInfo = statusConfig[book.status as keyof typeof statusConfig] || statusConfig['want-to-read'];
 
-  // Calculate cover color from book properties
-  const getCoverColor = () => {
-    if (!book.coverImage) return '#4a5568'; // Default gray
-    // You could extract dominant color from cover image here if needed
-    return '#2d3748'; // Default dark gray for books with covers
-  };
+  const [coverColor, setCoverColor] = useState('#2d3748');
+
+  // Extract dominant color from book cover
+  useEffect(() => {
+    if (book.coverImage) {
+      getCachedDominantColor(book.coverImage)
+        .then(color => setCoverColor(color))
+        .catch(() => setCoverColor('#2d3748'));
+    } else {
+      setCoverColor('#4a5568'); // Default for books without covers
+    }
+  }, [book.coverImage]);
 
   return (
     <div className="group relative">
@@ -154,7 +161,7 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
         data-testid={`card-book-${book.id}`}
         style={{
           '--book-thickness': `${bookDimensions.depth * 0.4}px`,
-          '--cover-color': getCoverColor(),
+          '--cover-color': coverColor,
           width: `${bookDimensions.width}px`,
           height: `${bookDimensions.height}px`
         } as React.CSSProperties}
