@@ -129,6 +129,7 @@
     max-width: 250px;
     margin: 0 auto;
     cursor: pointer;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
   }
 
   .book-3d__inner {
@@ -136,6 +137,7 @@
     transform-style: preserve-3d;
     transform: rotateY(-25deg);
     transition: transform 0.8s ease;
+    filter: drop-shadow(2px 8px 16px rgba(0, 0, 0, 0.25));
   }
 
   .book-3d:hover .book-3d__inner {
@@ -157,6 +159,9 @@
       hsl(0, 0%, 94%) 45%, #fff 50%, hsl(0, 0%, 94%) 55%, #fff 60%, 
       hsl(0, 0%, 94%) 65%, #fff 70%, hsl(0, 0%, 94%) 75%, #fff 80%, 
       hsl(0, 0%, 94%) 85%, #fff 90%, hsl(0, 0%, 94%) 95%, #fff 100%);
+    box-shadow: 
+      -2px 0 4px rgba(0, 0, 0, 0.1),
+      inset -2px 0 4px rgba(0, 0, 0, 0.1);
   }
 
   /* Rear Cover - using pseudo-element */
@@ -170,7 +175,10 @@
     transform: translateZ(calc(var(--book-thickness) * -1));
     background-color: var(--cover-color);
     border-radius: 0 2px 2px 0;
-    box-shadow: -10px 0 50px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 
+      -10px 0 50px 10px rgba(0, 0, 0, 0.3),
+      inset 2px 0 4px rgba(0, 0, 0, 0.2),
+      -2px 0 8px rgba(0, 0, 0, 0.15);
   }
 
   /* Front Cover */
@@ -180,7 +188,10 @@
     height: auto;
     border-radius: 0px 2px 2px 0px;
     transform: translateZ(var(--book-thickness));
-    box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 
+      5px 5px 20px rgba(0, 0, 0, 0.25),
+      2px 2px 8px rgba(0, 0, 0, 0.15),
+      inset -1px 0 2px rgba(0, 0, 0, 0.1);
   }
 
   /* Fallback styling for books without cover images */
@@ -195,7 +206,10 @@
     color: white;
     border-radius: 0px 2px 2px 0px;
     transform: translateZ(var(--book-thickness));
-    box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 
+      5px 5px 20px rgba(0, 0, 0, 0.25),
+      2px 2px 8px rgba(0, 0, 0, 0.15),
+      inset -1px 0 2px rgba(0, 0, 0, 0.1);
     overflow: hidden;
   }
   
