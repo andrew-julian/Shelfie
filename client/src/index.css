@@ -200,6 +200,7 @@
       #f9f9f9 95%,
       #fff 100%
       );
+    transform-origin: left center;
   }
 
   .book::after {
