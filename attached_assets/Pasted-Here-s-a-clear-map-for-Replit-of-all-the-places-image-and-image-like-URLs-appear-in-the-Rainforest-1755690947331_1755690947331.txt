@@ -1,0 +1,79 @@
+Here’s a clear map for Replit of all the places image (and image‑like) URLs appear in the Rainforest API product JSON, with JSONPath selectors, a short description, and an example from your file.
+
+Product‑level images
+
+$.product.main_image.link — the primary product image URL.
+Example: https://m.media-amazon.com/images/I/71dyq+RBmoL.jpg 
+
+$.product.images[*].link — gallery image URLs, each with a variant.
+Example: https://m.media-amazon.com/images/I/71dyq+RBmoL._SL1500_.jpg 
+
+$.product.images_flat — a comma‑separated string of image URLs (flattened version of the gallery).
+Example contains the same URL as above, flattened:
+https://m.media-amazon.com/images/I/71dyq+RBmoL._SL1500_.jpg 
+
+Review‑level images (and thumbnails/video stills)
+
+$.product.top_reviews[*].images[*].link — image URLs attached to reviews (can include placeholders/GIFs).
+Example: https://images-na.ssl-images-amazon.com/images/G/01/x-locale/common/grey-pixel.gif 
+
+$.product.top_reviews[*].videos[*].image — thumbnail image for a review video.
+Example: https://m.media-amazon.com/images/I/61kOVukLTZL._SY256.jpg 
+
+$.product.top_reviews[*].videos[*].video — video URL (not an image, but media you might want to collect separately).
+Example: https://m.media-amazon.com/images/I/B12xjdmpqfL.mp4 
+
+$.product.top_reviews[*].profile.image — reviewer avatar image.
+Example: https://m.media-amazon.com/images/S/amazon-avatars-global/90535817-3379-4c10-9a8d-80c9db4a3a8c._CR0%2C0%2C500%2C500_SX460_.jpg 
+
+Drop‑in JS extractor (unique, image‑only)
+
+Use this in Replit to traverse the object and collect unique image URLs (JPEG/PNG/WebP/GIF/SVG). It also splits the flattened string and includes review video thumbnails, while excluding .mp4 etc.
+
+function collectImageUrls(root) {
+  const urls = new Set();
+
+  // Helper: add if looks like an image
+  const addIfImage = (u) => {
+    if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
+      urls.add(u);
+    }
+  };
+
+  // 1) Product-level
+  addIfImage(root?.product?.main_image?.link);
+  (root?.product?.images ?? []).forEach(img => addIfImage(img?.link));
+
+  // images_flat may be a single URL or comma-separated
+  const flat = root?.product?.images_flat;
+  if (typeof flat === 'string') {
+    flat.split(',').map(s => s.trim()).forEach(addIfImage);
+  }
+
+  // 2) Reviews
+  (root?.product?.top_reviews ?? []).forEach(r => {
+    // attached review images
+    (r?.images ?? []).forEach(img => addIfImage(img?.link));
+    // video thumbnails (images)
+    (r?.videos ?? []).forEach(v => addIfImage(v?.image));
+    // reviewer avatar
+    addIfImage(r?.profile?.image);
+    // (Optional) scrape simple image strings in known HTML fields if you later decide to parse HTML
+  });
+
+  return Array.from(urls);
+}
+
+// Example:
+// const data = /* JSON parsed from file */;
+// console.log(collectImageUrls(data));
+
+Notes for implementation
+
+Treat images_flat as untrusted for spacing and split on commas safely. 
+
+If you also want all media, create a second collector for non‑image assets (e.g., review videos like .mp4). 
+
+Some review “images” may be placeholders (e.g., a 1×1 grey GIF). You can filter by dimensions only after fetching the headers, if needed. 
+
+This should give Replit an exact blueprint of where to find every image (and image‑adjacent) URL in the schema.

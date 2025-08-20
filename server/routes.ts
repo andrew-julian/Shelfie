@@ -116,21 +116,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Enhanced data extraction
       console.log("Raw Rainforest API response:", JSON.stringify(data, null, 2));
       
-      // Extract all available cover images from main product and variants
-      let coverImages: string[] = [];
-      
-      // Add main image first if available
-      if (product.main_image?.link) {
-        coverImages.push(product.main_image.link);
-      }
-      
-      // Add all other images from the images array
-      if (product.images && Array.isArray(product.images)) {
-        const additionalImages = product.images
-          .map((img: any) => img.link || img)
-          .filter((link: string) => link && !coverImages.includes(link)); // Avoid duplicates
-        coverImages.push(...additionalImages);
-      }
+      // Extract all available cover images using comprehensive approach
+      const collectImageUrls = (root: any) => {
+        const urls = new Set<string>();
+
+        // Helper: add if looks like an image
+        const addIfImage = (u: any) => {
+          if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
+            urls.add(u);
+          }
+        };
+
+        // 1) Product-level
+        addIfImage(root?.product?.main_image?.link);
+        (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+
+        // images_flat may be a single URL or comma-separated
+        const flat = root?.product?.images_flat;
+        if (typeof flat === 'string') {
+          flat.split(',').map(s => s.trim()).forEach(addIfImage);
+        }
+
+        // 2) Reviews (potential alternative covers in review images)
+        (root?.product?.top_reviews ?? []).forEach((r: any) => {
+          // attached review images
+          (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+          // video thumbnails (images)
+          (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
+          // reviewer avatar (skip these for covers)
+          // addIfImage(r?.profile?.image);
+        });
+
+        return Array.from(urls);
+      };
+
+      let coverImages = collectImageUrls(data);
       
       // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
       if (product.variants && Array.isArray(product.variants)) {
@@ -147,18 +167,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 const variantData = await variantResponse.json();
                 
                 if (variantData.product) {
-                  // Add variant's main image
-                  if (variantData.product.main_image?.link && !coverImages.includes(variantData.product.main_image.link)) {
-                    coverImages.push(variantData.product.main_image.link);
-                  }
-                  
-                  // Add variant's other images
-                  if (variantData.product.images && Array.isArray(variantData.product.images)) {
-                    const variantImages = variantData.product.images
-                      .map((img: any) => img.link || img)
-                      .filter((link: string) => link && !coverImages.includes(link));
-                    coverImages.push(...variantImages);
-                  }
+                  const variantImages = collectImageUrls(variantData);
+                  variantImages.forEach(img => {
+                    if (!coverImages.includes(img)) {
+                      coverImages.push(img);
+                    }
+                  });
                 }
               }
             } catch (variantError) {
@@ -168,7 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      console.log("Extracted cover images from all variants:", coverImages);
+      console.log("Extracted cover images from all sources:", coverImages);
       
       // Extract author more comprehensively
       let author = "Unknown Author";
@@ -474,21 +488,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const product = data.product;
       
-      // Extract all available cover images from main product and variants
-      let coverImages: string[] = [];
-      
-      // Add main image first if available
-      if (product.main_image?.link) {
-        coverImages.push(product.main_image.link);
-      }
-      
-      // Add all other images from the images array
-      if (product.images && Array.isArray(product.images)) {
-        const additionalImages = product.images
-          .map((img: any) => img.link || img)
-          .filter((link: string) => link && !coverImages.includes(link)); // Avoid duplicates
-        coverImages.push(...additionalImages);
-      }
+      // Extract all available cover images using comprehensive approach
+      const collectImageUrls = (root: any) => {
+        const urls = new Set<string>();
+
+        // Helper: add if looks like an image
+        const addIfImage = (u: any) => {
+          if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
+            urls.add(u);
+          }
+        };
+
+        // 1) Product-level
+        addIfImage(root?.product?.main_image?.link);
+        (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+
+        // images_flat may be a single URL or comma-separated
+        const flat = root?.product?.images_flat;
+        if (typeof flat === 'string') {
+          flat.split(',').map(s => s.trim()).forEach(addIfImage);
+        }
+
+        // 2) Reviews (potential alternative covers in review images)
+        (root?.product?.top_reviews ?? []).forEach((r: any) => {
+          // attached review images
+          (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+          // video thumbnails (images)
+          (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
+        });
+
+        return Array.from(urls);
+      };
+
+      let coverImages = collectImageUrls(data);
       
       // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
       if (product.variants && Array.isArray(product.variants)) {
@@ -505,18 +537,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 const variantData = await variantResponse.json();
                 
                 if (variantData.product) {
-                  // Add variant's main image
-                  if (variantData.product.main_image?.link && !coverImages.includes(variantData.product.main_image.link)) {
-                    coverImages.push(variantData.product.main_image.link);
-                  }
-                  
-                  // Add variant's other images
-                  if (variantData.product.images && Array.isArray(variantData.product.images)) {
-                    const variantImages = variantData.product.images
-                      .map((img: any) => img.link || img)
-                      .filter((link: string) => link && !coverImages.includes(link));
-                    coverImages.push(...variantImages);
-                  }
+                  const variantImages = collectImageUrls(variantData);
+                  variantImages.forEach(img => {
+                    if (!coverImages.includes(img)) {
+                      coverImages.push(img);
+                    }
+                  });
                 }
               }
             } catch (variantError) {
@@ -733,27 +759,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (data.product) {
               const product = data.product;
               
-              // Extract all available cover images from main product and variants
-              let coverImages: string[] = [];
-              
-              // Add main image first if available
-              if (product.main_image?.link) {
-                coverImages.push(product.main_image.link);
-              }
-              
-              // Add all other images from the images array
-              if (product.images && Array.isArray(product.images)) {
-                const additionalImages = product.images
-                  .map((img: any) => img.link || img)
-                  .filter((link: string) => link && !coverImages.includes(link)); // Avoid duplicates
-                coverImages.push(...additionalImages);
-              }
+              // Extract all available cover images using comprehensive approach
+              const collectImageUrls = (root: any) => {
+                const urls = new Set<string>();
+
+                // Helper: add if looks like an image
+                const addIfImage = (u: any) => {
+                  if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
+                    urls.add(u);
+                  }
+                };
+
+                // 1) Product-level
+                addIfImage(root?.product?.main_image?.link);
+                (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+
+                // images_flat may be a single URL or comma-separated
+                const flat = root?.product?.images_flat;
+                if (typeof flat === 'string') {
+                  flat.split(',').map(s => s.trim()).forEach(addIfImage);
+                }
+
+                // 2) Reviews (potential alternative covers in review images)
+                (root?.product?.top_reviews ?? []).forEach((r: any) => {
+                  // attached review images
+                  (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+                  // video thumbnails (images)
+                  (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
+                });
+
+                return Array.from(urls);
+              };
+
+              let coverImages = collectImageUrls(data);
               
               // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
               if (product.variants && Array.isArray(product.variants)) {
                 console.log(`Found ${product.variants.length} variants for refresh-all, fetching cover images...`);
                 
-                for (const variant of product.variants.slice(0, 3)) { // Limit to 3 variants for refresh-all to avoid too many API calls
+                for (const variant of product.variants.slice(0, 2)) { // Limit to 2 variants for refresh-all to avoid too many API calls
                   if (variant.asin && variant.asin !== product.asin) {
                     try {
                       console.log(`Fetching variant cover for ${variant.title} (${variant.asin})`);
@@ -764,18 +808,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                         const variantData = await variantResponse.json();
                         
                         if (variantData.product) {
-                          // Add variant's main image
-                          if (variantData.product.main_image?.link && !coverImages.includes(variantData.product.main_image.link)) {
-                            coverImages.push(variantData.product.main_image.link);
-                          }
-                          
-                          // Add variant's other images
-                          if (variantData.product.images && Array.isArray(variantData.product.images)) {
-                            const variantImages = variantData.product.images
-                              .map((img: any) => img.link || img)
-                              .filter((link: string) => link && !coverImages.includes(link));
-                            coverImages.push(...variantImages);
-                          }
+                          const variantImages = collectImageUrls(variantData);
+                          variantImages.forEach(img => {
+                            if (!coverImages.includes(img)) {
+                              coverImages.push(img);
+                            }
+                          });
                         }
                       }
                     } catch (variantError) {
