@@ -62,53 +62,50 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
   const statusInfo = statusConfig[book.status as keyof typeof statusConfig] || statusConfig['want-to-read'];
 
   return (
-    <div className="group">
+    <div className="group relative">
       <div 
-        className="relative aspect-[3/4] cursor-pointer transition-all duration-300 transform group-hover:scale-105"
+        className="book-container cursor-pointer"
         onClick={() => onSelect(book)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         data-testid={`card-book-${book.id}`}
       >
-        {/* Book Cover */}
-        <div className="w-full h-full rounded-xl overflow-hidden shadow-lg group-hover:shadow-2xl transition-all duration-300">
-          {book.coverImage ? (
-            <img 
-              src={book.coverImage} 
-              alt={`${book.title} book cover`}
-              className="object-cover w-full h-full"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex flex-col items-center justify-center text-gray-500">
-              <BookOpen className="w-8 h-8 mb-2" />
-              <span className="text-xs font-medium text-center px-2">{book.title}</span>
-            </div>
-          )}
-          
-          {/* Overlay on hover */}
-          <div className={`absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-xl`} />
+        <div className="book">
+          <div>
+            {book.coverImage ? (
+              <img 
+                src={book.coverImage} 
+                alt={`${book.title} book cover`}
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex flex-col items-center justify-center text-white">
+                <BookOpen className="w-10 h-10 mb-2" />
+                <span className="text-xs font-medium text-center px-2 leading-tight">{book.title}</span>
+              </div>
+            )}
+          </div>
         </div>
         
         {/* Status Tag */}
         <button
           onClick={handleStatusClick}
-          className={`absolute bottom-2 right-2 w-8 h-8 rounded-full text-white font-bold text-sm ${statusInfo.color} hover:scale-110 transition-all duration-200 shadow-lg flex items-center justify-center`}
+          className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full text-white font-bold text-sm ${statusInfo.color} hover:scale-110 transition-all duration-200 shadow-lg flex items-center justify-center z-10`}
           disabled={updateStatusMutation.isPending}
           title={statusInfo.label}
           data-testid={`button-status-${book.id}`}
         >
           {updateStatusMutation.isPending ? '⏳' : statusInfo.icon}
         </button>
-        
-        {/* Title overlay on hover */}
-        <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 rounded-b-xl transform transition-all duration-300 ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
-          <h3 className="font-bold text-white text-sm line-clamp-2 leading-tight mb-1" data-testid={`text-book-title-${book.id}`}>
-            {book.title}
-          </h3>
-          <p className="text-gray-200 text-xs font-medium" data-testid={`text-book-author-${book.id}`}>
-            {book.author === 'Unknown Author' ? 'Author unknown' : book.author}
-          </p>
-        </div>
+      </div>
+      
+      {/* Title overlay on hover */}
+      <div className={`absolute -bottom-8 left-0 right-0 text-center transform transition-all duration-300 ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
+        <h3 className="font-bold text-monochrome-black text-sm line-clamp-2 leading-tight mb-1" data-testid={`text-book-title-${book.id}`}>
+          {book.title}
+        </h3>
+        <p className="text-gray-600 text-xs font-medium" data-testid={`text-book-author-${book.id}`}>
+          {book.author === 'Unknown Author' ? 'Author unknown' : book.author}
+        </p>
       </div>
     </div>
   );
