@@ -70,25 +70,23 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
         onMouseLeave={() => setIsHovered(false)}
         data-testid={`card-book-${book.id}`}
       >
-        {/* 3D Book Cover */}
-        <div className="book-container w-full h-full">
-          <div className="book w-full h-full group-hover:shadow-2xl transition-all duration-300">
-            {book.coverImage ? (
-              <img 
-                src={book.coverImage} 
-                alt={`${book.title} book cover`}
-                className="object-cover w-full h-full"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex flex-col items-center justify-center text-gray-500">
-                <BookOpen className="w-8 h-8 mb-2" />
-                <span className="text-xs font-medium text-center px-2">{book.title}</span>
-              </div>
-            )}
-            
-            {/* Overlay on hover */}
-            <div className={`absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-lg`} />
-          </div>
+        {/* Book Cover */}
+        <div className="w-full h-full rounded-xl overflow-hidden shadow-lg group-hover:shadow-2xl transition-all duration-300">
+          {book.coverImage ? (
+            <img 
+              src={book.coverImage} 
+              alt={`${book.title} book cover`}
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex flex-col items-center justify-center text-gray-500">
+              <BookOpen className="w-8 h-8 mb-2" />
+              <span className="text-xs font-medium text-center px-2">{book.title}</span>
+            </div>
+          )}
+          
+          {/* Overlay on hover */}
+          <div className={`absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-xl`} />
         </div>
         
         {/* Status Tag */}
