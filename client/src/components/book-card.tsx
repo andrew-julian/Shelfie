@@ -33,10 +33,10 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
     const matches = book.dimensions.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
     if (!matches) return defaultDimensions;
     
-    let [, widthStr, heightStr, depthStr] = matches;
+    let [, widthStr, depthStr, heightStr] = matches;
     let width = parseFloat(widthStr);
-    let height = parseFloat(heightStr); 
     let depth = parseFloat(depthStr);
+    let height = parseFloat(heightStr);
     
     // Convert to inches if needed (assuming cm if > 15)
     if (width > 15) {
