@@ -153,7 +153,7 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
         onMouseLeave={() => setIsHovered(false)}
         data-testid={`card-book-${book.id}`}
         style={{
-          '--book-thickness': `${bookDimensions.depth}px`,
+          '--book-thickness': `${bookDimensions.depth * 0.4}px`,
           '--cover-color': getCoverColor(),
           width: `${bookDimensions.width}px`,
           height: `${bookDimensions.height}px`
