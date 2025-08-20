@@ -182,7 +182,7 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
             style={{
               width: `${bookDimensions.depth * 1.8}px`,
               height: `${bookDimensions.height - 2}px`,
-              transform: `translateX(${bookDimensions.width}px) rotateY(90deg)`
+              transform: `translateX(${bookDimensions.width - (bookDimensions.depth * 0.5)}px) rotateY(90deg)`
             }}
           />
         </div>
