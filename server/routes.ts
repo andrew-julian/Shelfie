@@ -69,12 +69,73 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
 }
 import { insertBookSchema } from "@shared/schema";
 import { z } from "zod";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Get all books
-  app.get("/api/books", async (req, res) => {
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const books = await storage.getAllBooks();
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // User preferences routes
+  app.get('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      let preferences = await storage.getUserPreferences(userId);
+      
+      // Create default preferences if they don't exist
+      if (!preferences) {
+        preferences = await storage.createUserPreferences({
+          userId,
+          amazonDomain: "amazon.com.au",
+          currency: "AUD",
+          measurementUnit: "metric"
+        });
+      }
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error fetching user preferences:", error);
+      res.status(500).json({ message: "Failed to fetch user preferences" });
+    }
+  });
+
+  app.patch('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { amazonDomain, currency, measurementUnit } = req.body;
+      
+      const updatedPreferences = await storage.updateUserPreferences(userId, {
+        amazonDomain,
+        currency,
+        measurementUnit
+      });
+      
+      if (!updatedPreferences) {
+        return res.status(404).json({ message: "User preferences not found" });
+      }
+      
+      res.json(updatedPreferences);
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      res.status(500).json({ message: "Failed to update user preferences" });
+    }
+  });
+  // Get all books
+  app.get("/api/books", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const books = await storage.getAllBooks(userId);
       res.json(books);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch books" });
@@ -82,16 +143,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Lookup book by ISBN using Rainforest API
-  app.get("/api/books/lookup/:isbn", async (req, res) => {
+  app.get("/api/books/lookup/:isbn", isAuthenticated, async (req: any, res) => {
     try {
       const { isbn } = req.params;
       const { region } = req.query;
+      const userId = req.user.claims.sub;
       
-      // Default to Australian Amazon domain, but allow override
-      const amazonDomain = (region as string) || "amazon.com.au";
+      // Get user's preferred region, fallback to query param or default
+      let amazonDomain = region as string;
+      if (!amazonDomain) {
+        const userPreferences = await storage.getUserPreferences(userId);
+        amazonDomain = userPreferences?.amazonDomain || "amazon.com.au";
+      }
       
-      // Check if book already exists
-      const existingBook = await storage.getBookByIsbn(isbn);
+      // Check if book already exists for this user
+      const existingBook = await storage.getBookByIsbn(isbn, userId);
       if (existingBook) {
         return res.status(409).json({ 
           message: "Book already exists in your library",
@@ -350,6 +416,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         featureBullets: featureBullets,
         availability: product.availability?.raw || product.availability || product.in_stock ? "In Stock" : null,
         amazonDomain: amazonDomain,
+        userId: userId,
         status: "want-to-read"
       };
       
@@ -364,12 +431,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Add book to library
-  app.post("/api/books", async (req, res) => {
+  app.post("/api/books", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
       const validatedData = insertBookSchema.parse(req.body);
       
-      // Check if book already exists
-      const existingBook = await storage.getBookByIsbn(validatedData.isbn);
+      // Check if book already exists for this user
+      const existingBook = await storage.getBookByIsbn(validatedData.isbn, userId);
       if (existingBook) {
         return res.status(409).json({ 
           message: "Book already exists in your library",
@@ -377,7 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const book = await storage.createBook(validatedData);
+      const book = await storage.createBook({ ...validatedData, userId });
       res.status(201).json(book);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -389,17 +457,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update book data
-  app.patch("/api/books/:id", async (req, res) => {
+  app.patch("/api/books/:id", isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
+      const userId = req.user.claims.sub;
       const updateData = req.body;
       
       // Remove fields that shouldn't be updated
       delete updateData.id;
       delete updateData.isbn;
       delete updateData.addedAt;
+      delete updateData.userId;
 
-      const updatedBook = await storage.updateBookData(id, updateData);
+      const updatedBook = await storage.updateBookData(id, updateData, userId);
       
       if (!updatedBook) {
         return res.status(404).json({ message: "Book not found" });
@@ -412,16 +482,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update book status
-  app.patch("/api/books/:id/status", async (req, res) => {
+  app.patch("/api/books/:id/status", isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       const { status } = req.body;
+      const userId = req.user.claims.sub;
       
       if (!["want-to-read", "reading", "read"].includes(status)) {
         return res.status(400).json({ message: "Invalid status" });
       }
 
-      const updatedBook = await storage.updateBookStatus(id, status);
+      const updatedBook = await storage.updateBookStatus(id, status, userId);
       
       if (!updatedBook) {
         return res.status(404).json({ message: "Book not found" });
@@ -434,16 +505,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update selected cover image
-  app.patch("/api/books/:id/cover", async (req, res) => {
+  app.patch("/api/books/:id/cover", isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       const { selectedCoverIndex } = req.body;
+      const userId = req.user.claims.sub;
       
       if (typeof selectedCoverIndex !== 'number' || selectedCoverIndex < 0) {
         return res.status(400).json({ message: "Invalid cover index" });
       }
       
-      const book = await storage.getBook(id);
+      const book = await storage.getBook(id, userId);
       if (!book) {
         return res.status(404).json({ message: "Book not found" });
       }
@@ -455,7 +527,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedBook = await storage.updateBookData(id, {
         selectedCoverIndex,
         coverImage: book.coverImages[selectedCoverIndex] // Update the main coverImage too
-      });
+      }, userId);
       
       res.json(updatedBook);
     } catch (error) {
@@ -465,12 +537,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Refresh book data from API
-  app.patch("/api/books/:id/refresh", async (req, res) => {
+  app.patch("/api/books/:id/refresh", isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
+      const userId = req.user.claims.sub;
       
       // Get existing book
-      const existingBook = await storage.getBook(id);
+      const existingBook = await storage.getBook(id, userId);
       if (!existingBook) {
         return res.status(404).json({ message: "Book not found" });
       }
@@ -730,7 +803,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ratingsTotal: product.ratings_total || product.rating_breakdown?.total || existingBook.ratingsTotal,
         categories: categories.length > 0 ? categories : existingBook.categories,
         featureBullets: product.feature_bullets || existingBook.featureBullets,
-      });
+      }, userId);
       
       if (!updatedBook) {
         return res.status(404).json({ message: "Failed to update book" });
@@ -745,9 +818,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Refresh all books
-  app.post("/api/books/refresh-all", async (req, res) => {
+  app.post("/api/books/refresh-all", isAuthenticated, async (req: any, res) => {
     try {
-      const allBooks = await storage.getAllBooks();
+      const userId = req.user.claims.sub;
+      const allBooks = await storage.getAllBooks(userId);
       const refreshedBooks = [];
       const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
       
@@ -946,7 +1020,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 depth: parsedDimensions.depth?.toString() || null,
               };
               
-              const updatedBook = await storage.updateBookData(book.id, updateData);
+              const updatedBook = await storage.updateBookData(book.id, updateData, userId);
               if (updatedBook) {
                 refreshedBooks.push(updatedBook);
                 console.log(`Refreshed: ${book.title} -> dimensions: ${finalDimensions}, parsed: w:${parsedDimensions.width}, h:${parsedDimensions.height}, d:${parsedDimensions.depth}, author: ${author}`);

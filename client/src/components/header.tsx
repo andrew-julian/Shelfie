@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { BookOpen, Search, Filter, RefreshCw, SortAsc, X } from "lucide-react";
+import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "wouter";
 
 type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
@@ -41,12 +43,15 @@ export default function Header({
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center space-x-4">
             <BookOpen className="text-monochrome-black text-2xl" />
-            <h1 className="text-2xl font-bold text-monochrome-black tracking-tight">BookScan</h1>
+            <h1 className="text-2xl font-bold text-monochrome-black tracking-tight">BookCatalog</h1>
           </div>
           <div className="flex items-center space-x-6">
             <span className="text-sm text-gray-600 font-medium" data-testid="text-books-count">
               {filteredCount !== booksCount ? `${filteredCount} of ${booksCount}` : booksCount} {booksCount === 1 ? 'book' : 'books'}
             </span>
+            
+            {/* User Menu */}
+            <UserMenu />
             {onRefreshAll && booksCount > 0 && (
               <button 
                 onClick={onRefreshAll}
@@ -153,5 +158,61 @@ export default function Header({
         </div>
       )}
     </header>
+  );
+}
+
+function UserMenu() {
+  const { user } = useAuth();
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  if (!user) return null;
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setShowDropdown(!showDropdown)}
+        className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+        data-testid="button-user-menu"
+      >
+        {(user as any)?.profileImageUrl ? (
+          <img 
+            src={(user as any).profileImageUrl} 
+            alt="Profile" 
+            className="h-8 w-8 rounded-full object-cover"
+            data-testid="img-user-avatar"
+          />
+        ) : (
+          <User className="h-8 w-8 text-gray-600" />
+        )}
+        <span className="text-sm font-medium" data-testid="text-user-name">
+          {(user as any)?.firstName || 'User'}
+        </span>
+      </button>
+
+      {showDropdown && (
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+          <div className="py-1">
+            <Link href="/settings">
+              <button 
+                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => setShowDropdown(false)}
+                data-testid="button-settings-menu"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </button>
+            </Link>
+            <button 
+              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              onClick={() => window.location.href = '/api/logout'}
+              data-testid="button-logout-menu"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

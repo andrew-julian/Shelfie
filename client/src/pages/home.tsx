@@ -1,10 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/header";
 import BookCard from "@/components/book-card";
 import ScannerModal from "@/components/scanner-modal";
 import BookDetailsModal from "@/components/book-details-modal";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { isUnauthorizedError } from "@/lib/authUtils";
 import { Book } from "@shared/schema";
 import { BookOpen, Camera, Book as BookIcon, Eye, CheckCircle } from "lucide-react";
 
@@ -21,8 +23,24 @@ export default function Home() {
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { isAuthenticated, isLoading } = useAuth();
 
-  const { data: allBooks = [], isLoading, refetch } = useQuery<Book[]>({
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+      return;
+    }
+  }, [isAuthenticated, isLoading, toast]);
+
+  const { data: allBooks = [], isLoading: booksLoading, refetch } = useQuery<Book[]>({
     queryKey: ['/api/books'],
   });
 
@@ -88,6 +106,18 @@ export default function Home() {
       });
     },
     onError: (error) => {
+      if (isUnauthorizedError(error as Error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      
       toast({
         title: "Error",
         description: "Failed to refresh books. Please try again.",
@@ -159,7 +189,7 @@ export default function Home() {
         </div>
 
         {/* Books Grid */}
-        {isLoading ? (
+        {booksLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 justify-items-center">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="group">
