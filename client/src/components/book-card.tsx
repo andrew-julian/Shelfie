@@ -180,7 +180,7 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
           <div 
             className="book-spine"
             style={{
-              width: `${bookDimensions.depth * 1.8}px`,
+              width: `${bookDimensions.depth * 3.2}px`,
               height: `${bookDimensions.height - 2}px`,
               transform: `translateX(${bookDimensions.width}px) rotateY(90deg)`
             }}
