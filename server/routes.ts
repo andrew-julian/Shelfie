@@ -85,6 +85,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/books/lookup/:isbn", async (req, res) => {
     try {
       const { isbn } = req.params;
+      const { region } = req.query;
+      
+      // Default to Australian Amazon domain, but allow override
+      const amazonDomain = (region as string) || "amazon.com.au";
       
       // Check if book already exists
       const existingBook = await storage.getBookByIsbn(isbn);
@@ -97,7 +101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Call Rainforest API
       const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
-      const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${isbn}&amazon_domain=amazon.com`;
+      const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${isbn}&amazon_domain=${amazonDomain}`;
       
       const response = await fetch(rainforestUrl);
       
@@ -160,7 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (variant.asin && variant.asin !== product.asin) {
             try {
               console.log(`Fetching variant cover for ${variant.title} (${variant.asin})`);
-              const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=amazon.com`;
+              const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=${amazonDomain}`;
               const variantResponse = await fetch(variantUrl);
               
               if (variantResponse.ok) {
@@ -345,6 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         categories: categories,
         featureBullets: featureBullets,
         availability: product.availability?.raw || product.availability || product.in_stock ? "In Stock" : null,
+        amazonDomain: amazonDomain,
         status: "want-to-read"
       };
       
@@ -470,9 +475,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Book not found" });
       }
 
-      // Call Rainforest API with fresh lookup
+      // Call Rainforest API with fresh lookup using the book's stored region
       const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
-      const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${existingBook.isbn}&amazon_domain=amazon.com`;
+      const amazonDomain = existingBook.amazonDomain || "amazon.com.au"; // Use stored region or default to Australia
+      const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${existingBook.isbn}&amazon_domain=${amazonDomain}`;
       
       const response = await fetch(rainforestUrl);
       
@@ -530,7 +536,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (variant.asin && variant.asin !== product.asin) {
             try {
               console.log(`Fetching variant cover for ${variant.title} (${variant.asin})`);
-              const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=amazon.com`;
+              const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=${amazonDomain}`;
               const variantResponse = await fetch(variantUrl);
               
               if (variantResponse.ok) {
@@ -667,7 +673,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               // Make API call to get variant's detailed specifications
               try {
-                const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=amazon.com`;
+                const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=${amazonDomain}`;
                 const variantResponse = await fetch(variantUrl);
                 
                 if (variantResponse.ok) {
@@ -749,8 +755,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       for (const book of allBooks) {
         try {
-          // Call Rainforest API for fresh data
-          const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${book.isbn}&amazon_domain=amazon.com`;
+          // Call Rainforest API for fresh data using book's stored region
+          const amazonDomain = book.amazonDomain || "amazon.com.au"; // Use stored region or default to Australia
+          const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${book.isbn}&amazon_domain=${amazonDomain}`;
           const response = await fetch(rainforestUrl);
           
           if (response.ok) {
@@ -801,7 +808,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   if (variant.asin && variant.asin !== product.asin) {
                     try {
                       console.log(`Fetching variant cover for ${variant.title} (${variant.asin})`);
-                      const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=amazon.com`;
+                      const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=${amazonDomain}`;
                       const variantResponse = await fetch(variantUrl);
                       
                       if (variantResponse.ok) {
@@ -878,7 +885,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                       
                       // Make API call to get variant's detailed specifications
                       try {
-                        const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=amazon.com`;
+                        const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=${amazonDomain}`;
                         const variantResponse = await fetch(variantUrl);
                         
                         if (variantResponse.ok) {

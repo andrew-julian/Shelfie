@@ -31,6 +31,7 @@ export const books = pgTable("books", {
   categories: text("categories").array(),
   featureBullets: text("feature_bullets").array(),
   availability: text("availability"),
+  amazonDomain: varchar("amazon_domain", { length: 50 }).notNull().default("amazon.com.au"),
   status: varchar("status", { length: 20 }).notNull().default("want-to-read"),
   addedAt: timestamp("added_at").defaultNow().notNull(),
 });
