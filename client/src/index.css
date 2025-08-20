@@ -1,42 +1,52 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: hsl(0 0% 100%);
-  --foreground: hsl(210 25% 7.8431%);
+  /* Rippl Color Palette */
+  --rippl-red: #DD454E;
+  --light-aqua: #B9DFDA;
+  --electric-blue: #0066FF;
+  --aqua: #00E5FF;
+  --light-grey: #F5F7FA;
+  --charcoal-grey: #333333;
+  
+  /* Updated System Colors */
+  --background: #F5F7FA;
+  --foreground: #333333;
   --card: hsl(0 0% 100%);
-  --card-foreground: hsl(210 25% 7.8431%);
+  --card-foreground: #333333;
   --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(210 25% 7.8431%);
-  --primary: hsl(203 88% 53%);
+  --popover-foreground: #333333;
+  --primary: #DD454E;
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(0 0% 26%);
-  --secondary-foreground: hsl(0 0% 100%);
-  --muted: hsl(210 40% 98%);
-  --muted-foreground: hsl(215 13% 65%);
-  --accent: hsl(36 100% 58%);
+  --secondary: #B9DFDA;
+  --secondary-foreground: #333333;
+  --muted: #F5F7FA;
+  --muted-foreground: #666666;
+  --accent: #0066FF;
   --accent-foreground: hsl(0 0% 100%);
   --destructive: hsl(0 84% 60%);
   --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(214 32% 91%);
-  --input: hsl(214 32% 91%);
-  --ring: hsl(203 88% 53%);
-  --chart-1: hsl(203 88% 53%);
-  --chart-2: hsl(159 100% 36%);
-  --chart-3: hsl(42 93% 56%);
-  --chart-4: hsl(147 79% 42%);
-  --chart-5: hsl(341 75% 51%);
+  --border: #E1E5E9;
+  --input: #E1E5E9;
+  --ring: #DD454E;
+  --chart-1: #DD454E;
+  --chart-2: #B9DFDA;
+  --chart-3: #0066FF;
+  --chart-4: #00E5FF;
+  --chart-5: #333333;
   --sidebar: hsl(0 0% 100%);
-  --sidebar-foreground: hsl(210 25% 7.8431%);
-  --sidebar-primary: hsl(203 88% 53%);
+  --sidebar-foreground: #333333;
+  --sidebar-primary: #DD454E;
   --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(210 40% 98%);
-  --sidebar-accent-foreground: hsl(203 88% 53%);
-  --sidebar-border: hsl(214 32% 91%);
-  --sidebar-ring: hsl(203 88% 53%);
-  --font-sans: 'Roboto', sans-serif;
+  --sidebar-accent: #F5F7FA;
+  --sidebar-accent-foreground: #DD454E;
+  --sidebar-border: #E1E5E9;
+  --sidebar-ring: #DD454E;
+  --font-brand: 'Unbounded', sans-serif;
+  --font-sans: 'Inter', sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: 'Fira Code', monospace;
   --radius: 0.5rem;
@@ -83,8 +93,22 @@
   }
 
   body {
-    @apply font-sans antialiased bg-gray-50 text-foreground;
-    font-family: 'Roboto', sans-serif;
+    @apply font-sans antialiased text-foreground;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--light-grey);
+    color: var(--charcoal-grey);
+    font-weight: 400;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: var(--charcoal-grey);
+  }
+  
+  .brand-font {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
   }
 }
 
@@ -192,7 +216,7 @@
     position: absolute;
     width: 100%;
     height: 2px;
-    background: linear-gradient(to right, transparent, hsl(203 88% 53%), transparent);
+    background: linear-gradient(to right, transparent, var(--rippl-red), transparent);
     animation: scanLine 2s linear infinite;
   }
   
@@ -203,18 +227,29 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: hsl(203 88% 53%);
+    background: linear-gradient(135deg, var(--electric-blue), var(--aqua));
     color: white;
     border: none;
     cursor: pointer;
-    box-shadow: 0 8px 16px rgba(25, 118, 210, 0.3);
+    box-shadow: 0 8px 16px rgba(221, 69, 78, 0.3);
     transition: all 0.3s ease;
     z-index: 1000;
   }
   
   .floating-action-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(25, 118, 210, 0.4);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 12px 24px rgba(221, 69, 78, 0.4);
+  }
+  
+  .gradient-button {
+    background: linear-gradient(135deg, var(--electric-blue), var(--aqua));
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .gradient-button:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
   }
 }
 
