@@ -457,7 +457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(400).json({ message: "Invalid book data", errors: error.errors });
       } else {
         console.error("Non-Zod error:", error);
-        res.status(500).json({ message: "Failed to add book", error: error.message });
+        res.status(500).json({ message: "Failed to add book", error: (error as Error).message });
       }
     }
   });
