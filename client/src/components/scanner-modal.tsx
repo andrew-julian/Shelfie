@@ -89,7 +89,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   });
 
   const startScanner = async () => {
-    if (!window.ScanbotSDK || !isSDKLoaded) {
+    if (!window.ScanbotSDK) {
       toast({
         title: "Scanner Error",
         description: "Scanner SDK is not loaded. Please enter ISBN manually.",
@@ -100,29 +100,22 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
 
     try {
       setIsScanning(true);
+      console.log('Starting Scanbot scanner...');
       
-      // Create proper Scanbot SDK configuration
+      // Create configuration using the simple approach
       const config = new window.ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration();
       
-      // Configure barcode formats
-      config.scannerConfiguration.barcodeFormats = [
-        'EAN_8', 'EAN_13', 'UPC_A', 'UPC_E',
-        'CODE_39', 'CODE_93', 'CODE_128',
-        'ITF', 'RSS_14', 'RSS_EXPANDED'
-      ];
-      
-      // Configure UI
-      config.topBarConfiguration.title = 'Scan Book Barcode';
-      config.userGuidanceConfiguration.title = 'Position barcode in the frame';
-      config.userGuidanceConfiguration.background.fillColor = '#000000CC';
+      console.log('Creating barcode scanner with config:', config);
       
       // Create and present the scanner
       const result = await window.ScanbotSDK.UI.createBarcodeScanner(config);
       
       setIsScanning(false);
+      console.log('Scanner result:', result);
       
       if (result && result.items && result.items.length > 0) {
         const scannedCode = result.items[0].barcode.text;
+        console.log('Scanned barcode:', scannedCode);
         if (scannedCode && scannedCode.length >= 10) {
           lookupMutation.mutate(scannedCode);
         } else {
@@ -133,7 +126,6 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
           });
         }
       } else {
-        // User cancelled or no barcode found
         console.log('Scanner cancelled or no barcode detected');
       }
     } catch (error) {
@@ -141,7 +133,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       setIsScanning(false);
       toast({
         title: "Camera Error",
-        description: "Could not access camera. Please enter ISBN manually.",
+        description: `Could not access camera: ${error.message}. Please enter ISBN manually.`,
         variant: "destructive",
       });
     }
@@ -181,23 +173,25 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
           script.src = 'https://cdn.jsdelivr.net/npm/scanbot-web-sdk@7.2.0/bundle/ScanbotSDK.ui2.min.js';
           script.onload = async () => {
             try {
+              console.log('Scanbot SDK script loaded, initializing...');
               // Initialize the SDK
               await window.ScanbotSDK.initialize({
                 licenseKey: LICENSE_KEY,
                 enginePath: 'https://cdn.jsdelivr.net/npm/scanbot-web-sdk@7.2.0/bundle/bin/complete/',
               });
+              console.log('Scanbot SDK initialized successfully');
               setIsSDKLoaded(true);
             } catch (error) {
               console.error('Failed to initialize Scanbot SDK:', error);
               toast({
                 title: "Scanner Initialization Error",
-                description: "Failed to initialize barcode scanner. Please enter ISBN manually.",
+                description: `Failed to initialize barcode scanner: ${error.message}. Please enter ISBN manually.`,
                 variant: "destructive",
               });
             }
           };
-          script.onerror = () => {
-            console.error('Failed to load Scanbot SDK script');
+          script.onerror = (error) => {
+            console.error('Failed to load Scanbot SDK script:', error);
             toast({
               title: "Scanner Load Error",
               description: "Failed to load barcode scanner. Please enter ISBN manually.",
@@ -241,7 +235,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
                 <Button 
                   onClick={startScanner} 
                   className="primary-button" 
-                  disabled={!isSDKLoaded}
+                  disabled={!window.ScanbotSDK}
                   data-testid="button-start-scanner"
                 >
                   <Camera className="w-4 h-4 mr-2" />
