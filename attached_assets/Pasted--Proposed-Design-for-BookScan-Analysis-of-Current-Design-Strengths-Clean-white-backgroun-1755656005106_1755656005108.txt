@@ -1,0 +1,75 @@
+# Proposed Design for BookScan
+
+## Analysis of Current Design
+
+### Strengths
+- Clean white background with strong typography.
+- Simple stats (total books, read, reading) are easy to scan.
+- Book covers stand out visually.
+- Pop-up modal gives full book detail without leaving the main page.
+
+### Weaknesses
+- The **“Unknown Author”** label feels unfinished — metadata should feel polished.
+- Cards (“Want to Read” buttons) are visually heavy and duplicated inside details.
+- Too much empty white space between sections, creating visual gaps rather than flow.
+- The stats (total books, read, reading) look more like *admin boxes* than an inviting part of your reading journey.
+- The detail modal is informative but not visually inspiring — it feels like a form rather than a showcase of the book.
+
+---
+
+## Proposed Design: Clean, Simple & Compelling
+
+### 1. Dashboard Layout
+- Replace the three separate stat boxes with a **single horizontal tracker bar** at the top:
+  - Example:  
+    **📚 2 books** · **✅ 0 read** · **📖 0 reading**
+- Smaller, lighter typography with icons for quick recognition.
+- Keeps focus on the books themselves.
+
+### 2. Book Grid
+- Switch to a **tight, elegant grid** of book covers, with covers as the hero.
+- Show only the cover + a subtle overlay (status indicator).
+- Example: bottom-right corner has a small tag: *Want to Read / Reading / Finished*.
+- Remove redundant text under each cover; reveal details on hover/click.
+
+### 3. Book Detail View
+- Make the book detail modal **feel like a showcase**:
+  - Full-bleed book cover left side.
+  - Right side: clean stacked info with hierarchy:
+    - Title (big, bold)
+    - Author(s) (always resolved; if unknown, grey placeholder “Author unknown”)
+    - ⭐ rating (larger, spaced out)
+    - Toggleable reading status (pill-shaped segmented control: Want → Reading → Read).
+  - Publication details in collapsible sections (“More Info”).
+
+### 4. Typography & Icons
+- Use **lightweight sans-serif typography** with varied sizes for hierarchy.
+- Softer iconography (line icons instead of filled).
+- Muted but modern colour palette:
+  - Blue = reading  
+  - Green = finished  
+  - Grey = want to read  
+
+### 5. Interactions
+- **Hover effect on book covers**: subtle lift + shadow.
+- **One-click status toggle**: click the status tag directly on the cover to cycle through *Want → Reading → Read*.
+- **Search/filter bar** always visible in top-right, slimmer and integrated.
+
+### 6. Streamlined Experience
+- When scanning books, users should see only:
+  - The cover (visual memory anchor).
+  - The current status (small tag).
+- All deeper metadata (ISBN, publication details, ratings) hidden until expanded.
+- Reduces noise and keeps the library *visual first, metadata second*.
+
+---
+
+## The Resulting Feel
+- **Slick**: minimal cards, no duplicated metadata.
+- **Compelling**: covers dominate, making the library look like a real bookshelf.
+- **Streamlined**: fast toggling of reading states, smooth hover animations.
+- **Attractive**: consistent typography, subtle colours, elegant modal.
+
+---
+
+👉 In short: *shift from “admin dashboard of books” to “personal bookshelf you want to browse.”*

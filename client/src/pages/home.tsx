@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
-import StatsCards from "@/components/stats-cards";
 import BookCard from "@/components/book-card";
 import ScannerModal from "@/components/scanner-modal";
 import BookDetailsModal from "@/components/book-details-modal";
 import { Book } from "@shared/schema";
-import { BookOpen, Camera } from "lucide-react";
+import { BookOpen, Camera, Book as BookIcon, Eye, CheckCircle } from "lucide-react";
 
 export default function Home() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -35,29 +34,48 @@ export default function Home() {
       
       <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
         {/* Hero Section */}
-        <div className="mb-16 text-center">
-          <h2 className="text-5xl font-bold text-monochrome-black mb-6 tracking-tight leading-tight">Your Digital Library</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Scan barcodes to instantly add books to your collection. Browse, organize, and discover your reading journey with modern simplicity.
+        <div className="mb-12 text-center">
+          <h2 className="text-4xl font-bold text-monochrome-black mb-4 tracking-tight leading-tight">Your Digital Library</h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-8">
+            Scan barcodes to instantly add books to your collection. Browse, organize, and discover your reading journey.
           </p>
+          
+          {/* Horizontal Tracker Bar */}
+          {books.length > 0 && (
+            <div className="inline-flex items-center gap-8 bg-white rounded-full px-8 py-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-700">
+                <BookIcon className="w-5 h-5 text-coral-red" />
+                <span className="font-semibold text-lg">{books.length}</span>
+                <span className="text-sm text-gray-500">books</span>
+              </div>
+              <div className="w-px h-6 bg-gray-200" />
+              <div className="flex items-center gap-2 text-gray-700">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span className="font-semibold text-lg">{books.filter(b => b.status === 'read').length}</span>
+                <span className="text-sm text-gray-500">read</span>
+              </div>
+              <div className="w-px h-6 bg-gray-200" />
+              <div className="flex items-center gap-2 text-gray-700">
+                <Eye className="w-5 h-5 text-sky-blue" />
+                <span className="font-semibold text-lg">{books.filter(b => b.status === 'reading').length}</span>
+                <span className="text-sm text-gray-500">reading</span>
+              </div>
+            </div>
+          )}
         </div>
-
-        <StatsCards books={books} />
 
         {/* Books Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-                <div className="w-full h-48 bg-gray-200 rounded mb-3 animate-pulse" />
-                <div className="h-4 bg-gray-200 rounded mb-2 animate-pulse" />
-                <div className="h-3 bg-gray-200 rounded mb-2 animate-pulse" />
-                <div className="h-6 bg-gray-200 rounded animate-pulse" />
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="group">
+                <div className="relative aspect-[3/4] bg-gray-200 rounded-lg mb-2 animate-pulse" />
+                <div className="absolute bottom-2 right-2 w-6 h-6 bg-gray-300 rounded-full animate-pulse" />
               </div>
             ))}
           </div>
         ) : books.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" data-testid="books-grid">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4" data-testid="books-grid">
             {books.map((book) => (
               <BookCard
                 key={book.id}
@@ -69,20 +87,20 @@ export default function Home() {
           </div>
         ) : (
           /* Empty State */
-          <div className="text-center py-16" data-testid="empty-state">
-            <div className="mb-8">
-              <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-medium text-gray-900 mb-2">No books in your library yet</h3>
-              <p className="text-gray-600 max-w-md mx-auto">
-                Start building your digital library by scanning book barcodes with your camera.
+          <div className="text-center py-20" data-testid="empty-state">
+            <div className="mb-10">
+              <BookOpen className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold text-gray-900 mb-3">Build Your Digital Bookshelf</h3>
+              <p className="text-gray-600 max-w-lg mx-auto text-lg leading-relaxed">
+                Start your reading journey by scanning book barcodes. Watch your personal library come to life.
               </p>
             </div>
             <button
               onClick={() => setIsScannerOpen(true)}
-              className="primary-button inline-flex items-center text-lg font-semibold"
+              className="inline-flex items-center px-8 py-4 bg-coral-red hover:bg-red-600 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               data-testid="button-scan-first-book"
             >
-              <Camera className="w-5 h-5 mr-3" />
+              <Camera className="w-6 h-6 mr-3" />
               Scan Your First Book
             </button>
           </div>
@@ -90,13 +108,15 @@ export default function Home() {
       </main>
 
       {/* Floating Action Button */}
-      <button
-        onClick={() => setIsScannerOpen(true)}
-        className="floating-action-button"
-        data-testid="button-floating-scan"
-      >
-        <Camera className="w-6 h-6" />
-      </button>
+      {books.length > 0 && (
+        <button
+          onClick={() => setIsScannerOpen(true)}
+          className="fixed bottom-8 right-8 bg-coral-red hover:bg-red-600 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 z-50"
+          data-testid="button-floating-scan"
+        >
+          <Camera className="w-7 h-7" />
+        </button>
+      )}
 
       {/* Modals */}
       <ScannerModal 
