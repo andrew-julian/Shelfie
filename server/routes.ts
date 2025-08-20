@@ -298,12 +298,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         categories = product.category_path.map((cat: any) => cat.name || cat).filter(Boolean);
       }
       
-      // Enhanced dimensions extraction
+      // Enhanced dimensions extraction - check multiple locations
       let extractedDimensions: string | null = null;
       
-      if (product.details && product.details.dimensions) {
-        extractedDimensions = String(product.details.dimensions);
-      } else if (product.product_details) {
+      // Check top-level dimensions field
+      if (product.dimensions) {
+        extractedDimensions = String(product.dimensions);
+      }
+      
+      // Check additional_details_flat array
+      if (!extractedDimensions && product.additional_details_flat && Array.isArray(product.additional_details_flat)) {
+        for (const detail of product.additional_details_flat) {
+          if (detail && typeof detail === 'object') {
+            if (detail.name && detail.value) {
+              const name = String(detail.name).toLowerCase();
+              if (name.includes('dimension') || name.includes('product dimension') || name.includes('package dimension')) {
+                extractedDimensions = String(detail.value);
+                break;
+              }
+            }
+          }
+        }
+      }
+      
+      // Check specifications_flat array  
+      if (!extractedDimensions && product.specifications_flat && Array.isArray(product.specifications_flat)) {
+        for (const spec of product.specifications_flat) {
+          if (spec && typeof spec === 'object') {
+            if (spec.name && spec.value) {
+              const name = String(spec.name).toLowerCase();
+              if (name.includes('dimension') || name.includes('product dimension') || name.includes('package dimension')) {
+                extractedDimensions = String(spec.value);
+                break;
+              }
+            }
+          }
+        }
+      }
+      
+      // Check nested product_details
+      if (!extractedDimensions && product.product_details) {
         Object.entries(product.product_details as any).forEach(([key, value]) => {
           const lowerKey = key.toLowerCase();
           if ((lowerKey.includes('dimension') || lowerKey.includes('size')) && value && !extractedDimensions) {
@@ -312,6 +346,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Check legacy specifications object
       if (!extractedDimensions && product.specifications) {
         const specs = product.specifications as any;
         if (specs.dimensions) {
