@@ -152,8 +152,8 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
             width: `${bookDimensions.width}px`,
             height: `${bookDimensions.height}px`
           }}
-          data-depth={bookDimensions.depth}
         >
+          {/* Book Cover */}
           {book.coverImage ? (
             <img 
               src={book.coverImage} 
@@ -175,6 +175,16 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
               <span className="text-xs font-medium text-center px-2 leading-tight">{book.title}</span>
             </div>
           )}
+          
+          {/* White Spine */}
+          <div 
+            className="book-spine"
+            style={{
+              width: `${bookDimensions.depth * 1.8}px`,
+              height: `${bookDimensions.height - 2}px`,
+              transform: `translateX(${bookDimensions.width - bookDimensions.depth}px) rotateY(90deg)`
+            }}
+          />
         </div>
         
         {/* Status Tag */}
