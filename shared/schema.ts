@@ -6,7 +6,7 @@ import { relations } from "drizzle-orm";
 
 export const books = pgTable("books", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  isbn: varchar("isbn", { length: 13 }).notNull().unique(),
+  isbn: varchar("isbn", { length: 13 }).notNull(),
   asin: varchar("asin", { length: 20 }),
   title: text("title").notNull(),
   author: text("author").notNull(),
@@ -36,7 +36,10 @@ export const books = pgTable("books", {
   userId: varchar("user_id"), // nullable initially to preserve existing data
   status: varchar("status", { length: 20 }).notNull().default("want-to-read"),
   addedAt: timestamp("added_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  // Create a composite unique constraint for ISBN per user (but allow null userId)
+  userIsbnUnique: index("user_isbn_idx").on(table.userId, table.isbn),
+}));
 
 export const insertBookSchema = createInsertSchema(books).omit({
   id: true,
