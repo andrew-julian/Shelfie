@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/header";
 import BookCard from "@/components/book-card";
@@ -8,16 +8,65 @@ import { useToast } from "@/hooks/use-toast";
 import { Book } from "@shared/schema";
 import { BookOpen, Camera, Book as BookIcon, Eye, CheckCircle } from "lucide-react";
 
+type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added';
+type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
+
 export default function Home() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('title-asc');
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
+  const [showFilters, setShowFilters] = useState(false);
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: books = [], isLoading, refetch } = useQuery<Book[]>({
+  const { data: allBooks = [], isLoading, refetch } = useQuery<Book[]>({
     queryKey: ['/api/books'],
   });
+
+  // Filter and sort books based on current state
+  const books = useMemo(() => {
+    let filtered = allBooks;
+
+    // Filter by search term
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(book => 
+        book.title.toLowerCase().includes(term) ||
+        book.author.toLowerCase().includes(term)
+      );
+    }
+
+    // Filter by status
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(book => book.status === filterStatus);
+    }
+
+    // Sort books
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'title-asc':
+          return a.title.localeCompare(b.title);
+        case 'title-desc':
+          return b.title.localeCompare(a.title);
+        case 'author-asc':
+          return a.author.localeCompare(b.author);
+        case 'author-desc':
+          return b.author.localeCompare(a.author);
+        case 'status':
+          const statusOrder = { 'reading': 0, 'want-to-read': 1, 'read': 2 };
+          return (statusOrder[a.status as keyof typeof statusOrder] || 3) - (statusOrder[b.status as keyof typeof statusOrder] || 3);
+        case 'date-added':
+          return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [allBooks, searchTerm, filterStatus, sortBy]);
   
   const refreshAllMutation = useMutation({
     mutationFn: async () => {
@@ -63,9 +112,18 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       <Header 
-        booksCount={books.length} 
+        booksCount={allBooks.length}
+        filteredCount={books.length}
         onRefreshAll={() => refreshAllMutation.mutate()}
         isRefreshing={refreshAllMutation.isPending}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        filterStatus={filterStatus}
+        onFilterStatusChange={setFilterStatus}
+        showFilters={showFilters}
+        onToggleFilters={() => setShowFilters(!showFilters)}
       />
       
       <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
