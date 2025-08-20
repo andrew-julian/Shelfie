@@ -49,13 +49,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const bookData = {
         isbn,
+        asin: product.asin || null,
         title: product.title || "Unknown Title",
         author: product.brand || product.by_line || "Unknown Author",
         description: product.description || product.feature_bullets?.join(" ") || "",
         coverImage: product.main_image?.link || "",
         publishYear: product.publication_date ? new Date(product.publication_date).getFullYear() : null,
+        publishDate: product.publication_date || null,
+        publisher: product.publisher || null,
+        language: product.language || null,
         pages: product.pages || null,
+        dimensions: product.dimensions || null,
+        weight: product.weight || null,
         rating: product.rating?.toString() || null,
+        ratingsTotal: product.ratings_total || null,
+        reviewsTotal: product.reviews_total || null,
+        price: product.price?.raw || product.price || null,
+        originalPrice: product.original_price?.raw || product.original_price || null,
+        categories: product.categories || [],
+        featureBullets: product.feature_bullets || [],
+        availability: product.availability?.raw || product.availability || null,
         status: "want-to-read"
       };
 
