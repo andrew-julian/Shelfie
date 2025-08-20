@@ -1,0 +1,515 @@
+{
+  "request_info": {
+    "success": true,
+    "credits_used": 31,
+    "credits_used_this_request": 1,
+    "credits_remaining": 9969,
+    "credits_reset_at": "2025-09-20T04:09:08.000Z"
+  },
+  "request_parameters": {
+    "amazon_domain": "amazon.com",
+    "type": "product",
+    "gtin": "9781526620163"
+  },
+  "request_metadata": {
+    "created_at": "2025-08-20T11:43:35.388Z",
+    "processed_at": "2025-08-20T11:43:39.796Z",
+    "total_time_taken": 4.41,
+    "amazon_url": "https://www.amazon.com/dp/B09FYHKYFJ?th=1&psc=1"
+  },
+  "product": {
+    "title": "Stolen Focus: Why You Can't Pay Attention—and How to Think Deeply Again",
+    "search_alias": {
+      "title": "Audible Books & Originals",
+      "value": "audible"
+    },
+    "keywords": "Stolen,Focus:,Why,You,Can't,Pay,Attention—and,How,to,Think,Deeply,Again",
+    "keywords_list": [
+      "Stolen",
+      "Focus:",
+      "Can't",
+      "Attention—and",
+      "Think",
+      "Deeply",
+      "Again"
+    ],
+    "is_collection": false,
+    "asin": "B09FYHKYFJ",
+    "parent_asin": "B09FYHKYFJ",
+    "link": "https://www.amazon.com/Stolen-Focus-Attention-Think-Deeply/dp/B09FYHKYFJ",
+    "sell_on_amazon": false,
+    "variants": [
+      {
+        "title": "Kindle",
+        "link": "https://www.amazon.com/Stolen-Focus-Attention-Think-Deeply-ebook/dp/B093G9TS91/ref=tmm_kin_swatch_0?th=1&psc=1",
+        "asin": "B093G9TS91",
+        "price": {
+          "symbol": "$",
+          "value": 14.99,
+          "currency": "USD",
+          "raw": "$14.99"
+        },
+        "is_current_product": false
+      },
+      {
+        "title": "Audiobook",
+        "link": "https://www.amazon.com/Stolen-Focus-Attention-Think-Deeply/dp/B09FYHKYFJ?th=1&psc=1",
+        "asin": "B09FYHKYFJ",
+        "price": {
+          "symbol": "$",
+          "value": 0,
+          "currency": "USD",
+          "raw": "$0.00"
+        },
+        "is_current_product": true
+      },
+      {
+        "title": "Hardcover",
+        "link": "https://www.amazon.com/Stolen-Focus-Attention-Think-Deeply/dp/0593138511/ref=tmm_hrd_swatch_0?th=1&psc=1",
+        "asin": "0593138511",
+        "price": {
+          "symbol": "$",
+          "value": 13.32,
+          "currency": "USD",
+          "raw": "$13.32"
+        },
+        "is_current_product": false
+      },
+      {
+        "title": "Paperback",
+        "link": "https://www.amazon.com/Stolen-Focus-Attention-Think-Deeply/dp/0593138538/ref=tmm_pap_swatch_0?th=1&psc=1",
+        "asin": "0593138538",
+        "price": {
+          "symbol": "$",
+          "value": 11.99,
+          "currency": "USD",
+          "raw": "$11.99"
+        },
+        "is_current_product": false
+      }
+    ],
+    "variant_asins_flat": "B093G9TS91,B09FYHKYFJ,0593138511,0593138538",
+    "proposition_65_warning": false,
+    "authors": [
+      {
+        "name": "Johann Hari",
+        "link": "https://www.amazon.com/s/ref=dp_byline_sr_audible_1?ie=UTF8&search-alias=audible&field-keywords=Johann+Hari"
+      },
+      {
+        "name": "Random House Audio",
+        "link": "https://www.amazon.com/s/ref=dp_byline_sr_audible_2?ie=UTF8&search-alias=audible&field-keywords=Random+House+Audio"
+      }
+    ],
+    "format": "Audiobook",
+    "has_size_guide": false,
+    "categories": [
+      {
+        "name": "Audible Books & Originals",
+        "link": "https://www.amazon.com/Audible-Books-and-Originals/b/ref=dp_bc_1?ie=UTF8&node=18145289011",
+        "category_id": "18145289011"
+      },
+      {
+        "name": "Health & Wellness",
+        "link": "https://www.amazon.com/b/ref=dp_bc_2?ie=UTF8&node=18573370011",
+        "category_id": "18573370011"
+      },
+      {
+        "name": "Psychology & Mental Health",
+        "link": "https://www.amazon.com/b/ref=dp_bc_3?ie=UTF8&node=18573475011",
+        "category_id": "18573475011"
+      },
+      {
+        "name": "Psychology",
+        "link": "https://www.amazon.com/b/ref=dp_bc_4?ie=UTF8&node=18573491011",
+        "category_id": "18573491011"
+      },
+      {
+        "name": "Creativity & Genius",
+        "link": "https://www.amazon.com/b/ref=dp_bc_5?ie=UTF8&node=18573492011",
+        "category_id": "18573492011"
+      }
+    ],
+    "categories_flat": "Audible Books & Originals > Health & Wellness > Psychology & Mental Health > Psychology > Creativity & Genius",
+    "sub_title": {
+      "text": "Johann Hari        (Author, Narrator),               Random House Audio        (Publisher)",
+      "link": "https://www.audible.com/legal/license-agreement"
+    },
+    "rating": 4.4,
+    "rating_breakdown": {
+      "five_star": {
+        "percentage": 64,
+        "count": 5350
+      },
+      "four_star": {
+        "percentage": 24,
+        "count": 2006
+      },
+      "three_star": {
+        "percentage": 9,
+        "count": 752
+      },
+      "two_star": {
+        "percentage": 2,
+        "count": 167
+      },
+      "one_star": {
+        "percentage": 1,
+        "count": 83
+      }
+    },
+    "ratings_total": 8360,
+    "book_description": "NEW YORK TIMES BESTSELLER Our ability to pay attention is collapsing. From the author of Chasing the Scream and Lost Connections comes a groundbreaking examination of why this is happening—and how to get our attention back. “The book the world needs in order to win the war on distraction.”—Adam Grant, author of Think Again “Read this book to save your mind.”—Susan Cain, author of Quiet WINNER OF THE PORCHLIGHT BUSINESS BOOK AWARD ONE OF THE BEST BOOKS OF THE YEAR: The Wall Street Journal, Financial Times, New York Post, Mashable, Mindful In the United States, teenagers can focus on one task for only sixty-five seconds at a time, and office workers average only three minutes. Like so many of us, Johann Hari was finding that constantly switching from device to device and tab to tab was a diminishing and depressing way to live. He tried all sorts of self-help solutions—even abandoning his phone for three months—but nothing seemed to work. So Hari went on an epic journey across the world to interview the leading experts on human attention—and he discovered that everything we think we know about this crisis is wrong. We think our inability to focus is a personal failure to exert enough willpower over our devices. The truth is even more disturbing: our focus has been stolen by powerful external forces that have left us uniquely vulnerable to corporations determined to raid our attention for profit. Hari found that there are twelve deep causes of this crisis, from the decline of mind-wandering to rising pollution, all of which have robbed some of our attention. In Stolen Focus, he introduces readers to Silicon Valley dissidents who learned to hack human attention, and veterinarians who diagnose dogs with ADHD. He explores a favela in Rio de Janeiro where everyone lost their attention in a particularly surreal way, and an office in New Zealand that discovered a remarkable technique to restore workers’ productivity. Crucially, Hari learned how we can reclaim our focus—as individuals, and as a society—if we are determined to fight for it. Stolen Focus will transform the debate about attention and finally show us how to get it back.",
+    "main_image": {
+      "link": "https://m.media-amazon.com/images/I/71dyq+RBmoL.jpg"
+    },
+    "images": [
+      {
+        "link": "https://m.media-amazon.com/images/I/71dyq+RBmoL._SL1500_.jpg",
+        "variant": "MAIN"
+      }
+    ],
+    "images_count": 1,
+    "images_flat": "https://m.media-amazon.com/images/I/71dyq+RBmoL._SL1500_.jpg",
+    "has_360_view": false,
+    "is_bundle": false,
+    "top_reviews": [
+      {
+        "id": "RVUSTVWH7R26G",
+        "title": "Gargantuan, Necessary Book--Everyone Needs to Read This",
+        "body": "This is a gargantuan book--and not because of its size (which I'm sure the publisher limited and 30% of it is end notes). It's massive in the scope of what it attempts: to explain the degredation of our ability to focus.  Do you feel it? I sure do. It predates COVID-19, but like many things, the pandemic just shoved us forward, abruptly, on a path we were already headed down.  It should not surprise you that there's no single factor, but a multitutde, each with their own pernicious effect. Hari's effort here is so broad that many times I would think \"hold up, I want an entire book about THIS\"--and I'm sure that was a struggle for him, giving cursory mention to whole swaths of scientific research on a certain aspect. Hari is nothing if not thorough, by nature. But the scope of this necessitated that, and those end notes are the breadcrumb trails, should you choose to follow them.  The most important part about this book, in my opinion, is the framework he provides: our focus has been *stolen* and there's no easy fix. It is a collective problem with massive individual impact. He's careful to point out that there are *many* things an individual can do to make it better (or worse)--and you should absolutely attempt those things--but those things are accessible primarily to the privileged. And it's an insult to pretend otherwise. Worse, intentional efforts are made (by corporations or other parties who benefit) to blame individuals for the very problems the corporations created (and continue to profit from). Victim-blaming is real, and culturally, we're well-primed to blame the individual for everything--from blaming women who can't carry an endless unpaid care-labor burden for their difficulty in focusing to blaming kids with stressful lives for not being able to focus in a testing-obsessed educational system. The pandemic shone a spotlight (a FOCUS) on the fact that the system doesn't work for most people, hasn't worked for some time, and is actively getting worse.  We were all collectively suffering, and some of us are starting to realize this is not an *individual* problem.  In some ways, this is a depressing, challenging book. There are no easy answers--just a whole bunch of really difficult ones. But it's a terribly important book. Because it gives a framework (a FOCUS) to the problem, which is a vital first step. We'll need to work collectively to solve this problem of focus--just like the climate crisis, just like the erosion of democracy--and I don't know if we will. We're *capable* of it, that's certain. But I don't know if we'll make that choice.  I'll leave you with a couple quotes from Hari, to get a flavor of what he's attempting, but if it's not clear: I think everyone *needs* to read this book. Addressing this problem is foundational to fixing *every* problem.  \"Solving big problems requires the sustained focus of many people over many years. Democracy requires the ability of a population to pay attention long enough to identify real problems, distinguish them from fantasies, come up with solutions, and hold their leaders accountable if they fail to deliver them.\"  \"Imagine that one day you are attacked by a bear. You will stop paying attention to your normal concerns—what you’re going to eat tonight, or how you will pay the rent. You become vigilant. Your attention flips to scanning for unexpected dangers all around you. For days and weeks afterward, you will find it harder to focus on more everyday concerns. This isn’t limited to bears. These sites make you feel that you are in an environment full of anger and hostility, so you become more vigilant—a situation where more of your attention shifts to searching for dangers, and less and less is available for slower forms of focus like reading a book or playing with your kids.\" Read more",
+        "body_html": "<script>   (function() {    P.when(&apos;cr-A&apos;, &apos;ready&apos;).execute(function(A) {     if(typeof A.toggleExpanderAriaLabel === &apos;function&apos;) {      A.toggleExpanderAriaLabel(&apos;review_text_read_more&apos;, &apos;Read more of this review&apos;, &apos;Read less of this review&apos;);     }    });   })();  </script>  <style>   .review-text-read-more-expander:focus-visible {    outline: 2px solid #2162a1;    outline-offset: 2px;    border-radius: 5px;   }  </style> <div data-a-expander-name=\"review_text_read_more\" data-a-expander-collapsed-height=\"300\" class=\"a-expander-collapsed-height a-row a-expander-container a-expander-partial-collapse-container review-text-read-more-expander\" style=\"max-height:300px\"><div data-hook=\"review-collapsed\" data-expanded=\"false\" class=\"a-expander-content reviewText review-text-content a-expander-partial-collapse-content\">             <span>This is a gargantuan book--and not because of its size (which I&apos;m sure the publisher limited and 30% of it is end notes). It&apos;s massive in the scope of what it attempts: to explain the degredation of our ability to focus.<br/><br/>Do you feel it? I sure do. It predates COVID-19, but like many things, the pandemic just shoved us forward, abruptly, on a path we were already headed down.<br/><br/>It should not surprise you that there&apos;s no single factor, but a multitutde, each with their own pernicious effect. Hari&apos;s effort here is so broad that many times I would think &quot;hold up, I want an entire book about THIS&quot;--and I&apos;m sure that was a struggle for him, giving cursory mention to whole swaths of scientific research on a certain aspect. Hari is nothing if not thorough, by nature. But the scope of this necessitated that, and those end notes are the breadcrumb trails, should you choose to follow them.<br/><br/>The most important part about this book, in my opinion, is the framework he provides: our focus has been *stolen* and there&apos;s no easy fix. It is a collective problem with massive individual impact. He&apos;s careful to point out that there are *many* things an individual can do to make it better (or worse)--and you should absolutely attempt those things--but those things are accessible primarily to the privileged. And it&apos;s an insult to pretend otherwise. Worse, intentional efforts are made (by corporations or other parties who benefit) to blame individuals for the very problems the corporations created (and continue to profit from). Victim-blaming is real, and culturally, we&apos;re well-primed to blame the individual for everything--from blaming women who can&apos;t carry an endless unpaid care-labor burden for their difficulty in focusing to blaming kids with stressful lives for not being able to focus in a testing-obsessed educational system.<br/>The pandemic shone a spotlight (a FOCUS) on the fact that the system doesn&apos;t work for most people, hasn&apos;t worked for some time, and is actively getting worse.<br/><br/>We were all collectively suffering, and some of us are starting to realize this is not an *individual* problem.<br/><br/>In some ways, this is a depressing, challenging book. There are no easy answers--just a whole bunch of really difficult ones. But it&apos;s a terribly important book. Because it gives a framework (a FOCUS) to the problem, which is a vital first step. We&apos;ll need to work collectively to solve this problem of focus--just like the climate crisis, just like the erosion of democracy--and I don&apos;t know if we will. We&apos;re *capable* of it, that&apos;s certain. But I don&apos;t know if we&apos;ll make that choice.<br/><br/>I&apos;ll leave you with a couple quotes from Hari, to get a flavor of what he&apos;s attempting, but if it&apos;s not clear: I think everyone *needs* to read this book. Addressing this problem is foundational to fixing *every* problem.<br/><br/>&quot;Solving big problems requires the sustained focus of many people over many years. Democracy requires the ability of a population to pay attention long enough to identify real problems, distinguish them from fantasies, come up with solutions, and hold their leaders accountable if they fail to deliver them.&quot;<br/><br/>&quot;Imagine that one day you are attacked by a bear. You will stop paying attention to your normal concerns&#x2014;what you&#x2019;re going to eat tonight, or how you will pay the rent. You become vigilant. Your attention flips to scanning for unexpected dangers all around you. For days and weeks afterward, you will find it harder to focus on more everyday concerns. This isn&#x2019;t limited to bears. These sites make you feel that you are in an environment full of anger and hostility, so you become more vigilant&#x2014;a situation where more of your attention shifts to searching for dangers, and less and less is available for slower forms of focus like reading a book or playing with your kids.&quot;<br/></span>   </div><div class=\"a-expander-header a-expander-partial-collapse-header\"><div class=\"a-expander-content-fade\"/><a href=\"javascript:void(0)\" data-hook=\"expand-collapse-read-more-less\" aria-label=\"Read more of this review\" aria-expanded=\"false\" role=\"button\" data-action=\"a-expander-toggle\" class=\"a-declarative\" data-a-expander-toggle=\"{&quot;allowLinkDefault&quot;:true, &quot;expand_prompt&quot;:&quot;Read more&quot;, &quot;collapse_prompt&quot;:&quot;Read less&quot;}\"><i class=\"a-icon a-icon-extender-expand\"/><span class=\"a-expander-prompt\">Read more</span></a></div></div>",
+        "link": "https://www.amazon.com/gp/customer-reviews/RVUSTVWH7R26G/ref=cm_cr_dp_d_rvw_ttl?ie=UTF8",
+        "rating": 5,
+        "date": {
+          "raw": "Reviewed in the United States on January 31, 2022",
+          "utc": "2022-01-31T00:00:00.000Z"
+        },
+        "profile": {
+          "name": "Susan Quinn",
+          "link": "https://www.amazon.com/gp/profile/amzn1.account.AE7VN4S5FL4XDO7DNB4OJ63I6C2Q/ref=cm_cr_dp_d_gw_tr?ie=UTF8",
+          "id": "AE7VN4S5FL4XDO7DNB4OJ63I6C2Q"
+        },
+        "vine_program": false,
+        "verified_purchase": true,
+        "helpful_votes": 395,
+        "review_country": "us",
+        "is_global_review": false
+      },
+      {
+        "id": "R286OGPK1BQ0ME",
+        "title": "Thought Provoking",
+        "body": "The digital hijacking of our brains by media and social media brainwashing was very informative and highlights the need to change our habits as individuals and define/implement guardrails as a society. The author escapes to Provincetown to do a digital detox and it is mentioned literally 70 times in this book. We get it. You spent 3 months in Provincetown. But the content is worth reading. Read more",
+        "body_html": "<div data-a-expander-name=\"review_text_read_more\" data-a-expander-collapsed-height=\"300\" class=\"a-expander-collapsed-height a-row a-expander-container a-expander-partial-collapse-container review-text-read-more-expander\" style=\"max-height:300px\"><div data-hook=\"review-collapsed\" data-expanded=\"false\" class=\"a-expander-content reviewText review-text-content a-expander-partial-collapse-content\">             <span>The digital hijacking of our brains by media and social media brainwashing was very informative and highlights the need to change our habits as individuals and define/implement guardrails as a society. The author escapes to Provincetown to do a digital detox and it is mentioned literally 70 times in this book. We get it. You spent 3 months in Provincetown. But the content is worth reading.<br/></span>   </div><div class=\"a-expander-header a-expander-partial-collapse-header\"><div class=\"a-expander-content-fade\"/><a href=\"javascript:void(0)\" data-hook=\"expand-collapse-read-more-less\" aria-label=\"Read more of this review\" aria-expanded=\"false\" role=\"button\" data-action=\"a-expander-toggle\" class=\"a-declarative\" data-a-expander-toggle=\"{&quot;allowLinkDefault&quot;:true, &quot;expand_prompt&quot;:&quot;Read more&quot;, &quot;collapse_prompt&quot;:&quot;Read less&quot;}\"><i class=\"a-icon a-icon-extender-expand\"/><span class=\"a-expander-prompt\">Read more</span></a></div></div>",
+        "link": "https://www.amazon.com/gp/customer-reviews/R286OGPK1BQ0ME/ref=cm_cr_dp_d_rvw_ttl?ie=UTF8",
+        "rating": 4,
+        "date": {
+          "raw": "Reviewed in the United States on August 1, 2025",
+          "utc": "2025-08-01T00:00:00.000Z"
+        },
+        "profile": {
+          "name": "BeckyK",
+          "link": "https://www.amazon.com/gp/profile/amzn1.account.AGJNQQUTWRV3VR4PI3A4DVGHYEEQ/ref=cm_cr_dp_d_gw_tr?ie=UTF8",
+          "id": "AGJNQQUTWRV3VR4PI3A4DVGHYEEQ"
+        },
+        "vine_program": false,
+        "verified_purchase": true,
+        "helpful_votes": 2,
+        "review_country": "us",
+        "is_global_review": false
+      },
+      {
+        "id": "R1QSDJJPXIB5IZ",
+        "title": "Sharp and Insightful, though Lacking Structural Logic",
+        "body": "Stolen Focus offers a powerful critique of the attention crisis plaguing modern society. Hari compellingly reframes the issue, moving away from dismissive comparisons to past obsessions like comic books or video games. Instead, they explain how today’s \"stolen focus\" is a systemic phenomenon, shaped by factors such as the overwhelming flood of information, the addictive designs of social media, and the economic incentives driving Big Tech. The book highlights that the root cause is not individual weakness but structural forces that demand collective action and policy change to address.  Hari also delves into deeper societal questions, pointing out that the development of digital technologies comes with negative externalities, akin to environmental issues stemming from economic growth. The book argues that just as society has responded to environmental challenges with regulation, we must address attention exploitation by curbing the addictive mechanisms of digital products.  In addition to discussing the role of Big Tech, the book explores other contributors to the attention crisis, such as changes in the food industry, chronic sleep deprivation, and the erosion of flow states. While these points are well-researched and supported by expert interviews, personal anecdotes, and engaging stories, the structure of the book could be improved. The author lists over ten causes of the attention crisis, but they often feel like isolated points rather than an interconnected framework. A more hierarchical or layered approach to these arguments would make the overall narrative more cohesive.  Despite this structural issue, Stolen Focus succeeds as both an informative and thought-provoking work. Written from a journalist's perspective, it balances scientific rigor with readability, capturing the reader’s attention through vivid storytelling. It leaves the reader with a stronger awareness of their digital habits and the societal implications of attention exploitation. This book is not only a wake-up call for individual action but also a compelling case for systemic reform. A must-read for anyone seeking to understand and reclaim their focus in the digital age. Read more",
+        "body_html": "<div data-a-expander-name=\"review_text_read_more\" data-a-expander-collapsed-height=\"300\" class=\"a-expander-collapsed-height a-row a-expander-container a-expander-partial-collapse-container review-text-read-more-expander\" style=\"max-height:300px\"><div data-hook=\"review-collapsed\" data-expanded=\"false\" class=\"a-expander-content reviewText review-text-content a-expander-partial-collapse-content\">             <span>Stolen Focus offers a powerful critique of the attention crisis plaguing modern society. Hari compellingly reframes the issue, moving away from dismissive comparisons to past obsessions like comic books or video games. Instead, they explain how today&#x2019;s &quot;stolen focus&quot; is a systemic phenomenon, shaped by factors such as the overwhelming flood of information, the addictive designs of social media, and the economic incentives driving Big Tech. The book highlights that the root cause is not individual weakness but structural forces that demand collective action and policy change to address.<br/><br/>Hari also delves into deeper societal questions, pointing out that the development of digital technologies comes with negative externalities, akin to environmental issues stemming from economic growth. The book argues that just as society has responded to environmental challenges with regulation, we must address attention exploitation by curbing the addictive mechanisms of digital products.<br/><br/>In addition to discussing the role of Big Tech, the book explores other contributors to the attention crisis, such as changes in the food industry, chronic sleep deprivation, and the erosion of flow states. While these points are well-researched and supported by expert interviews, personal anecdotes, and engaging stories, the structure of the book could be improved. The author lists over ten causes of the attention crisis, but they often feel like isolated points rather than an interconnected framework. A more hierarchical or layered approach to these arguments would make the overall narrative more cohesive.<br/><br/>Despite this structural issue, Stolen Focus succeeds as both an informative and thought-provoking work. Written from a journalist&apos;s perspective, it balances scientific rigor with readability, capturing the reader&#x2019;s attention through vivid storytelling. It leaves the reader with a stronger awareness of their digital habits and the societal implications of attention exploitation. This book is not only a wake-up call for individual action but also a compelling case for systemic reform. A must-read for anyone seeking to understand and reclaim their focus in the digital age.<br/></span>   </div><div class=\"a-expander-header a-expander-partial-collapse-header\"><div class=\"a-expander-content-fade\"/><a href=\"javascript:void(0)\" data-hook=\"expand-collapse-read-more-less\" aria-label=\"Read more of this review\" aria-expanded=\"false\" role=\"button\" data-action=\"a-expander-toggle\" class=\"a-declarative\" data-a-expander-toggle=\"{&quot;allowLinkDefault&quot;:true, &quot;expand_prompt&quot;:&quot;Read more&quot;, &quot;collapse_prompt&quot;:&quot;Read less&quot;}\"><i class=\"a-icon a-icon-extender-expand\"/><span class=\"a-expander-prompt\">Read more</span></a></div></div>",
+        "link": "https://www.amazon.com/gp/customer-reviews/R1QSDJJPXIB5IZ/ref=cm_cr_dp_d_rvw_ttl?ie=UTF8",
+        "rating": 5,
+        "date": {
+          "raw": "Reviewed in the United States on December 4, 2024",
+          "utc": "2024-12-04T00:00:00.000Z"
+        },
+        "profile": {
+          "name": "AlanT",
+          "link": "https://www.amazon.com/gp/profile/amzn1.account.AG6VU2QLD3IHF5Z22PLT536XCBDQ/ref=cm_cr_dp_d_gw_tr?ie=UTF8",
+          "id": "AG6VU2QLD3IHF5Z22PLT536XCBDQ"
+        },
+        "vine_program": false,
+        "verified_purchase": true,
+        "images": [
+          {
+            "link": "https://images-na.ssl-images-amazon.com/images/G/01/x-locale/common/grey-pixel.gif"
+          }
+        ],
+        "helpful_votes": 17,
+        "review_country": "us",
+        "is_global_review": false
+      },
+      {
+        "id": "R11KBY7BJW9LW5",
+        "title": "Veramente interessante, peccato non lo si trovi in italiano!",
+        "body": "The media could not be loaded. Un libro da leggere pian piano, crea molti pensieri e fornisce infiniti spunti sulla nostra esistenza frenetica. Veramente non avevo mai pensato e visto gli aspetti che Hari esplica con la massima accuratezza e precisione di informazioni. Mi sta dando molta centratura ed equilibrio. Read more",
+        "body_html": "<script>   (function() {    P.when(&apos;cr-A&apos;, &apos;ready&apos;).execute(function(A) {     if(typeof A.toggleExpanderAriaLabel === &apos;function&apos;) {      A.toggleExpanderAriaLabel(&apos;review_text_read_more&apos;, &apos;Read more of this review&apos;, &apos;Read less of this review&apos;);     }    });   })();  </script>  <style>   .review-text-read-more-expander:focus-visible {    outline: 2px solid #2162a1;    outline-offset: 2px;    border-radius: 5px;   }  </style> <div data-a-expander-name=\"review_text_read_more\" data-a-expander-collapsed-height=\"300\" class=\"a-expander-collapsed-height a-row a-expander-container a-expander-partial-collapse-container review-text-read-more-expander\" style=\"max-height:300px\"><div data-hook=\"review-collapsed\" data-expanded=\"false\" class=\"a-expander-content reviewText review-text-content a-expander-partial-collapse-content\"><div id=\"video-block-R11KBY7BJW9LW5\" class=\"a-section a-spacing-small a-spacing-top-mini video-block\">                                                  <div id=\"review-video-id-R11KBY7BJW9LW5\" class=\"cr-video-desktop cr-video-desktop-placeholder\" data-review-id=\"R11KBY7BJW9LW5\" data-video-url=\"https://m.media-amazon.com/images/S/vse-vms-transcoding-artifact-eu-west-1-prod/1d87c14d-35eb-4409-be68-5c5662ddc1e8/default.jobtemplate.hls.m3u8\" data-closed-captions=\"it,https://m.media-amazon.com/images/S/vse-vms-closed-captions-artifact-eu-west-1-prod/closedCaptions/07bc9c23-7703-462c-8034-e3c72d0f2ba0.vtt\" data-thumbnail-url=\"https://m.media-amazon.com/images/I/61kOVukLTZL._SY256.jpg\">       <div class=\"cr-media-status-container\">     <span class=\"a-spinner a-spinner-medium cr-media-spinner\"/>     <span class=\"a-color-inverse cr-media-error-msg\">      The media could not be loaded.     </span>    </div>     </div>                </div><input type=\"hidden\" name=\"\" value=\"https://m.media-amazon.com/images/I/B12xjdmpqfL.mp4\" class=\"video-url\"/><input type=\"hidden\" name=\"\" value=\"https://m.media-amazon.com/images/I/61kOVukLTZL._SY256.jpg\" class=\"video-slate-img-url\"/>           <span class=\"cr-original-review-content\">Un libro da leggere pian piano, crea molti pensieri e fornisce infiniti spunti sulla nostra esistenza frenetica.<br/>Veramente non avevo mai pensato e visto gli aspetti che Hari esplica con la massima accuratezza e precisione di informazioni.<br/>Mi sta dando molta centratura ed equilibrio.<br/></span><span class=\"cr-translated-review-content aok-hidden\"/>     </div><div class=\"a-expander-header a-expander-partial-collapse-header\"><div class=\"a-expander-content-fade\"/><a href=\"javascript:void(0)\" data-hook=\"expand-collapse-read-more-less\" aria-label=\"Read more of this review\" aria-expanded=\"false\" role=\"button\" data-action=\"a-expander-toggle\" class=\"a-declarative\" data-a-expander-toggle=\"{&quot;allowLinkDefault&quot;:true, &quot;expand_prompt&quot;:&quot;Read more&quot;, &quot;collapse_prompt&quot;:&quot;Read less&quot;}\"><i class=\"a-icon a-icon-extender-expand\"/><span class=\"a-expander-prompt\">Read more</span></a></div></div>",
+        "rating": 5,
+        "date": {
+          "raw": "Reviewed in Italy on March 24, 2023",
+          "utc": "2023-03-24T00:00:00.000Z"
+        },
+        "profile": {
+          "name": "Isabella",
+          "image": "https://m.media-amazon.com/images/S/amazon-avatars-global/90535817-3379-4c10-9a8d-80c9db4a3a8c._CR0%2C0%2C500%2C500_SX460_.jpg"
+        },
+        "vine_program": false,
+        "verified_purchase": true,
+        "videos": [
+          {
+            "video": "https://m.media-amazon.com/images/I/B12xjdmpqfL.mp4",
+            "image": "https://m.media-amazon.com/images/I/61kOVukLTZL._SY256.jpg"
+          }
+        ],
+        "review_country": "it",
+        "is_global_review": true
+      },
+      {
+        "id": "R14F96CR2V6C0",
+        "title": "great book, must read",
+        "body": "This book is a must read. Very interesting and holistic view on the concentration crisis. Starts as a personal journey, which is already interesting but becomes a very thorough analysis of what’s wrong with current society and corporate factors in it. Read more",
+        "body_html": "<div data-a-expander-name=\"review_text_read_more\" data-a-expander-collapsed-height=\"300\" class=\"a-expander-collapsed-height a-row a-expander-container a-expander-partial-collapse-container review-text-read-more-expander\" style=\"max-height:300px\"><div data-hook=\"review-collapsed\" data-expanded=\"false\" class=\"a-expander-content reviewText review-text-content a-expander-partial-collapse-content\">             <span>This book is a must read. Very interesting and holistic view on the concentration crisis. Starts as a personal journey, which is already interesting but becomes a very thorough analysis of what&#x2019;s wrong with current society and corporate factors in it.<br/></span>   </div><div class=\"a-expander-header a-expander-partial-collapse-header\"><div class=\"a-expander-content-fade\"/><a href=\"javascript:void(0)\" data-hook=\"expand-collapse-read-more-less\" aria-label=\"Read more of this review\" aria-expanded=\"false\" role=\"button\" data-action=\"a-expander-toggle\" class=\"a-declarative\" data-a-expander-toggle=\"{&quot;allowLinkDefault&quot;:true, &quot;expand_prompt&quot;:&quot;Read more&quot;, &quot;collapse_prompt&quot;:&quot;Read less&quot;}\"><i class=\"a-icon a-icon-extender-expand\"/><span class=\"a-expander-prompt\">Read more</span></a></div></div>",
+        "rating": 5,
+        "date": {
+          "raw": "Reviewed in the Netherlands on March 30, 2025",
+          "utc": "2025-03-30T00:00:00.000Z"
+        },
+        "profile": {
+          "name": "Kurt NL"
+        },
+        "vine_program": false,
+        "verified_purchase": true,
+        "review_country": "us",
+        "is_global_review": true
+      },
+      {
+        "id": "R1FFHH56ISZFQB",
+        "title": "Recomendación",
+        "body": "Me lo recomendaron. No he acabado el libro aún, pero ya veo muchas ideal utiles Read more",
+        "body_html": "<div data-a-expander-name=\"review_text_read_more\" data-a-expander-collapsed-height=\"300\" class=\"a-expander-collapsed-height a-row a-expander-container a-expander-partial-collapse-container review-text-read-more-expander\" style=\"max-height:300px\"><div data-hook=\"review-collapsed\" data-expanded=\"false\" class=\"a-expander-content reviewText review-text-content a-expander-partial-collapse-content\">           <span class=\"cr-original-review-content\">Me lo recomendaron. No he acabado el libro a&#xFA;n, pero ya veo muchas ideal utiles<br/></span><span class=\"cr-translated-review-content aok-hidden\"/>     </div><div class=\"a-expander-header a-expander-partial-collapse-header\"><div class=\"a-expander-content-fade\"/><a href=\"javascript:void(0)\" data-hook=\"expand-collapse-read-more-less\" aria-label=\"Read more of this review\" aria-expanded=\"false\" role=\"button\" data-action=\"a-expander-toggle\" class=\"a-declarative\" data-a-expander-toggle=\"{&quot;allowLinkDefault&quot;:true, &quot;expand_prompt&quot;:&quot;Read more&quot;, &quot;collapse_prompt&quot;:&quot;Read less&quot;}\"><i class=\"a-icon a-icon-extender-expand\"/><span class=\"a-expander-prompt\">Read more</span></a></div></div>",
+        "rating": 5,
+        "date": {
+          "raw": "Reviewed in Spain on March 8, 2025",
+          "utc": "2025-03-08T00:00:00.000Z"
+        },
+        "profile": {
+          "name": "Inna"
+        },
+        "vine_program": false,
+        "verified_purchase": true,
+        "review_country": "es",
+        "is_global_review": true
+      },
+      {
+        "id": "R1KTL9JRUPOJXH",
+        "title": "Importante e correto, mas simplista",
+        "body": "Stolen Focus é um livro importantíssimo sobre uma enorme crise que estamos prestes a enfrentar. Os pensamentos contidos aqui são de grande utilidade para planejamento pessoal de seus hábitos, mas também para ativismo social, visão de mundo, e criação de filhos. As ideias contidas nele são marcantes e cruciais de serem entendidas. Infelizmente, a exposição em si dessas ideias é muito simplista. O autor tem o hábito de simplificar excessivamente questões complexas numa narrativa bonita, artística (sem dúvida relacionada a sua profissão como jornalista), porém superficial e desprovida de nuances. Nessa busca por uma história bonita, ele frequentemente fala coisas inclusive terrivelmente erradas em alguns capítulos. De qualquer forma, é um bom livro como introdução ao assunto. Read more",
+        "body_html": "<div data-a-expander-name=\"review_text_read_more\" data-a-expander-collapsed-height=\"300\" class=\"a-expander-collapsed-height a-row a-expander-container a-expander-partial-collapse-container review-text-read-more-expander\" style=\"max-height:300px\"><div data-hook=\"review-collapsed\" data-expanded=\"false\" class=\"a-expander-content reviewText review-text-content a-expander-partial-collapse-content\">           <span class=\"cr-original-review-content\">Stolen Focus &#xE9; um livro important&#xED;ssimo sobre uma enorme crise que estamos prestes a enfrentar. Os pensamentos contidos aqui s&#xE3;o de grande utilidade para planejamento pessoal de seus h&#xE1;bitos, mas tamb&#xE9;m para ativismo social, vis&#xE3;o de mundo, e cria&#xE7;&#xE3;o de filhos. As ideias contidas nele s&#xE3;o marcantes e cruciais de serem entendidas.<br/>Infelizmente, a exposi&#xE7;&#xE3;o em si dessas ideias &#xE9; muito simplista. O autor tem o h&#xE1;bito de simplificar excessivamente quest&#xF5;es complexas numa narrativa bonita, art&#xED;stica (sem d&#xFA;vida relacionada a sua profiss&#xE3;o como jornalista), por&#xE9;m superficial e desprovida de nuances. Nessa busca por uma hist&#xF3;ria bonita, ele frequentemente fala coisas inclusive terrivelmente erradas em alguns cap&#xED;tulos. De qualquer forma, &#xE9; um bom livro como introdu&#xE7;&#xE3;o ao assunto.<br/></span><span class=\"cr-translated-review-content aok-hidden\"/>     </div><div class=\"a-expander-header a-expander-partial-collapse-header\"><div class=\"a-expander-content-fade\"/><a href=\"javascript:void(0)\" data-hook=\"expand-collapse-read-more-less\" aria-label=\"Read more of this review\" aria-expanded=\"false\" role=\"button\" data-action=\"a-expander-toggle\" class=\"a-declarative\" data-a-expander-toggle=\"{&quot;allowLinkDefault&quot;:true, &quot;expand_prompt&quot;:&quot;Read more&quot;, &quot;collapse_prompt&quot;:&quot;Read less&quot;}\"><i class=\"a-icon a-icon-extender-expand\"/><span class=\"a-expander-prompt\">Read more</span></a></div></div>",
+        "rating": 2,
+        "date": {
+          "raw": "Reviewed in Brazil on December 21, 2023",
+          "utc": "2023-12-21T00:00:00.000Z"
+        },
+        "profile": {
+          "name": "Pietro"
+        },
+        "vine_program": false,
+        "verified_purchase": true,
+        "review_country": "br",
+        "is_global_review": true
+      },
+      {
+        "id": "R2JILCSHKEQ1TW",
+        "title": "A really important book",
+        "body": "Stolen Focus: How you are losing attention, Johann Hari looks at how we have reduced attention spans and how all over the world, our ability to pay attention is collapsing. In the US, college students now focus on one task for only 65 seconds, and office workers on average manage only three minutes. And it's not just the internet – though it’s a big factor. We are no longer able to appear to sustain attention in anything that we do, this goes from a reduction in reading books to an increase in watching TV. In a similar way that 50 years ago, few people were obese and now with ready-made, highly processed junk food everywhere from supermarket meals to fast food joints, obesity and all the health issues that come with it, everyone is at a greater risk of diabetes, heart attacks, strokes and some forms of cancer and many other diseases. And a poor diet reduces our ability to concentrate and learn. However, what else is affecting our attention. The question in this book is that the same thing is happening with our attention. - INCREASE IN SPEED SWITCHING AND FITERING: The author begins with a holiday and not taking his smart phone. He notices that by not being constantly distracted by Facebook, Twitter, and 1000 TV channels, he begins to read more and notice more. The problem nowadays is we're constantly switching and trying to filter out information that constantly overwhelms us and distracts us and reduces our ability to focus. We get angry over things we read on Twitter – and rage is an important factor that internet engineers know is very useful in keeping us attached to stay on an internet sites than any happy news. - A study by Professor Michael Posner at the University of Oregon found that if you are focusing on something and you get interrupted, on average it will take 23 minutes for you to get back to the same state of focus. - One small study looked at how often an average American college student pays attention to anything, scientists used tracking software on their computers and monitored what they did in a typical day. They discovered that, on average, a student would switch task once every sixty-five seconds. The median amount of time they focused on any one thing was just nineteen seconds. A different study by Gloria Mark, professor of informatics at the University of California, Irvine observed how long on average an adult working in an office stays on one task. It was three minutes. - The increase in speed, switching and filtering: this is causing us to constantly switch and filter our focus. As we are now presented with more data, people are struggling to focus less on single pieces of information. - THE DISRUPTION OF MIND WANDERING We need to let our minds wander. By constantly being in a rush and distracting ourselves with tasks, distractions, and entertainment, we never give our minds the ability to just wander. And this is impacting our ability to be imaginative, thoughtful, and reflect on what is going on around us. And as we let our minds wander, we develop greater attention and focus. And by letting our minds wander, we form new connections between ideas and thoughts which can help us to solve problems. Since reading this chapter, I have put my phone down more, and just try to let my mind be freer. I have found this important. - THE RISE OF PHYSICAL AND MENTAL EXHAUSTION: When you’re tired, the ability to focus or concentrate becomes reduced. Sleep deprivation shows people have reduced cognitive skills and attention becomes reduced – particularly in children. At night, when you sleep, you go through several cycles of sleep – from waking to deep sleep. At a deep level, your brain clears the build-up of plaques as cerebrospinal fluid washes your brain, flushing out toxic proteins and carries these to your liver to be rid of. Lack of sleep is a risk factor for dementia. It also restores your energy levels. More and more people are also knocking themselves out with alcohol or medicinal drugs (e.g., melatonin). 9 million Americans are using prescription sleeping pills. - COLLAPSE OF SUSTAINED READING: In a study of 26,000 Americans between 2004 and 2017 the proportion of men reading for pleasure had fallen by 40% and in women it was down to 29%. By 2017 the average American spent 17 minutes a day reading books and 5.4 hours on their phone. Some 57% of Americans now do not read a single book in a typical year. In experiments where two groups are given the information in a printed book and the same information on screen, when asked questions about what they had just read, people remembered more information in written form. As we lose our capacity for deep reading that comes from books, we are then becoming less likely to read books. It’s like when you gain weight, it gets harder and harder to exercise when you don't do it and the same could be true of our ability to read long texts any more with sustained attention. - Reading helps to develop greater empathy and seeing things from other people’s viewpoints. Experiments show that the more novels you read, the greater your ability to read other people's emotions. We need to become more empathetic especially as everything is becoming more tribal with ‘us and them’ and ‘black and white’ thinking with understanding and emotional reasoning of complex issues. - Reading even changes the way we breathe, calmly and slowly as opposed to shallow breathing when following a story on TV or scrolling internet sites. Now we just skim and scan and it prevents us from the joy of reading. - THE RISE OF TECHNOLOGY THAT CAN TRACK AND MANIPULATE YOU / SURVEILLANCE CAPITALISM AND THE INTERNET: Every time you put your phone down, there are thousands of engineers in Silicon Valley whose only job is to make you pick your phone up again – often using the same understanding that those in the gambling industry use to keep punters coming back to slot machines and throwing their money away. However, having a digital detox is no more the answer than that wearing a gas mask for two days a week outside isn’t the answer to dealing with pollution. It’s not sustainable and it doesn’t address the systemic issues. The designers of the internet have learnt that it is possible to manipulate your attention to a similar degree that a magician would use to trick your attention, treating you as a puppet, pulling strings and making you choose whatever it wants you too. Its aim is to keep you distracted (whoops, entertained) so you can become a product to sell advertising to. People have learnt how to manipulate your attention though natural opioid hits in your brain that can change your personality, your ability to self-think and your behaviour. Cambridge analytic could determine what kind of person you were through around 30 likes on a social media site and know you better than your own partner – and target people with different information based on these profiles. They would then sell this information to advertisers and others without you knowing and play you like a puppet master. If a politician wants to target you with a personalised message – they could. Much of this is manipulation, control, and propaganda. It's psychological programming. Google wants to send you down a rabbit hole – the longer you are on their sites, the more they can influence you with advertising. Interruptions cause a deterioration in people’s ability to focus and think clearly – but it's often what internet sites are trying to do to you. One example sited is where social media hits use to make you hit a new page for a new page of searches, but by making people use an infinite scroll, they keep you staying on a site for longer. Google's wealth is worth $1 trillion – it doesn’t want to change these formulas or algorithms, so will continue to keep you distracted, rob you of attention and your ability to work on alternative tasks that are real and more meaningful. Facebook makes more money for every extra second you are glued to their screen, and they lose money every time you put the screen down. - Shoshana Zuboff states that information and communication are more widespread that electricity, reaching three billion of the world’s seven billion people. We sometimes blame ourselves for being too unfocused, but willpower alone isn’t going to change your addictions to the internet – because you are fighting a losing battle. But what is it doing to our children? Imagine if a site could show you happy or sad news, the algorithms don’t care how you feel, they just want you to keep scrolling, whilst you miss out on what life’s better alternatives such as meeting friends or having better life experiences. And the more time you look, the more money these sites make. We are becoming lost in lies. If you give people fairy tales or reality – many choose fairy tales and can’t tell the difference. However, things have changed – women have more equality, being gay is no longer a mental disorder (the DSM-II had it as one in 1969) or illegal in many countries (homophobia ruled for 2000 years and then it didn’t and there is greater tolerance of multicultural societies – so change can occur. People might think it too late to change but the axe existed for 1.4 million years before anyone put a handle on it, the web is less than 10,000 days old. - THE SURGE IN STRESS AND HOW IT TRIGGERS VIOLENCE: The number one reason that people, when surveyed said was the root cause of their difficulties, the number one reason was stress. However, nowadays you are more likely to be given medicines such as Ritalin or antidepressants, rather than looking at the root causes of depression such as increased workloads, lack of appreciation and constant criticism. When a flower is broken, you fix the environment it grows in, not the flower itself – but we’re not fixing the environment our children are growing in. And Ritalin doesn’t treat sexual abuse and significant parental neglect or trauma or poverty. If you're stressed, you become hyper-vigilant to threats and that is exhausting. Stress often triggers other problems that undermine attention. One study sites how children who have been abused compared to children who hadn’t, showed that those abused had double the rate of ADHD. And once we are stressed, we become hypervigilant to further threats, seeing them everywhere. We live in better times than at any time in history, but we are constantly bombarded with new events depicting an alternative view. - DIET: We feel our bodies with food to act as fuel to run our bodies but over the last but ‘if you put shampoo you won’t be surprised when the engine conks out’ but all over the western world we are putting we are putting food into our bodies that is so far-removed from what we should be putting into run our bodies. And highly processed food is affecting our ability to focus. Numerous studies are showing that giving children highly processed foods full of sugars, trans fats and lacking essential nutrients and vitamins are affecting children’s abilities to concentrate and learn. Countries that eat more healthy based foods have lower rates of having lower levels of ADHD and dementia. - POLLUTION: People who live within 15 minutes of a busy road in a busy town are more likely to have a 15% increase in dying than people who don't. Our bodies were not designed to take in and deal with the amount of pollutants in order to have a healthy, optimised brain. One example included in the book discusses how lead was added to petrol for 40 years with all the companies pushing research into whether lead was safe or not being governed by the automobile industry and petrol companies. However, what lead was doing to the brain and places where there are high levels within it dramatically had an impact on children's ability to learn and an impact on their cognition and memory ability. Lead was also painted on babies' cots and babies liked the taste. Our brains are consuming high levels of pollutants that our brains don’t know how to process. MRI studies have shown in Mexico where there are areas where there are children exposed to high levels of pollutants that their brains are shrinking and seeing plaques and tangles as you see in dementia patients. These children perform worse when doing tests also. These chemicals act on the chemical messengers in our brain and some scientists are arguing that we no longer have a normal brain. - THE RISE OF ADHD AND HOW WE ARE RESPONDING TO IT: Between 2003 and 2011, diagnosis of attention deficit hyperactivity disorder soared in the United States by 43% overall and by 55% amongst girls. It has now reached the point that 13% of adolescents in USA have been given this diagnosis and of them the majority have been given powerful stimulant drugs as a result. In Britain the increase has been extraordinary and between 1998 in 2004 alone, the number of children being given stimulants doubled. The question we need to ask is, if it's a biological problem requiring drugs that act on these chemical messengers. Vets have been regularly given animal tranquillisers and medication such as Ritalin not because they have some chemical disorder but because these animals are kept in zoos or captivity and not allowed to be free to do the things they need to do such as run and walk. Many of these animals are then given medication if all these animals when they're in the wild do not suffer the same disorders. The same is true of children who have now had so many changes such as significant pressure to perform in exams and to succeed in education and no play or reduced play. - THE CONFINEMENT OF CHILDREN BOTH PHYSICALLY AND PSYCHOLOGICALLY: Across the world, for almost our entire history, children have run around freely, without their parents, for thousands of years with only a few exceptions such as working in factories and forced into slavery. However, by 2003, in the US only 10% of children spent any time playing freely outdoors on a regular basis. Children are now overwhelmingly kept behind closed doors and when they do go out to play, they are supervised by grown-ups, or it takes place on screens. In schools in both the USA and Britain, teachers are now forced to spend most of their time preparing and drilling children for tests as redesigned by politicians. Free play and free enquiry, where children learn to form relationships, problem solve, get messy and have fun has dramatically reduced and fallen off a cliff. Nowadays, if a parent was to let their child make their own mistakes, play with peers unsupervised, and have fun without supervision, they would be reported and criticised by other adults. Adults are afraid to let play though children are now three times more likely to be struck by lightning than to be killed by a stranger. Would you imprison your child to prevent them from being hit by lightning? The idea that kids can't play outside without this being dangerous has never been the case in human history. By playing with your peers, you figure out how to make something happen, understand relationships, be creative, exercise and run around, expose yourself to daylight to prevent vitamin D deficiency. And develop crucial forms of attention. Play builds the foundation of a solid personality. Nowadays, we supervise children, we keep them indoors, we organise activities, we supervise play, and we've drained it of most of its value. One study showed that instead of play, children are now overwhelmingly spending it on homework (which has exploded by 145% between 1981 and 1997), screens and shopping with parents. A 2004 study found that you S kids spent 7.5 hours more each week on academics than they had 20 years before. We have effectively put children under house arrest. In turn, there has been a big rise in anxiety amongst children and teens and part of this is because of play deprivation. And when you're anxious, your attention will suffer. In Finland, they have begun to encourage much more free play, and they have left ADHD and less problems with mental health difficulties in children. In many other parts of the world, children no longer know what to do when playing with their peers. And yet parents often complain that all their children are doing is watching their screens on smartphones or iPads. - In experiments carried out on two groups of rats, the first were prevented from playing with other apps at all and the second group was allowed to play with rats one hour a day. Scientists watched the rats as they grew up and noted differences. By the time they became adults, the play deprived rats experienced much more fear and anxiety and they were less able to deal with unexpected events. The rats who got to play were braver, more likely to explore and better able to cope with new situations. The rats who had been allowed to play were also significantly smarter and able to problem solve much better than the play deprived rats. - In Finland, children don't go to school until their seven years of age and before then they just play. Between 7 and 16, they are given almost no homework and they sit almost no tests until they graduate from high school. Free play is the beating heart of Finnish kids' lives and by law teachers have to give kids 15 minutes of free play for every 45 minutes they are teaching. And the outcome is that only 0.1% of their kids are diagnosed with attention problems and Finns are the most literate, numerate and happy people in the world. CONCLUSION: So what can we do? Read this book, stop switching, eat better foods, become aware of the internet's tricks, let children play and rather than over supervise or imprison our children. Their health will suffer, they will be less fit, less happy, more anxious. Imagine you brought a plant and you wanted to help it grow, what would you do? You would make sure it had sunlight, water, and was filled with the right nutrients. You would protect it from the things that could damage or kill it, planted far from the trampling feet of other people and from pests and disease. If you want to fix a flower, first you fix the environment that it grows in and not the flower itself. We need to liberate ourselves from people who are controlling our minds without our consent. the two great dystopian writers of 20th century, George Orwell and Alexis Huxley wrote about surveillance and Big Brother and that if we entertained the masses, they wouldn't care what was going on [see China for a good example of this] so by being aware, maybe we can change both ourselves and our children. The liberation of human attention may be the defining moral and political struggle of our time. Read more",
+        "body_html": "<div data-a-expander-name=\"review_text_read_more\" data-a-expander-collapsed-height=\"300\" class=\"a-expander-collapsed-height a-row a-expander-container a-expander-partial-collapse-container review-text-read-more-expander\" style=\"max-height:300px\"><div data-hook=\"review-collapsed\" data-expanded=\"false\" class=\"a-expander-content reviewText review-text-content a-expander-partial-collapse-content\">             <span>Stolen Focus: How you are losing attention, Johann Hari looks at how we have reduced attention spans and how all over the world, our ability to pay attention is collapsing. In the US, college students now focus on one task for only 65 seconds, and office workers on average manage only three minutes. And it&apos;s not just the internet &#x2013; though it&#x2019;s a big factor. We are no longer able to appear to sustain attention in anything that we do, this goes from a reduction in reading books to an increase in watching TV. In a similar way that 50 years ago, few people were obese and now with ready-made, highly processed junk food everywhere from supermarket meals to fast food joints, obesity and all the health issues that come with it, everyone is at a greater risk of diabetes, heart attacks, strokes and some forms of cancer and many other diseases. And a poor diet reduces our ability to concentrate and learn. However, what else is affecting our attention. The question in this book is that the same thing is happening with our attention.<br/>- INCREASE IN SPEED SWITCHING AND FITERING: The author begins with a holiday and not taking his smart phone. He notices that by not being constantly distracted by Facebook, Twitter, and 1000 TV channels, he begins to read more and notice more. The problem nowadays is we&apos;re constantly switching and trying to filter out information that constantly overwhelms us and distracts us and reduces our ability to focus. We get angry over things we read on Twitter &#x2013; and rage is an important factor that internet engineers know is very useful in keeping us attached to stay on an internet sites than any happy news.<br/>- A study by Professor Michael Posner at the University of Oregon found that if you are focusing on something and you get interrupted, on average it will take 23 minutes for you to get back to the same state of focus.<br/>- One small study looked at how often an average American college student pays attention to anything, scientists used tracking software on their computers and monitored what they did in a typical day. They discovered that, on average, a student would switch task once every sixty-five seconds. The median amount of time they focused on any one thing was just nineteen seconds. A different study by Gloria Mark, professor of informatics at the University of California, Irvine observed how long on average an adult working in an office stays on one task. It was three minutes.<br/>- The increase in speed, switching and filtering: this is causing us to constantly switch and filter our focus. As we are now presented with more data, people are struggling to focus less on single pieces of information.<br/>- THE DISRUPTION OF MIND WANDERING We need to let our minds wander. By constantly being in a rush and distracting ourselves with tasks, distractions, and entertainment, we never give our minds the ability to just wander. And this is impacting our ability to be imaginative, thoughtful, and reflect on what is going on around us. And as we let our minds wander, we develop greater attention and focus. And by letting our minds wander, we form new connections between ideas and thoughts which can help us to solve problems. Since reading this chapter, I have put my phone down more, and just try to let my mind be freer. I have found this important.<br/>- THE RISE OF PHYSICAL AND MENTAL EXHAUSTION: When you&#x2019;re tired, the ability to focus or concentrate becomes reduced. Sleep deprivation shows people have reduced cognitive skills and attention becomes reduced &#x2013; particularly in children. At night, when you sleep, you go through several cycles of sleep &#x2013; from waking to deep sleep. At a deep level, your brain clears the build-up of plaques as cerebrospinal fluid washes your brain, flushing out toxic proteins and carries these to your liver to be rid of. Lack of sleep is a risk factor for dementia. It also restores your energy levels. More and more people are also knocking themselves out with alcohol or medicinal drugs (e.g., melatonin). 9 million Americans are using prescription sleeping pills.<br/>- COLLAPSE OF SUSTAINED READING: In a study of 26,000 Americans between 2004 and 2017 the proportion of men reading for pleasure had fallen by 40% and in women it was down to 29%. By 2017 the average American spent 17 minutes a day reading books and 5.4 hours on their phone. Some 57% of Americans now do not read a single book in a typical year. In experiments where two groups are given the information in a printed book and the same information on screen, when asked questions about what they had just read, people remembered more information in written form. As we lose our capacity for deep reading that comes from books, we are then becoming less likely to read books. It&#x2019;s like when you gain weight, it gets harder and harder to exercise when you don&apos;t do it and the same could be true of our ability to read long texts any more with sustained attention.<br/>- Reading helps to develop greater empathy and seeing things from other people&#x2019;s viewpoints. Experiments show that the more novels you read, the greater your ability to read other people&apos;s emotions. We need to become more empathetic especially as everything is becoming more tribal with &#x2018;us and them&#x2019; and &#x2018;black and white&#x2019; thinking with understanding and emotional reasoning of complex issues.<br/>- Reading even changes the way we breathe, calmly and slowly as opposed to shallow breathing when following a story on TV or scrolling internet sites. Now we just skim and scan and it prevents us from the joy of reading.<br/>- THE RISE OF TECHNOLOGY THAT CAN TRACK AND MANIPULATE YOU / SURVEILLANCE CAPITALISM AND THE INTERNET: Every time you put your phone down, there are thousands of engineers in Silicon Valley whose only job is to make you pick your phone up again &#x2013; often using the same understanding that those in the gambling industry use to keep punters coming back to slot machines and throwing their money away. However, having a digital detox is no more the answer than that wearing a gas mask for two days a week outside isn&#x2019;t the answer to dealing with pollution. It&#x2019;s not sustainable and it doesn&#x2019;t address the systemic issues. The designers of the internet have learnt that it is possible to manipulate your attention to a similar degree that a magician would use to trick your attention, treating you as a puppet, pulling strings and making you choose whatever it wants you too. Its aim is to keep you distracted (whoops, entertained) so you can become a product to sell advertising to. People have learnt how to manipulate your attention though natural opioid hits in your brain that can change your personality, your ability to self-think and your behaviour. Cambridge analytic could determine what kind of person you were through around 30 likes on a social media site and know you better than your own partner &#x2013; and target people with different information based on these profiles. They would then sell this information to advertisers and others without you knowing and play you like a puppet master. If a politician wants to target you with a personalised message &#x2013; they could. Much of this is manipulation, control, and propaganda. It&apos;s psychological programming. Google wants to send you down a rabbit hole &#x2013; the longer you are on their sites, the more they can influence you with advertising. Interruptions cause a deterioration in people&#x2019;s ability to focus and think clearly &#x2013; but it&apos;s often what internet sites are trying to do to you. One example sited is where social media hits use to make you hit a new page for a new page of searches, but by making people use an infinite scroll, they keep you staying on a site for longer. Google&apos;s wealth is worth $1 trillion &#x2013; it doesn&#x2019;t want to change these formulas or algorithms, so will continue to keep you distracted, rob you of attention and your ability to work on alternative tasks that are real and more meaningful. Facebook makes more money for every extra second you are glued to their screen, and they lose money every time you put the screen down.<br/>- Shoshana Zuboff states that information and communication are more widespread that electricity, reaching three billion of the world&#x2019;s seven billion people. We sometimes blame ourselves for being too unfocused, but willpower alone isn&#x2019;t going to change your addictions to the internet &#x2013; because you are fighting a losing battle. But what is it doing to our children? Imagine if a site could show you happy or sad news, the algorithms don&#x2019;t care how you feel, they just want you to keep scrolling, whilst you miss out on what life&#x2019;s better alternatives such as meeting friends or having better life experiences. And the more time you look, the more money these sites make. We are becoming lost in lies. If you give people fairy tales or reality &#x2013; many choose fairy tales and can&#x2019;t tell the difference. However, things have changed &#x2013; women have more equality, being gay is no longer a mental disorder (the DSM-II had it as one in 1969) or illegal in many countries (homophobia ruled for 2000 years and then it didn&#x2019;t and there is greater tolerance of multicultural societies &#x2013; so change can occur. People might think it too late to change but the axe existed for 1.4 million years before anyone put a handle on it, the web is less than 10,000 days old.<br/>- THE SURGE IN STRESS AND HOW IT TRIGGERS VIOLENCE: The number one reason that people, when surveyed said was the root cause of their difficulties, the number one reason was stress. However, nowadays you are more likely to be given medicines such as Ritalin or antidepressants, rather than looking at the root causes of depression such as increased workloads, lack of appreciation and constant criticism. When a flower is broken, you fix the environment it grows in, not the flower itself &#x2013; but we&#x2019;re not fixing the environment our children are growing in. And Ritalin doesn&#x2019;t treat sexual abuse and significant parental neglect or trauma or poverty. If you&apos;re stressed, you become hyper-vigilant to threats and that is exhausting. Stress often triggers other problems that undermine attention. One study sites how children who have been abused compared to children who hadn&#x2019;t, showed that those abused had double the rate of ADHD. And once we are stressed, we become hypervigilant to further threats, seeing them everywhere. We live in better times than at any time in history, but we are constantly bombarded with new events depicting an alternative view.<br/>- DIET: We feel our bodies with food to act as fuel to run our bodies but over the last but &#x2018;if you put shampoo you won&#x2019;t be surprised when the engine conks out&#x2019; but all over the western world we are putting we are putting food into our bodies that is so far-removed from what we should be putting into run our bodies. And highly processed food is affecting our ability to focus. Numerous studies are showing that giving children highly processed foods full of sugars, trans fats and lacking essential nutrients and vitamins are affecting children&#x2019;s abilities to concentrate and learn. Countries that eat more healthy based foods have lower rates of having lower levels of ADHD and dementia.<br/>- POLLUTION: People who live within 15 minutes of a busy road in a busy town are more likely to have a 15% increase in dying than people who don&apos;t. Our bodies were not designed to take in and deal with the amount of pollutants in order to have a healthy, optimised brain. One example included in the book discusses how lead was added to petrol for 40 years with all the companies pushing research into whether lead was safe or not being governed by the automobile industry and petrol companies. However, what lead was doing to the brain and places where there are high levels within it dramatically had an impact on children&apos;s ability to learn and an impact on their cognition and memory ability. Lead was also painted on babies&apos; cots and babies liked the taste. Our brains are consuming high levels of pollutants that our brains don&#x2019;t know how to process. MRI studies have shown in Mexico where there are areas where there are children exposed to high levels of pollutants that their brains are shrinking and seeing plaques and tangles as you see in dementia patients. These children perform worse when doing tests also. These chemicals act on the chemical messengers in our brain and some scientists are arguing that we no longer have a normal brain.<br/>- THE RISE OF ADHD AND HOW WE ARE RESPONDING TO IT: Between 2003 and 2011, diagnosis of attention deficit hyperactivity disorder soared in the United States by 43% overall and by 55% amongst girls. It has now reached the point that 13% of adolescents in USA have been given this diagnosis and of them the majority have been given powerful stimulant drugs as a result. In Britain the increase has been extraordinary and between 1998 in 2004 alone, the number of children being given stimulants doubled. The question we need to ask is, if it&apos;s a biological problem requiring drugs that act on these chemical messengers. Vets have been regularly given animal tranquillisers and medication such as Ritalin not because they have some chemical disorder but because these animals are kept in zoos or captivity and not allowed to be free to do the things they need to do such as run and walk. Many of these animals are then given medication if all these animals when they&apos;re in the wild do not suffer the same disorders. The same is true of children who have now had so many changes such as significant pressure to perform in exams and to succeed in education and no play or reduced play.<br/>- THE CONFINEMENT OF CHILDREN BOTH PHYSICALLY AND PSYCHOLOGICALLY: Across the world, for almost our entire history, children have run around freely, without their parents, for thousands of years with only a few exceptions such as working in factories and forced into slavery. However, by 2003, in the US only 10% of children spent any time playing freely outdoors on a regular basis. Children are now overwhelmingly kept behind closed doors and when they do go out to play, they are supervised by grown-ups, or it takes place on screens. In schools in both the USA and Britain, teachers are now forced to spend most of their time preparing and drilling children for tests as redesigned by politicians. Free play and free enquiry, where children learn to form relationships, problem solve, get messy and have fun has dramatically reduced and fallen off a cliff. Nowadays, if a parent was to let their child make their own mistakes, play with peers unsupervised, and have fun without supervision, they would be reported and criticised by other adults. Adults are afraid to let play though children are now three times more likely to be struck by lightning than to be killed by a stranger. Would you imprison your child to prevent them from being hit by lightning? The idea that kids can&apos;t play outside without this being dangerous has never been the case in human history. By playing with your peers, you figure out how to make something happen, understand relationships, be creative, exercise and run around, expose yourself to daylight to prevent vitamin D deficiency. And develop crucial forms of attention. Play builds the foundation of a solid personality. Nowadays, we supervise children, we keep them indoors, we organise activities, we supervise play, and we&apos;ve drained it of most of its value. One study showed that instead of play, children are now overwhelmingly spending it on homework (which has exploded by 145% between 1981 and 1997), screens and shopping with parents. A 2004 study found that you S kids spent 7.5 hours more each week on academics than they had 20 years before. We have effectively put children under house arrest. In turn, there has been a big rise in anxiety amongst children and teens and part of this is because of play deprivation. And when you&apos;re anxious, your attention will suffer. In Finland, they have begun to encourage much more free play, and they have left ADHD and less problems with mental health difficulties in children. In many other parts of the world, children no longer know what to do when playing with their peers. And yet parents often complain that all their children are doing is watching their screens on smartphones or iPads.<br/>- In experiments carried out on two groups of rats, the first were prevented from playing with other apps at all and the second group was allowed to play with rats one hour a day. Scientists watched the rats as they grew up and noted differences. By the time they became adults, the play deprived rats experienced much more fear and anxiety and they were less able to deal with unexpected events. The rats who got to play were braver, more likely to explore and better able to cope with new situations. The rats who had been allowed to play were also significantly smarter and able to problem solve much better than the play deprived rats.<br/>- In Finland, children don&apos;t go to school until their seven years of age and before then they just play. Between 7 and 16, they are given almost no homework and they sit almost no tests until they graduate from high school. Free play is the beating heart of Finnish kids&apos; lives and by law teachers have to give kids 15 minutes of free play for every 45 minutes they are teaching. And the outcome is that only 0.1% of their kids are diagnosed with attention problems and Finns are the most literate, numerate and happy people in the world.<br/>CONCLUSION: So what can we do? Read this book, stop switching, eat better foods, become aware of the internet&apos;s tricks, let children play and rather than over supervise or imprison our children. Their health will suffer, they will be less fit, less happy, more anxious. Imagine you brought a plant and you wanted to help it grow, what would you do? You would make sure it had sunlight, water, and was filled with the right nutrients. You would protect it from the things that could damage or kill it, planted far from the trampling feet of other people and from pests and disease. If you want to fix a flower, first you fix the environment that it grows in and not the flower itself. We need to liberate ourselves from people who are controlling our minds without our consent. the two great dystopian writers of 20th century, George Orwell and Alexis Huxley wrote about surveillance and Big Brother and that if we entertained the masses, they wouldn&apos;t care what was going on [see China for a good example of this] so by being aware, maybe we can change both ourselves and our children. The liberation of human attention may be the defining moral and political struggle of our time.<br/></span>   </div><div class=\"a-expander-header a-expander-partial-collapse-header\"><div class=\"a-expander-content-fade\"/><a href=\"javascript:void(0)\" data-hook=\"expand-collapse-read-more-less\" aria-label=\"Read more of this review\" aria-expanded=\"false\" role=\"button\" data-action=\"a-expander-toggle\" class=\"a-declarative\" data-a-expander-toggle=\"{&quot;allowLinkDefault&quot;:true, &quot;expand_prompt&quot;:&quot;Read more&quot;, &quot;collapse_prompt&quot;:&quot;Read less&quot;}\"><i class=\"a-icon a-icon-extender-expand\"/><span class=\"a-expander-prompt\">Read more</span></a></div></div>",
+        "rating": 5,
+        "date": {
+          "raw": "Reviewed in the United Kingdom on April 14, 2023",
+          "utc": "2023-04-14T00:00:00.000Z"
+        },
+        "profile": {
+          "name": "J. Drew"
+        },
+        "vine_program": false,
+        "verified_purchase": true,
+        "review_country": "gb",
+        "is_global_review": true
+      }
+    ],
+    "bestsellers_rank": [
+      {
+        "rank": 2683,
+        "category": "Audible Books & Originals",
+        "link": "https://www.amazon.com/gp/bestsellers/audible/ref=pd_zg_ts_audible"
+      },
+      {
+        "rank": 2,
+        "category": "Memory Improvement",
+        "link": "https://www.amazon.com/gp/bestsellers/audible/18574807011/ref=pd_zg_hrsr_audible"
+      },
+      {
+        "rank": 3,
+        "category": "Popular Psychology Creativity & Genius",
+        "link": "https://www.amazon.com/gp/bestsellers/books/11160/ref=pd_zg_hrsr_books"
+      },
+      {
+        "rank": 4,
+        "category": "Memory Improvement Self-Help",
+        "link": "https://www.amazon.com/gp/bestsellers/books/4743/ref=pd_zg_hrsr_books"
+      }
+    ],
+    "buybox_winner": {
+      "One-time_price": {
+        "symbol": "$",
+        "value": 15.75,
+        "currency": "USD",
+        "raw": "$15.75"
+      },
+      "is_prime": true,
+      "is_prime_exclusive_deal": false,
+      "is_amazon_fresh": false,
+      "condition": {
+        "is_new": true
+      },
+      "fulfillment": {
+        "type": "1p",
+        "is_sold_by_amazon": true,
+        "amazon_seller": {
+          "name": "Amazon"
+        },
+        "is_fulfilled_by_amazon": true,
+        "is_fulfilled_by_third_party": false,
+        "is_sold_by_third_party": false
+      },
+      "price": {
+        "symbol": "$",
+        "value": 0,
+        "currency": "USD",
+        "raw": "$0.00"
+      }
+    },
+    "specifications": [
+      {
+        "name": "Listening Length",
+        "value": "10 hours and 21 minutes"
+      },
+      {
+        "name": "Author",
+        "value": "Johann Hari"
+      },
+      {
+        "name": "Narrator",
+        "value": "Johann Hari"
+      },
+      {
+        "name": "Whispersync for Voice",
+        "value": "Ready"
+      },
+      {
+        "name": "Audible.com Release Date",
+        "value": "January 25, 2022"
+      },
+      {
+        "name": "Publisher",
+        "value": "Random House Audio"
+      },
+      {
+        "name": "Program Type",
+        "value": "Audiobook"
+      },
+      {
+        "name": "Version",
+        "value": "Unabridged"
+      },
+      {
+        "name": "Language",
+        "value": "English"
+      },
+      {
+        "name": "ASIN",
+        "value": "B09FYHKYFJ"
+      },
+      {
+        "name": "Best Sellers Rank",
+        "value": "#2,683 in Audible Books & Originals (See Top 100 in Audible Books & Originals) #2 in Memory Improvement (Audible Books & Originals) #3 in Popular Psychology Creativity & Genius #4 in Memory Improvement Self-Help"
+      }
+    ],
+    "specifications_flat": "Best Sellers Rank: #2,683 in Audible Books & Originals (See Top 100 in Audible Books & Originals) #2 in Memory Improvement (Audible Books & Originals) #3 in Popular Psychology Creativity & Genius #4 in Memory Improvement Self-Help. ASIN: B09FYHKYFJ. Language: English. Version: Unabridged. Program Type: Audiobook. Publisher: Random House Audio. Audible.com Release Date: January 25, 2022. Whispersync for Voice: Ready. Narrator: Johann Hari. Author: Johann Hari. Listening Length: 10 hours and 21 minutes.",
+    "gift_guide_badge": {
+      "text": "Editors' pick",
+      "link": "https://www.amazon.com/kindle-dbs/books-category/browse-redirect/?ref=ess_dp_epicks&node=17276799011"
+    },
+    "publisher": "Random House Audio",
+    "release_date": "January 25, 2022",
+    "language": "English",
+    "bestsellers_rank_flat": "Category: Audible Books & Originals | Rank: 2683, Category: Memory Improvement | Rank: 2, Category: Popular Psychology Creativity & Genius | Rank: 3, Category: Memory Improvement Self-Help | Rank: 4"
+  },
+  "also_bought": [
+    {
+      "title": "The Comfort Crisis: Embrace Discomfort to Reclaim Your Wild, Happy, Healthy Self",
+      "asin": "B08LDX3TZ2",
+      "link": "https://www.amazon.com/dp/B08LDX3TZ2?plink=CSmnMIjYDSQkTLpv&pf_rd_r=W5TGXG1R5N85CNJEYBR9&pf_rd_p=fd5b7c68-f41d-4258-9060-5bfd6bb33224&ref_=adblp13npsbx_1_0_im",
+      "image": "https://images-na.ssl-images-amazon.com/images/G/01/x-locale/common/grey-pixel.gif",
+      "price": {
+        "symbol": "$",
+        "value": 0,
+        "currency": "USD",
+        "raw": "$0.00 Free with Audible trial"
+      }
+    },
+    {
+      "title": "How to Know a Person: The Art of Seeing Others Deeply and Being Deeply Seen",
+      "asin": "B0BXFNXWS7",
+      "link": "https://www.amazon.com/dp/B0BXFNXWS7?plink=CSmnMIjYDSQkTLpv&pf_rd_r=W5TGXG1R5N85CNJEYBR9&pf_rd_p=fd5b7c68-f41d-4258-9060-5bfd6bb33224&ref_=adblp13npsbx_1_1_im",
+      "image": "https://images-na.ssl-images-amazon.com/images/G/01/x-locale/common/grey-pixel.gif",
+      "price": {
+        "symbol": "$",
+        "value": 0,
+        "currency": "USD",
+        "raw": "$0.00 Free with Audible trial"
+      }
+    },
+    {
+      "title": "The Creative Act: A Way of Being",
+      "asin": "B0B3L8W1JJ",
+      "link": "https://www.amazon.com/dp/B0B3L8W1JJ?plink=CSmnMIjYDSQkTLpv&pf_rd_r=W5TGXG1R5N85CNJEYBR9&pf_rd_p=fd5b7c68-f41d-4258-9060-5bfd6bb33224&ref_=adblp13npsbx_1_2_im",
+      "image": "https://images-na.ssl-images-amazon.com/images/G/01/x-locale/common/grey-pixel.gif",
+      "price": {
+        "symbol": "$",
+        "value": 0,
+        "currency": "USD",
+        "raw": "$0.00 Free with Audible trial"
+      }
+    },
+    {
+      "title": "Hidden Potential: The Science of Achieving Greater Things",
+      "asin": "B0C5Y6DM2D",
+      "link": "https://www.amazon.com/dp/B0C5Y6DM2D?plink=CSmnMIjYDSQkTLpv&pf_rd_r=W5TGXG1R5N85CNJEYBR9&pf_rd_p=fd5b7c68-f41d-4258-9060-5bfd6bb33224&ref_=adblp13npsbx_1_3_im",
+      "image": "https://images-na.ssl-images-amazon.com/images/G/01/x-locale/common/grey-pixel.gif",
+      "price": {
+        "symbol": "$",
+        "value": 0,
+        "currency": "USD",
+        "raw": "$0.00 Free with Audible trial"
+      }
+    },
+    {
+      "title": "Four Thousand Weeks: Time Management for Mortals",
+      "asin": "B08XZY5ZF7",
+      "link": "https://www.amazon.com/dp/B08XZY5ZF7?plink=CSmnMIjYDSQkTLpv&pf_rd_r=W5TGXG1R5N85CNJEYBR9&pf_rd_p=fd5b7c68-f41d-4258-9060-5bfd6bb33224&ref_=adblp13npsbx_1_4_im",
+      "image": "https://images-na.ssl-images-amazon.com/images/G/01/x-locale/common/grey-pixel.gif",
+      "price": {
+        "symbol": "$",
+        "value": 0,
+        "currency": "USD",
+        "raw": "$0.00 Free with Audible trial"
+      }
+    }
+  ]
+}

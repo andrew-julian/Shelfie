@@ -116,7 +116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Enhanced data extraction
       console.log("Raw Rainforest API response:", JSON.stringify(data, null, 2));
       
-      // Extract all available cover images
+      // Extract all available cover images from main product and variants
       let coverImages: string[] = [];
       
       // Add main image first if available
@@ -132,7 +132,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         coverImages.push(...additionalImages);
       }
       
-      console.log("Extracted cover images:", coverImages);
+      // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
+      if (product.variants && Array.isArray(product.variants)) {
+        console.log(`Found ${product.variants.length} variants, fetching cover images...`);
+        
+        for (const variant of product.variants.slice(0, 4)) { // Limit to 4 variants to avoid too many API calls
+          if (variant.asin && variant.asin !== product.asin) {
+            try {
+              console.log(`Fetching variant cover for ${variant.title} (${variant.asin})`);
+              const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=amazon.com`;
+              const variantResponse = await fetch(variantUrl);
+              
+              if (variantResponse.ok) {
+                const variantData = await variantResponse.json();
+                
+                if (variantData.product) {
+                  // Add variant's main image
+                  if (variantData.product.main_image?.link && !coverImages.includes(variantData.product.main_image.link)) {
+                    coverImages.push(variantData.product.main_image.link);
+                  }
+                  
+                  // Add variant's other images
+                  if (variantData.product.images && Array.isArray(variantData.product.images)) {
+                    const variantImages = variantData.product.images
+                      .map((img: any) => img.link || img)
+                      .filter((link: string) => link && !coverImages.includes(link));
+                    coverImages.push(...variantImages);
+                  }
+                }
+              }
+            } catch (variantError) {
+              console.error(`Failed to fetch variant ${variant.asin}:`, variantError);
+            }
+          }
+        }
+      }
+      
+      console.log("Extracted cover images from all variants:", coverImages);
       
       // Extract author more comprehensively
       let author = "Unknown Author";
@@ -438,7 +474,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const product = data.product;
       
-      // Extract all available cover images
+      // Extract all available cover images from main product and variants
       let coverImages: string[] = [];
       
       // Add main image first if available
@@ -452,6 +488,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .map((img: any) => img.link || img)
           .filter((link: string) => link && !coverImages.includes(link)); // Avoid duplicates
         coverImages.push(...additionalImages);
+      }
+      
+      // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
+      if (product.variants && Array.isArray(product.variants)) {
+        console.log(`Found ${product.variants.length} variants for refresh, fetching cover images...`);
+        
+        for (const variant of product.variants.slice(0, 4)) { // Limit to 4 variants to avoid too many API calls
+          if (variant.asin && variant.asin !== product.asin) {
+            try {
+              console.log(`Fetching variant cover for ${variant.title} (${variant.asin})`);
+              const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=amazon.com`;
+              const variantResponse = await fetch(variantUrl);
+              
+              if (variantResponse.ok) {
+                const variantData = await variantResponse.json();
+                
+                if (variantData.product) {
+                  // Add variant's main image
+                  if (variantData.product.main_image?.link && !coverImages.includes(variantData.product.main_image.link)) {
+                    coverImages.push(variantData.product.main_image.link);
+                  }
+                  
+                  // Add variant's other images
+                  if (variantData.product.images && Array.isArray(variantData.product.images)) {
+                    const variantImages = variantData.product.images
+                      .map((img: any) => img.link || img)
+                      .filter((link: string) => link && !coverImages.includes(link));
+                    coverImages.push(...variantImages);
+                  }
+                }
+              }
+            } catch (variantError) {
+              console.error(`Failed to fetch variant ${variant.asin}:`, variantError);
+            }
+          }
+        }
       }
       
       console.log("Extracted cover images for refresh:", coverImages);
@@ -661,7 +733,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (data.product) {
               const product = data.product;
               
-              // Extract all available cover images
+              // Extract all available cover images from main product and variants
               let coverImages: string[] = [];
               
               // Add main image first if available
@@ -675,6 +747,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   .map((img: any) => img.link || img)
                   .filter((link: string) => link && !coverImages.includes(link)); // Avoid duplicates
                 coverImages.push(...additionalImages);
+              }
+              
+              // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
+              if (product.variants && Array.isArray(product.variants)) {
+                console.log(`Found ${product.variants.length} variants for refresh-all, fetching cover images...`);
+                
+                for (const variant of product.variants.slice(0, 3)) { // Limit to 3 variants for refresh-all to avoid too many API calls
+                  if (variant.asin && variant.asin !== product.asin) {
+                    try {
+                      console.log(`Fetching variant cover for ${variant.title} (${variant.asin})`);
+                      const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=amazon.com`;
+                      const variantResponse = await fetch(variantUrl);
+                      
+                      if (variantResponse.ok) {
+                        const variantData = await variantResponse.json();
+                        
+                        if (variantData.product) {
+                          // Add variant's main image
+                          if (variantData.product.main_image?.link && !coverImages.includes(variantData.product.main_image.link)) {
+                            coverImages.push(variantData.product.main_image.link);
+                          }
+                          
+                          // Add variant's other images
+                          if (variantData.product.images && Array.isArray(variantData.product.images)) {
+                            const variantImages = variantData.product.images
+                              .map((img: any) => img.link || img)
+                              .filter((link: string) => link && !coverImages.includes(link));
+                            coverImages.push(...variantImages);
+                          }
+                        }
+                      }
+                    } catch (variantError) {
+                      console.error(`Failed to fetch variant ${variant.asin}:`, variantError);
+                    }
+                  }
+                }
               }
               
               console.log("Extracted cover images for refresh-all:", coverImages);
