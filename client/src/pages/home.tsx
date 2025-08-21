@@ -144,15 +144,27 @@ export default function Home() {
   // Use color-sorted books when appropriate
   const finalBooks = (sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') ? colorSortedBooks : books;
 
-  // Book dimensions calculation function (matching BookCard logic)
+  // Book dimensions calculation function with responsive scaling
   const getBookDimensions = (book: Book) => {
-    const defaultDimensions = { width: 140, height: 200, depth: 15 };
+    // Responsive scale based on container width
+    const getResponsiveScale = (containerWidth: number) => {
+      if (containerWidth <= 480) return 32; // Mobile: larger books
+      if (containerWidth <= 768) return 28; // Tablet: medium-large books
+      if (containerWidth <= 1024) return 25; // Small desktop: medium books
+      return 22; // Large desktop: standard size
+    };
+    
+    const baseScale = getResponsiveScale(containerDimensions.width);
+    const defaultDimensions = { 
+      width: Math.round(140 * baseScale / 22), 
+      height: Math.round(200 * baseScale / 22), 
+      depth: Math.round(15 * baseScale / 22) 
+    };
     
     if (book.width && book.height && book.depth) {
       const width = parseFloat(book.width);
       const height = parseFloat(book.height);
       const depth = parseFloat(book.depth);
-      const baseScale = 22;
       
       return {
         width: Math.round(width * baseScale),
@@ -184,11 +196,19 @@ export default function Home() {
   // Calculate dynamic layout when books or container changes
   useEffect(() => {
     if (finalBooks.length > 0 && containerDimensions.width > 0) {
+      // Responsive spacing based on screen width
+      const getResponsiveSpacing = (containerWidth: number) => {
+        if (containerWidth <= 480) return { padding: 20, minSpacing: 20 }; // Mobile: tighter spacing
+        if (containerWidth <= 768) return { padding: 24, minSpacing: 24 }; // Tablet: medium spacing
+        return { padding: 32, minSpacing: 28 }; // Desktop: original spacing
+      };
+      
+      const spacing = getResponsiveSpacing(containerDimensions.width);
       const config: LayoutConfig = {
         containerWidth: containerDimensions.width,
         containerHeight: containerDimensions.height,
-        padding: 32,
-        minSpacing: 28
+        padding: spacing.padding,
+        minSpacing: spacing.minSpacing
       };
       
       const positions = calculateDynamicLayout(finalBooks, config, getBookDimensions);
