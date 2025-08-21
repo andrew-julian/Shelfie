@@ -160,16 +160,16 @@ body {
     transition: transform 0.8s ease;
     /* Layered realistic shadows with softer integration */
     box-shadow:
-      0 6px 10px rgba(0,0,0,.14),   /* ambient occlusion */
-      0 24px 40px -20px rgba(0,0,0,.25); /* directional cast shadow */
+      0 6px 10px rgba(0,0,0,.18),   /* ambient occlusion */
+      0 24px 40px -20px rgba(0,0,0,.35); /* directional cast shadow */
   }
 
   .book-3d:hover .book-3d__inner {
     transform: translateZ(2px);
     /* Enhanced shadows on hover */
     box-shadow:
-      0 8px 15px rgba(0,0,0,.18),   /* stronger ambient */
-      0 30px 50px -20px rgba(0,0,0,.32); /* longer cast shadow */
+      0 8px 15px rgba(0,0,0,.22),   /* stronger ambient */
+      0 30px 50px -20px rgba(0,0,0,.4); /* longer cast shadow */
   }
 
   /* Disable hover effects when scrolling */
@@ -193,7 +193,7 @@ body {
     bottom: -10%;
     height: 22px;
     background: radial-gradient(50% 100% at 50% 0,
-                rgba(0,0,0,.25), rgba(0,0,0,0) 70%);
+                rgba(0,0,0,.35), rgba(0,0,0,0) 70%);
     transform: translateZ(-1px);
     pointer-events: none;
     z-index: -1;

@@ -28,6 +28,7 @@ export default {
         'sky-blue': '#449CFF',
         'monochrome-black': '#111111',
         'monochrome-white': '#FFFFFF',
+        'gray-150': '#F1F3F4',
         background: "var(--background)",
         foreground: "var(--foreground)",
         card: {
