@@ -39,8 +39,8 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
               // Skip transparent pixels
               if (a < 128) continue;
               
-              // Skip very light/white pixels (likely text or highlights)
-              if (r > 240 && g > 240 && b > 240) continue;
+              // Skip pure white pixels but allow off-white/cream colors
+              if (r > 250 && g > 250 && b > 250) continue;
               
               // Convert to single number for frequency counting
               samples.push((r << 16) | (g << 8) | b);
@@ -61,7 +61,7 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
               const a = pixel[3];
               
               if (a < 128) continue;
-              if (r > 240 && g > 240 && b > 240) continue;
+              if (r > 250 && g > 250 && b > 250) continue;
               
               samples.push((r << 16) | (g << 8) | b);
             } catch (e) {
@@ -81,7 +81,7 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
               const a = pixel[3];
               
               if (a < 128) continue;
-              if (r > 240 && g > 240 && b > 240) continue;
+              if (r > 250 && g > 250 && b > 250) continue;
               
               samples.push((r << 16) | (g << 8) | b);
             } catch (e) {
@@ -101,7 +101,7 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
               const a = pixel[3];
               
               if (a < 128) continue;
-              if (r > 240 && g > 240 && b > 240) continue;
+              if (r > 250 && g > 250 && b > 250) continue;
               
               samples.push((r << 16) | (g << 8) | b);
             } catch (e) {
@@ -132,10 +132,18 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
           }
         });
         
-        // Convert back to RGB and darken slightly for back cover
-        const r = Math.floor((dominantColor >> 16) * 0.8); // Darken by 20%
-        const g = Math.floor(((dominantColor >> 8) & 255) * 0.8);
-        const b = Math.floor((dominantColor & 255) * 0.8);
+        // Convert back to RGB and darken appropriately for back cover
+        let r = (dominantColor >> 16);
+        let g = ((dominantColor >> 8) & 255);
+        let b = (dominantColor & 255);
+        
+        // For light colors, darken less aggressively to avoid making white covers black
+        const lightness = (r + g + b) / 3;
+        const darkenFactor = lightness > 200 ? 0.92 : 0.8; // Less darkening for light colors
+        
+        r = Math.floor(r * darkenFactor);
+        g = Math.floor(g * darkenFactor);
+        b = Math.floor(b * darkenFactor);
         
         resolve(`rgb(${r}, ${g}, ${b})`);
         
