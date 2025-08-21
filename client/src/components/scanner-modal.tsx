@@ -285,8 +285,49 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       setIsScanning(true);
       console.log('Starting Scanbot scanner...');
       
-      // Create configuration using the simple approach
-      const config = new window.ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration();
+      // Create configuration with properly configured cancel button for mobile
+      const config = new window.ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration({
+        topBar: new window.ScanbotSDK.UI.Config.TopBarConfiguration({
+          cancelButton: new window.ScanbotSDK.UI.Config.ButtonConfiguration({
+            visible: true,
+            text: "Cancel",
+            accessibilityDescription: "Cancel scanning",
+            background: new window.ScanbotSDK.UI.Config.BackgroundStyle({
+              strokeColor: "#00000000",
+              fillColor: "#00000000", 
+              strokeWidth: 0.0
+            }),
+            foreground: new window.ScanbotSDK.UI.Config.ForegroundStyle({
+              iconVisible: true,
+              color: "#FFFFFF",
+              useShadow: false
+            })
+          })
+        }),
+        userGuidance: new window.ScanbotSDK.UI.Config.UserGuidanceConfiguration({
+          visible: true,
+          title: new window.ScanbotSDK.UI.Config.StyledText({
+            text: "Move the finder over a barcode",
+            color: "#FFFFFF"
+          }),
+          background: new window.ScanbotSDK.UI.Config.BackgroundStyle({
+            fillColor: "#66000000"
+          })
+        }),
+        viewFinder: new window.ScanbotSDK.UI.Config.ViewFinderConfiguration({
+          style: new window.ScanbotSDK.UI.Config.FinderCorneredStyle({
+            strokeColor: "#FFFFFF",
+            strokeWidth: 2.0,
+            cornerRadius: 10.0
+          }),
+          overlayColor: "#33000000",
+          aspectRatio: new window.ScanbotSDK.UI.Config.AspectRatio({
+            width: 1.0,
+            height: 0.6
+          }),
+          visible: true
+        })
+      });
       
       console.log('Creating barcode scanner with config:', config);
       
