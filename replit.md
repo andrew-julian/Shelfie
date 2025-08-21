@@ -17,6 +17,14 @@ Preferred communication style: Simple, everyday language.
 - **Glossy Highlights**: Implemented specular highlights and vignette effects for professional glossy stock appearance
 - **Rapid Scanning Queue**: Created non-blocking queue system for continuous book scanning without waiting for API calls
 
+### Scanbot SDK Integration (August 2025)
+- **Environment-Based License Keys**: Implemented automatic license key selection based on domain
+  - Production: Uses bookscan.vanaheim.com.au license key
+  - Development: Uses Replit-specific license key for riker.replit.dev subdomains
+  - Automatic detection based on window.location.hostname
+- **Mobile UX Improvements**: Added guidance for mobile cancel button limitations and 30-second timeout fallback
+- **Book Cover Modal Fix**: Fixed immediate visual feedback when selecting different cover options in book details modal
+
 ## System Architecture
 
 ### Frontend Architecture
