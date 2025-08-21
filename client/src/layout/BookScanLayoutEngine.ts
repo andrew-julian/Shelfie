@@ -187,10 +187,20 @@ function processRow(
     const bookDims = dims.get(book.id)!;
     const naturalWidth = naturalWidths[i];
     
-    // Apply scaling
-    const w = naturalWidth * scale;
-    const h = cfg.targetRowHeight * scale;
+    // Apply scaling with size clamping for mobile/desktop optimization
+    let w = naturalWidth * scale;
+    let h = cfg.targetRowHeight * scale;
     const d = Math.max(2, Math.round(bookDims.d_norm * scale));
+    
+    // Clamp book width to prevent pathological cases
+    const minW = 84; // Minimum readable width
+    const maxW = 360; // Maximum width to prevent oversized books
+    
+    if (w < minW || w > maxW) {
+      const originalAspect = naturalWidth / cfg.targetRowHeight;
+      w = Math.max(minW, Math.min(maxW, w));
+      h = w / originalAspect; // Preserve aspect ratio
+    }
     
     // Calculate organic offsets using Halton sequences
     const hashBase = hash32(book.id);

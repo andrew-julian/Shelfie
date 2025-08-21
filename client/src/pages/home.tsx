@@ -140,11 +140,46 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerDimensions, setContainerDimensions] = useState({ width: 1200, height: 800 });
   
-  // Layout engine configuration (memoized to prevent infinite re-renders)
-  const engineConfig: EngineConfig = useMemo(() => ({
+  // Container-based responsive configuration
+  const [responsiveConfig, setResponsiveConfig] = useState<EngineConfig>({
     ...DEFAULT_CFG,
-    raggedLastRow: !tidyMode // Use justified rows in tidy mode
-  }), [tidyMode]);
+    raggedLastRow: !tidyMode
+  });
+
+  // Update config when container size or tidy mode changes
+  useEffect(() => {
+    const width = containerDimensions.width;
+    let baseConfig = { ...DEFAULT_CFG };
+    
+    // Container-query equivalent logic
+    if (width < 480) {
+      baseConfig = {
+        ...baseConfig,
+        targetRowHeight: 160,
+        gutterX: 8,
+        gutterY: 12
+      };
+    } else if (width < 900) {
+      baseConfig = {
+        ...baseConfig,
+        targetRowHeight: 184,
+        gutterX: 10,
+        gutterY: 12
+      };
+    } else {
+      baseConfig = {
+        ...baseConfig,
+        targetRowHeight: 200,
+        gutterX: 12,
+        gutterY: 14
+      };
+    }
+    
+    setResponsiveConfig({
+      ...baseConfig,
+      raggedLastRow: !tidyMode
+    });
+  }, [containerDimensions.width, tidyMode]);
 
   useEffect(() => {
     if ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && books.length > 0) {
@@ -175,16 +210,16 @@ export default function Home() {
   // Memoized book normalization
   const normalizedDimensions = useMemo(() => {
     const layoutBooks = convertToLayoutBooks(finalBooks);
-    return normaliseBooks(layoutBooks, engineConfig.BASE_HEIGHT);
-  }, [finalBooks, engineConfig.BASE_HEIGHT]);
+    return normaliseBooks(layoutBooks, responsiveConfig.BASE_HEIGHT);
+  }, [finalBooks, responsiveConfig.BASE_HEIGHT]);
 
   // Memoized layout calculation using new engine
   const newLayoutItems = useMemo(() => {
     if (finalBooks.length === 0 || containerDimensions.width === 0) return [];
     
     const layoutBooks = convertToLayoutBooks(finalBooks);
-    return calculateLayout(layoutBooks, normalizedDimensions, containerDimensions.width, engineConfig);
-  }, [finalBooks, normalizedDimensions, containerDimensions.width, engineConfig]);
+    return calculateLayout(layoutBooks, normalizedDimensions, containerDimensions.width, responsiveConfig);
+  }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig]);
 
   // Legacy dimension calculation (no longer used with new layout engine)
   // Kept for reference but replaced by the headless layout engine
@@ -358,10 +393,14 @@ export default function Home() {
         ) : finalBooks.length > 0 ? (
           <div 
             ref={containerRef}
-            className="relative w-full" 
+            className="gridContainer relative w-full" 
             style={{ 
-              minHeight: `${Math.max(400, layoutItems.reduce((max, item) => Math.max(max, item.y + item.h + 40), 400))}px` 
-            }}
+              containerType: 'inline-size',
+              minHeight: `${Math.max(400, layoutItems.reduce((max, item) => Math.max(max, item.y + item.h + 40), 400))}px`,
+              '--rowH': `${responsiveConfig.targetRowHeight}px`,
+              '--gutterX': `${responsiveConfig.gutterX}px`,
+              '--gutterY': `${responsiveConfig.gutterY}px`
+            } as React.CSSProperties}
             data-testid="books-layout"
           >
             {layoutItems.map((item) => {

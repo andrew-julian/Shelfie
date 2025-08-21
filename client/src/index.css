@@ -3,6 +3,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Container Query Responsive Layout */
+.gridContainer {
+  container-type: inline-size;
+}
+
+@container (width < 480px) {
+  .gridContainer {
+    --rowH: 160px;
+    --gutterX: 8px;
+    --gutterY: 12px;
+  }
+}
+
+@container (480px <= width < 900px) {
+  .gridContainer {
+    --rowH: 184px;
+    --gutterX: 10px;
+    --gutterY: 12px;
+  }
+}
+
+@container (width >= 900px) {
+  .gridContainer {
+    --rowH: 200px;
+    --gutterX: 12px;
+    --gutterY: 14px;
+  }
+}
+
 /* Prevent horizontal scrolling and ensure full-width mobile layout */
 html, body {
   overflow-x: hidden;

@@ -35,6 +35,9 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 - **Organic Positioning**: Hash-based deterministic jitter, rotation, and depth variations for natural appearance
 - **Configurable Parameters**: Customizable gutters, jitter amounts, tilt angles, and ragged/justified last row options
 - **Pure Functions**: Side-effect free implementation suitable for server-side rendering and testing
+- **Container Query Responsive**: CSS container queries for fluid responsiveness with size clamping (84px-360px width limits)
+- **No Collision Detection**: Removed O(n²) AABB overlap logic in favor of gap-aware jitter clamping for single-pass performance
+- **Mobile Optimization**: Dynamic row heights (160px-200px) and gutters (8px-14px) based on container width
 - **No Collision Detection**: Eliminated O(n²) AABB collision checks in favor of gap-aware jitter clamping during placement
 - **Single DOM Commit**: Reflow cost dominated by single pass calculation and one DOM update, even with 1,000+ books
 
