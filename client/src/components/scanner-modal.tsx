@@ -285,13 +285,30 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       setIsScanning(true);
       console.log('Starting Scanbot scanner...');
       
+      // Show mobile-specific guidance for the cancel button issue
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        toast({
+          title: "Scanner Tip",
+          description: "Tap the X Cancel text in the red header to exit the scanner",
+          duration: 4000,
+        });
+      }
+      
       // Create minimal configuration that should work reliably
       const config = new window.ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration();
       
       console.log('Creating barcode scanner with config:', config);
       
-      // Create and present the scanner
-      const result = await window.ScanbotSDK.UI.createBarcodeScanner(config);
+      // Create and present the scanner with a timeout fallback
+      const scannerPromise = window.ScanbotSDK.UI.createBarcodeScanner(config);
+      
+      // Add a timeout to auto-cancel if scanner gets stuck
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Scanner timeout after 30 seconds')), 30000);
+      });
+      
+      const result = await Promise.race([scannerPromise, timeoutPromise]);
       
       setIsScanning(false);
       console.log('Scanner result:', result);
@@ -330,15 +347,25 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
         }
       } else {
         console.log('Scanner cancelled or no barcode detected');
+        // Don't auto-restart if user cancelled
       }
     } catch (error) {
       console.error('Scanbot scanning error:', error);
       setIsScanning(false);
-      toast({
-        title: "Camera Error",
-        description: `Could not access camera: ${(error as Error).message}. Please enter ISBN manually.`,
-        variant: "destructive",
-      });
+      
+      if ((error as Error).message.includes('timeout')) {
+        toast({
+          title: "Scanner Timeout",
+          description: "Scanner timed out. You can try again or enter ISBN manually.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Camera Error",
+          description: `Could not access camera: ${(error as Error).message}. Please enter ISBN manually.`,
+          variant: "destructive",
+        });
+      }
     }
   };
 
