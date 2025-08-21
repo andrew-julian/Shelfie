@@ -35,6 +35,8 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 - **Organic Positioning**: Hash-based deterministic jitter, rotation, and depth variations for natural appearance
 - **Configurable Parameters**: Customizable gutters, jitter amounts, tilt angles, and ragged/justified last row options
 - **Pure Functions**: Side-effect free implementation suitable for server-side rendering and testing
+- **No Collision Detection**: Eliminated O(n²) AABB collision checks in favor of gap-aware jitter clamping during placement
+- **Single DOM Commit**: Reflow cost dominated by single pass calculation and one DOM update, even with 1,000+ books
 
 ### Book Visual Realism (August 2025)
 - **Paper Texture**: Added SVG fractal noise overlay to simulate printed paper grain on book covers

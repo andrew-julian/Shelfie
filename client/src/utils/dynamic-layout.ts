@@ -18,9 +18,10 @@ export interface LayoutConfig {
 }
 
 /**
- * Dynamic layout algorithm that preserves color order while preventing overlaps.
- * Uses a bin-packing inspired approach with shelving for optimal space utilization.
- * In tidy mode, sorts books by size (height, width, depth) for organized arrangement.
+ * LEGACY: Dynamic layout algorithm that preserves color order.
+ * NOTE: This algorithm is deprecated in favor of the new headless layout engine.
+ * Kept for reference but no longer used in the main layout path.
+ * The new engine eliminates O(n²) collision detection in favor of gap-aware jitter.
  */
 export function calculateDynamicLayout(
   books: Book[], 
@@ -30,7 +31,7 @@ export function calculateDynamicLayout(
   const positions: BookPosition[] = [];
   const rows: Array<{ books: Book[]; totalWidth: number; height: number }> = [];
   
-  // In tidy mode, sort books by size for organized arrangement
+  // Single-pass book sorting (no O(n²) operations)
   const sortedBooks = config.tidyMode 
     ? [...books].sort((a, b) => {
         const aDim = getDimensions(a);
@@ -140,49 +141,6 @@ export function calculateDynamicLayout(
   return positions;
 }
 
-/**
- * Animated transition layout that smoothly moves books from their current positions
- * to new calculated positions over time.
- */
-export function calculateTransitionLayout(
-  currentPositions: BookPosition[],
-  targetPositions: BookPosition[],
-  progress: number // 0-1
-): BookPosition[] {
-  return currentPositions.map(current => {
-    const target = targetPositions.find(t => t.book.id === current.book.id);
-    if (!target) return current;
-    
-    // Eased transition using cubic-bezier for natural movement
-    const easeProgress = progress < 0.5 
-      ? 4 * progress * progress * progress
-      : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-    
-    return {
-      ...current,
-      x: current.x + (target.x - current.x) * easeProgress,
-      y: current.y + (target.y - current.y) * easeProgress,
-      zIndex: target.zIndex
-    };
-  });
-}
-
-/**
- * Collision detection for manual book dragging/positioning
- */
-export function detectCollision(
-  position: BookPosition, 
-  otherPositions: BookPosition[],
-  tolerance: number = 5
-): boolean {
-  return otherPositions.some(other => {
-    if (other.book.id === position.book.id) return false;
-    
-    return !(
-      position.x + position.width + tolerance < other.x ||
-      other.x + other.width + tolerance < position.x ||
-      position.y + position.height + tolerance < other.y ||
-      other.y + other.height + tolerance < position.y
-    );
-  });
-}
+// Removed O(n²) collision detection and transition layout functions
+// The new headless layout engine handles positioning with gap-aware jitter clamping
+// eliminating the need for pairwise overlap checks

@@ -140,11 +140,11 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerDimensions, setContainerDimensions] = useState({ width: 1200, height: 800 });
   
-  // Layout engine configuration
-  const engineConfig: EngineConfig = {
+  // Layout engine configuration (memoized to prevent infinite re-renders)
+  const engineConfig: EngineConfig = useMemo(() => ({
     ...DEFAULT_CFG,
     raggedLastRow: !tidyMode // Use justified rows in tidy mode
-  };
+  }), [tidyMode]);
 
   useEffect(() => {
     if ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && books.length > 0) {
