@@ -80,8 +80,6 @@ export default function Header({
                 <option value="date-added">Date Added</option>
                 <option value="color-light-to-dark">Colour Sort (Light to Dark)</option>
                 <option value="color-dark-to-light">Colour Sort (Dark to Light)</option>
-                <option value="color-light-to-dark">Colour Sort (Light to Dark)</option>
-                <option value="color-dark-to-light">Colour Sort (Dark to Light)</option>
               </select>
               <SortAsc className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
@@ -102,7 +100,95 @@ export default function Header({
               <Filter className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Mobile Navigation */}
+          <div className="md:hidden flex items-center space-x-4">
+            <span className="text-sm text-gray-600 font-medium" data-testid="text-books-count-mobile">
+              {filteredCount !== booksCount ? `${filteredCount} of ${booksCount}` : booksCount}
+            </span>
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="p-2 text-gray-600 hover:text-coral-red transition-colors"
+              data-testid="button-mobile-menu"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="md:hidden border-t border-gray-100 bg-white">
+            <div className="px-4 py-4 space-y-4">
+              <UserMenu />
+              
+              {onRefreshAll && booksCount > 0 && (
+                <button 
+                  onClick={() => {
+                    onRefreshAll();
+                    setShowMobileMenu(false);
+                  }}
+                  disabled={isRefreshing}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-coral-red border border-gray-200 rounded-lg transition-all disabled:opacity-50"
+                  data-testid="button-refresh-all-mobile"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  {isRefreshing ? 'Refreshing...' : 'Refresh All'}
+                </button>
+              )}
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Sort by:</label>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => {
+                    onSortChange(e.target.value as SortOption);
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full appearance-none bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-600"
+                  data-testid="select-sort-mobile"
+                >
+                  <option value="title-asc">Title A-Z</option>
+                  <option value="title-desc">Title Z-A</option>
+                  <option value="author-asc">Author A-Z</option>
+                  <option value="author-desc">Author Z-A</option>
+                  <option value="status">Status</option>
+                  <option value="date-added">Date Added</option>
+                  <option value="color-light-to-dark">Colour Sort (Light to Dark)</option>
+                  <option value="color-dark-to-light">Colour Sort (Dark to Light)</option>
+                </select>
+              </div>
+
+              <button 
+                onClick={() => {
+                  setShowSearch(!showSearch);
+                  setShowMobileMenu(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-coral-red border border-gray-200 rounded-lg transition-all"
+                data-testid="button-search-mobile"
+              >
+                <Search className="w-4 h-4" />
+                Search
+              </button>
+
+              <button 
+                onClick={() => {
+                  onToggleFilters();
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium border rounded-lg transition-all ${
+                  showFilters 
+                    ? 'text-coral-red bg-coral-red/10 border-coral-red' 
+                    : 'text-gray-600 hover:text-coral-red border-gray-200'
+                }`}
+                data-testid="button-filters-mobile"
+              >
+                <Filter className="w-4 h-4" />
+                Filters
+              </button>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Search Bar */}
