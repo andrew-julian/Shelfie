@@ -18,6 +18,8 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 - **Animated Transitions**: Added smooth 700ms transitions when books are repositioned, creating natural movement effects
 - **Deterministic Positioning**: Uses book ID-based micro-rotations for consistent yet natural appearance without randomness
 - **Responsive Container**: Dynamic container sizing with automatic height adjustment based on book positions
+- **Centered Row Layout**: Two-pass algorithm that calculates row widths then centers each row as a cohesive unit
+- **Mobile-Optimized Scaling**: Reduced book size on mobile (≤390px) to enable attractive 2-column layouts with tight spacing
 
 ### Book Visual Realism (August 2025)
 - **Paper Texture**: Added SVG fractal noise overlay to simulate printed paper grain on book covers
