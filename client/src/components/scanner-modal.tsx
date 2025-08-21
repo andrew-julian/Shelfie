@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, Camera, Search } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { X, Camera, Search, Check, AlertCircle, Loader2, RotateCcw } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -36,56 +37,210 @@ interface ScannerModalProps {
   onClose: () => void;
 }
 
+interface QueueItem {
+  id: string;
+  isbn: string;
+  status: 'scanning' | 'looking-up' | 'adding' | 'success' | 'error' | 'duplicate';
+  timestamp: number;
+  bookData?: any;
+  error?: string;
+  retryCount: number;
+}
+
+interface QueueItemCardProps {
+  item: QueueItem;
+  onRetry: () => void;
+  onRemove: () => void;
+}
+
+function QueueItemCard({ item, onRetry, onRemove }: QueueItemCardProps) {
+  const getStatusIcon = () => {
+    switch (item.status) {
+      case 'scanning':
+        return <Loader2 className="w-4 h-4 animate-spin text-blue-500" />;
+      case 'looking-up':
+        return <Loader2 className="w-4 h-4 animate-spin text-blue-500" />;
+      case 'adding':
+        return <Loader2 className="w-4 h-4 animate-spin text-green-500" />;
+      case 'success':
+        return <Check className="w-4 h-4 text-green-500" />;
+      case 'error':
+        return <AlertCircle className="w-4 h-4 text-red-500" />;
+      case 'duplicate':
+        return <AlertCircle className="w-4 h-4 text-yellow-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (item.status) {
+      case 'scanning':
+      case 'looking-up':
+      case 'adding':
+        return 'bg-blue-50 border-blue-200';
+      case 'success':
+        return 'bg-green-50 border-green-200';
+      case 'error':
+        return 'bg-red-50 border-red-200';
+      case 'duplicate':
+        return 'bg-yellow-50 border-yellow-200';
+      default:
+        return 'bg-gray-50 border-gray-200';
+    }
+  };
+
+  const getStatusText = () => {
+    switch (item.status) {
+      case 'scanning':
+        return 'Scanning...';
+      case 'looking-up':
+        return 'Looking up book...';
+      case 'adding':
+        return 'Adding to library...';
+      case 'success':
+        return `Added: ${item.bookData?.title || 'Book'}`;
+      case 'error':
+        return `Error: ${item.error || 'Unknown error'}`;
+      case 'duplicate':
+        return 'Already in library';
+      default:
+        return 'Processing...';
+    }
+  };
+
+  return (
+    <div className={`flex items-center justify-between p-3 rounded-lg border ${getStatusColor()}`}>
+      <div className="flex items-center space-x-3 flex-1 min-w-0">
+        {getStatusIcon()}
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium text-gray-900 truncate">
+            ISBN: {item.isbn}
+          </div>
+          <div className="text-xs text-gray-500 truncate">
+            {getStatusText()}
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-1 ml-2">
+        {item.status === 'error' && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRetry}
+            className="text-xs px-2 py-1 h-auto"
+            data-testid={`button-retry-${item.id}`}
+          >
+            <RotateCcw className="w-3 h-3" />
+          </Button>
+        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onRemove}
+          className="text-xs px-2 py-1 h-auto text-gray-400 hover:text-gray-600"
+          data-testid={`button-remove-${item.id}`}
+        >
+          <X className="w-3 h-3" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   const [manualIsbn, setManualIsbn] = useState("");
   const [isScanning, setIsScanning] = useState(false);
-  const [isLookingUp, setIsLookingUp] = useState(false);
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
+  const [queue, setQueue] = useState<QueueItem[]>([]);
+  const [scanCount, setScanCount] = useState(0);
   const scannerRef = useRef<HTMLDivElement>(null);
   const scanbotSDK = useRef<any>(null);
   const { toast } = useToast();
 
-  const lookupMutation = useMutation({
-    mutationFn: async (isbn: string) => {
-      setIsLookingUp(true);
-      const response = await fetch(`/api/books/lookup/${isbn}`);
+  // Queue management functions
+  const addToQueue = useCallback((isbn: string) => {
+    const id = `${isbn}-${Date.now()}`;
+    const newItem: QueueItem = {
+      id,
+      isbn,
+      status: 'scanning',
+      timestamp: Date.now(),
+      retryCount: 0
+    };
+    
+    setQueue(prev => [...prev, newItem]);
+    setScanCount(prev => prev + 1);
+    
+    // Immediately start processing this item
+    processQueueItem(newItem);
+    
+    return id;
+  }, []);
+
+  const updateQueueItem = useCallback((id: string, updates: Partial<QueueItem>) => {
+    setQueue(prev => prev.map(item => 
+      item.id === id ? { ...item, ...updates } : item
+    ));
+  }, []);
+
+  const removeFromQueue = useCallback((id: string) => {
+    setQueue(prev => prev.filter(item => item.id !== id));
+  }, []);
+
+  const processQueueItem = async (item: QueueItem) => {
+    try {
+      // Update status to looking-up
+      updateQueueItem(item.id, { status: 'looking-up' });
+      
+      // Lookup book data
+      const response = await fetch(`/api/books/lookup/${item.isbn}`);
       
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || 'Failed to lookup book');
       }
       
-      return response.json();
-    },
-    onSuccess: async (bookData) => {
-      try {
-        // Add book to library
-        const addResponse = await fetch('/api/books', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bookData),
-        });
-        
-        if (addResponse.ok) {
-          queryClient.invalidateQueries({ queryKey: ['/api/books'] });
-          toast({
-            title: "Success!",
-            description: "Book added to your library",
-          });
-          handleClose();
-        } else {
-          const error = await addResponse.json();
-          throw new Error(error.message || 'Failed to add book');
-        }
-      } catch (error) {
-        console.error('Error in book addition:', error);
-        throw error; // Re-throw to be handled by onError
-      }
-    },
-    onError: (error: Error) => {
-      console.error('Book lookup/add error:', error);
+      const bookData = await response.json();
       
-      if (isUnauthorizedError(error)) {
+      // Update status to adding and store book data
+      updateQueueItem(item.id, { 
+        status: 'adding', 
+        bookData 
+      });
+      
+      // Add book to library
+      const addResponse = await fetch('/api/books', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookData),
+      });
+      
+      if (addResponse.ok) {
+        // Success!
+        updateQueueItem(item.id, { status: 'success' });
+        queryClient.invalidateQueries({ queryKey: ['/api/books'] });
+        
+        // Auto-remove successful items after 3 seconds
+        setTimeout(() => {
+          removeFromQueue(item.id);
+        }, 3000);
+        
+      } else if (addResponse.status === 409) {
+        // Duplicate book
+        updateQueueItem(item.id, { 
+          status: 'duplicate',
+          error: 'Book already in library'
+        });
+      } else {
+        const error = await addResponse.json();
+        throw new Error(error.message || 'Failed to add book');
+      }
+      
+    } catch (error) {
+      console.error('Error processing queue item:', error);
+      
+      if (isUnauthorizedError(error as Error)) {
         toast({
           title: "Unauthorized",
           description: "You are logged out. Logging in again...",
@@ -97,16 +252,24 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
         return;
       }
       
-      toast({
-        title: "Error",
-        description: error.message || "Failed to add book. Please try again.",
-        variant: "destructive",
+      // Update item with error status
+      updateQueueItem(item.id, { 
+        status: 'error', 
+        error: (error as Error).message || 'Unknown error'
       });
-    },
-    onSettled: () => {
-      setIsLookingUp(false);
-    },
-  });
+    }
+  };
+
+  const retryQueueItem = useCallback((item: QueueItem) => {
+    const updatedItem = { 
+      ...item, 
+      status: 'scanning' as const, 
+      retryCount: item.retryCount + 1,
+      error: undefined 
+    };
+    updateQueueItem(item.id, updatedItem);
+    processQueueItem(updatedItem);
+  }, [updateQueueItem]);
 
   const startScanner = async () => {
     if (!window.ScanbotSDK) {
@@ -137,13 +300,33 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
         const scannedCode = result.items[0].barcode.text;
         console.log('Scanned barcode:', scannedCode);
         if (scannedCode && scannedCode.length >= 10) {
-          lookupMutation.mutate(scannedCode);
+          addToQueue(scannedCode);
+          
+          // Show quick success feedback
+          toast({
+            title: "Book Scanned!",
+            description: `ISBN ${scannedCode} added to queue`,
+            duration: 2000, // Short duration
+          });
+          
+          // Automatically restart scanner for rapid scanning
+          setTimeout(() => {
+            if (isOpen) { // Only restart if modal is still open
+              startScanner();
+            }
+          }, 500); // Brief pause to show feedback
         } else {
           toast({
             title: "Invalid Barcode",
             description: "Please scan a valid ISBN barcode (10-13 digits).",
             variant: "destructive",
           });
+          // Restart scanner after error for continuous scanning
+          setTimeout(() => {
+            if (isOpen) {
+              startScanner();
+            }
+          }, 1500);
         }
       } else {
         console.log('Scanner cancelled or no barcode detected');
@@ -168,13 +351,16 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   const handleClose = () => {
     stopScanner();
     setManualIsbn("");
+    setQueue([]); // Clear queue when closing
+    setScanCount(0); // Reset scan count
     onClose();
   };
 
   const handleManualLookup = () => {
     const isbn = manualIsbn.trim();
     if (isbn && (isbn.length === 10 || isbn.length === 13)) {
-      lookupMutation.mutate(isbn);
+      addToQueue(isbn);
+      setManualIsbn(""); // Clear input after adding to queue
     } else {
       toast({
         title: "Invalid ISBN",
@@ -235,7 +421,14 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       <DialogContent className="max-w-md" data-testid="modal-scanner">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span>Scan Book Barcode</span>
+            <div>
+              <span>Rapid Book Scanning</span>
+              {scanCount > 0 && (
+                <div className="text-sm font-normal text-gray-500 mt-1">
+                  {scanCount} books scanned • {queue.filter(item => item.status === 'success').length} added
+                </div>
+              )}
+            </div>
             <Button variant="ghost" size="icon" onClick={handleClose} data-testid="button-close-scanner">
               <X className="w-4 h-4" />
             </Button>
@@ -251,16 +444,21 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
               data-testid="camera-preview" 
             />
             {!isScanning && (
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-4">
                 <Button 
                   onClick={startScanner} 
-                  className="primary-button" 
-                  disabled={!window.ScanbotSDK}
+                  className="primary-button text-lg px-8 py-4 h-auto" 
+                  disabled={!isSDKLoaded}
                   data-testid="button-start-scanner"
                 >
-                  <Camera className="w-4 h-4 mr-2" />
-                  {isSDKLoaded ? 'Start Scanner' : 'Loading Scanner...'}
+                  <Camera className="w-6 h-6 mr-3" />
+                  {isSDKLoaded ? 'Start Rapid Scanning' : 'Loading Scanner...'}
                 </Button>
+                {queue.length > 0 && (
+                  <div className="text-sm text-gray-400">
+                    Ready to scan your next book!
+                  </div>
+                )}
               </div>
             )}
             {isScanning && (
@@ -299,27 +497,55 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
               />
               <Button 
                 onClick={handleManualLookup}
-                disabled={lookupMutation.isPending || isLookingUp}
+                disabled={!manualIsbn.trim()}
                 data-testid="button-lookup-isbn"
               >
-                {(lookupMutation.isPending || isLookingUp) ? (
-                  <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                ) : (
-                  <Search className="w-4 h-4" />
-                )}
+                <Search className="w-4 h-4" />
               </Button>
             </div>
           </div>
         </div>
         
-        {/* Loading State */}
-        {(lookupMutation.isPending || isLookingUp) && (
-          <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center rounded-lg">
-            <div className="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full mx-4 text-center">
-              <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Looking up book...</h3>
-              <p className="text-gray-600 text-sm">Fetching book details from Rainforest API</p>
+        {/* Queue Display */}
+        {queue.length > 0 && (
+          <div className="border-t pt-4 mt-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Scanning Queue ({queue.length})
+                </h3>
+                {queue.some(item => ['scanning', 'looking-up', 'adding'].includes(item.status)) && (
+                  <div className="flex items-center space-x-1">
+                    <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
+                    <span className="text-xs text-blue-600">Processing...</span>
+                  </div>
+                )}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setQueue([])}
+                className="text-xs text-gray-500 hover:text-gray-700"
+                data-testid="button-clear-queue"
+              >
+                Clear All
+              </Button>
             </div>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {queue.map((item) => (
+                <QueueItemCard 
+                  key={item.id} 
+                  item={item} 
+                  onRetry={() => retryQueueItem(item)}
+                  onRemove={() => removeFromQueue(item.id)}
+                />
+              ))}
+            </div>
+            {scanCount > 0 && (
+              <div className="mt-2 text-xs text-gray-500 text-center">
+                {queue.filter(item => item.status === 'success').length} of {scanCount} books added successfully
+              </div>
+            )}
           </div>
         )}
       </DialogContent>
