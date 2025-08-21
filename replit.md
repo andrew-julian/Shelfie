@@ -19,7 +19,7 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 - **Deterministic Positioning**: Uses book ID-based micro-rotations for consistent yet natural appearance without randomness
 - **Responsive Container**: Dynamic container sizing with automatic height adjustment based on book positions
 - **Centered Row Layout**: Two-pass algorithm that calculates row widths then centers each row as a cohesive unit
-- **Progressive Responsive Scaling**: Mobile (26 scale) for 2-column, desktop (22 scale) for 4-5 columns, ultra-wide (18 scale) for 6+ columns with optimized spacing across all breakpoints
+- **Constrained Responsive Scaling**: Dynamic scaling with hard minimum of 2 books per row - automatically reduces book size if needed to maintain this constraint across all screen widths
 
 ### Book Visual Realism (August 2025)
 - **Paper Texture**: Added SVG fractal noise overlay to simulate printed paper grain on book covers

@@ -42,12 +42,10 @@ export function calculateDynamicLayout(
     const spaceNeeded = currentRowWidth + (currentRow.length > 0 ? config.minSpacing : 0) + bookWidth;
     const availableWidth = config.containerWidth - (config.padding * 2);
     
-    // Mobile-specific 2-column limit OR natural width limit for desktop
-    const isMobile = config.containerWidth <= 390;
-    const shouldBreakRow = spaceNeeded > availableWidth && currentRow.length >= 1;
-    const maxBooksPerRow = isMobile ? 2 : Infinity; // Only limit columns on mobile
+    // Ensure minimum 2 books per row across all screen sizes
+    const shouldBreakRow = spaceNeeded > availableWidth && currentRow.length >= 2; // Always require at least 2 books before breaking
     
-    if (shouldBreakRow || currentRow.length >= maxBooksPerRow) {
+    if (shouldBreakRow) {
       // Save current row and start new one
       if (currentRow.length > 0) {
         rows.push({

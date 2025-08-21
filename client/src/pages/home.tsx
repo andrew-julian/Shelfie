@@ -146,18 +146,24 @@ export default function Home() {
 
   // Book dimensions calculation function with responsive scaling
   const getBookDimensions = (book: Book) => {
-    // Responsive scale based on container width - more columns on wide screens
+    // Responsive scale ensuring minimum 2 books per row
     const getResponsiveScale = (containerWidth: number) => {
+      // Calculate maximum book width to ensure at least 2 books fit
+      const padding = containerWidth <= 390 ? 16 : (containerWidth <= 1400 ? 32 : 40);
+      const minSpacing = 12;
+      const maxBookWidth = (containerWidth - (padding * 2) - minSpacing) / 2;
+      
       if (containerWidth <= 390) {
-        // Mobile: larger scale to fill space better in 2-column layout
-        return 26; // Increased scale for better mobile experience
+        // Mobile: scale for 2-column with padding constraints
+        const calculatedScale = Math.min(26, (maxBookWidth / 140) * 22);
+        return Math.max(calculatedScale, 16); // Never below 16
       }
-      if (containerWidth <= 600) return 34; // Narrow desktop: large books  
-      if (containerWidth <= 800) return 30; // Medium-narrow: medium-large books
-      if (containerWidth <= 1024) return 26; // Small desktop: medium books
-      if (containerWidth <= 1400) return 22; // Standard desktop: standard size
-      if (containerWidth <= 1800) return 20; // Large desktop: smaller books for more columns
-      return 18; // Ultra-wide: very small books for maximum columns
+      if (containerWidth <= 600) return Math.min(34, (maxBookWidth / 140) * 22);
+      if (containerWidth <= 800) return Math.min(30, (maxBookWidth / 140) * 22);
+      if (containerWidth <= 1024) return Math.min(26, (maxBookWidth / 140) * 22);
+      if (containerWidth <= 1400) return Math.min(22, (maxBookWidth / 140) * 22);
+      if (containerWidth <= 1800) return Math.min(20, (maxBookWidth / 140) * 22);
+      return Math.min(18, (maxBookWidth / 140) * 22); // Ultra-wide with constraint
     };
     
     const baseScale = getResponsiveScale(containerDimensions.width);
