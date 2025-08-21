@@ -3,14 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Performance optimizations for book layout */
-.book-container {
-  content-visibility: auto;
-  contain: layout paint size;
-}
-
-
-
 /* Prevent horizontal scrolling and ensure full-width mobile layout */
 html, body {
   overflow-x: hidden;
@@ -35,8 +27,6 @@ body {
   --sky-blue: #449CFF;
   --light-grey: #F8F9FA;
   --medium-grey: #6C757D;
-  
-
   
   /* Updated System Colors */
   --background: #FFFFFF;

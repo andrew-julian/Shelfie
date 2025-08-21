@@ -371,11 +371,11 @@ export default function Home() {
               return (
                 <div
                   key={item.id}
-                  className="absolute transition-all duration-700 ease-out book-container"
+                  className="absolute transition-all duration-700 ease-out"
                   style={{
                     '--x': `${item.x}px`,
                     '--y': `${item.y}px`,
-                    '--z': `${item.z}px`,
+                    '--z': item.z,
                     '--w': `${item.w}px`,
                     '--h': `${item.h}px`,
                     '--d': `${item.d}px`,
