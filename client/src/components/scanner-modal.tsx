@@ -16,21 +16,23 @@ declare global {
 }
 
 const LICENSE_KEY =
-  "hTf/Lg23A0W4/nkpYfNfxzoecc1AbZ" +
-  "fcRMaakHvbBb4ecLcONr21DcjSpjyu" +
-  "pjg7OJrLkc5p/6orGbB7ry5e4Al/Z2" +
-  "qYGXt97JzTnnUiooEoWvOQ8BmvCiPK" +
-  "sMaqDB2sfYqJx3IaR5RD0bcb3ONCBY" +
-  "9eRyuyj17/drfwHfF9EDWe9D6k0qnV" +
-  "QfFc6JHcouwNQUl+8wKkTHQ11dEsyK" +
-  "RocjI8q/XmOT9KDP0CySkpH1wMgOWW" +
-  "MouQGLv7Tg6BG4bVUrc1daFiHlhI5v" +
-  "tWTFqrOR+QjsbcxLnn5D3Ft5IA7u8w" +
-  "XtoltCrAtcHiAU9oGmJsdCURvd7HZx" +
-  "mWCfhFTWIWiw==\nU2NhbmJvdFNESw" +
-  "psb2NhbGhvc3R8cmlrZXIucmVwbGl0" +
-  "LmRldgoxNzU2NDI1NTk5CjgzODg2MD" +
-  "cKOA==\n";
+  "eF/Y56HZpKOTSmY2/E1vvYTAUnpZhT" +
+  "89i/FVKt+VBI2bhYuWAz5a/0PViy+D" +
+  "M4gTzDqMOa1Ythk5SFt9CCmYA8ALUd" +
+  "i+zv3i2xd8ostAwfWOqEeWRioBpvu7" +
+  "Jq9Fe2bIaScxaco68Zi75z6oIGSNre" +
+  "AqkEsNmJgK/i1ndp3vBigTNTtvZsv8" +
+  "v1fNZ6QBoklDhaxSqy1aR3v8hfjnbm" +
+  "By/W8t8AqiYvP33jgYPQ6354aLMV9N" +
+  "A/S8WINGwE7vk/SEwreMlYRS7NoEL1" +
+  "LcS6xgujaNcAmIY/CsRhQ/1hMbayLn" +
+  "1oHVzWhMcQ6v3/ZeR4HeJjs4oWQXV5" +
+  "Xx0N3z96nI9Q==\nU2NhbmJvdFNESw" +
+  "psb2NhbGhvc3R8NzJiN2U4N2YtY2Vl" +
+  "My00NmY2LThhOWEtOTM1ZWFkODE5Mj" +
+  "YxLTAwLTJwYnV4eXp4bW11ZzIucmlr" +
+  "ZXIucmVwbGl0LmRldgoxNzU2NDI1NT" +
+  "k5CjgzODg2MDcKOA==\n";
 
 interface ScannerModalProps {
   isOpen: boolean;
