@@ -146,11 +146,11 @@ export default function Home() {
 
   // Book dimensions calculation function with responsive scaling
   const getBookDimensions = (book: Book) => {
-    // Responsive scale based on container width - mobile-first approach
+    // Responsive scale based on container width - optimized mobile scaling
     const getResponsiveScale = (containerWidth: number) => {
       if (containerWidth <= 390) {
-        // Mobile: fixed scale that ensures clean 2-column layout
-        return 20; // Conservative scale for reliable mobile layout
+        // Mobile: larger scale to fill space better in 2-column layout
+        return 26; // Increased scale for better mobile experience
       }
       if (containerWidth <= 600) return 34; // Narrow desktop: large books  
       if (containerWidth <= 800) return 30; // Medium-narrow: medium-large books
@@ -200,9 +200,9 @@ export default function Home() {
   // Calculate dynamic layout when books or container changes
   useEffect(() => {
     if (finalBooks.length > 0 && containerDimensions.width > 0) {
-      // Responsive spacing based on screen width - fixed mobile spacing
+      // Responsive spacing based on screen width - tighter mobile spacing
       const getResponsiveSpacing = (containerWidth: number) => {
-        if (containerWidth <= 390) return { padding: 20, minSpacing: 20 }; // Mobile: generous spacing for clean layout
+        if (containerWidth <= 390) return { padding: 16, minSpacing: 12 }; // Mobile: tighter spacing for better use of space
         if (containerWidth <= 600) return { padding: 18, minSpacing: 20 }; // Narrow: tight spacing
         if (containerWidth <= 800) return { padding: 22, minSpacing: 24 }; // Medium-narrow: medium spacing
         if (containerWidth <= 1024) return { padding: 26, minSpacing: 26 }; // Small desktop: medium spacing
