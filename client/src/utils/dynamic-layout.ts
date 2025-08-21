@@ -26,44 +26,87 @@ export function calculateDynamicLayout(
   getDimensions: (book: Book) => { width: number; height: number; depth: number }
 ): BookPosition[] {
   const positions: BookPosition[] = [];
+  const rows: Array<{ books: Book[]; totalWidth: number; height: number }> = [];
   
-  let currentX = config.padding;
-  let currentY = config.padding;
+  // First pass: organize books into rows
+  let currentRow: Book[] = [];
+  let currentRowWidth = 0;
   let currentRowHeight = 0;
-  let zIndex = 1;
-
+  
   for (const book of books) {
     const dimensions = getDimensions(book);
     const bookWidth = dimensions.width;
     const bookHeight = dimensions.height;
     
     // Check if book fits on current row
-    if (currentX + bookWidth + config.padding > config.containerWidth) {
-      // Move to next row
-      currentY += currentRowHeight + config.minSpacing;
-      currentX = config.padding;
-      currentRowHeight = 0;
+    const spaceNeeded = currentRowWidth + (currentRow.length > 0 ? config.minSpacing : 0) + bookWidth;
+    if (spaceNeeded > config.containerWidth - (config.padding * 2) && currentRow.length > 0) {
+      // Save current row and start new one
+      rows.push({
+        books: [...currentRow],
+        totalWidth: currentRowWidth,
+        height: currentRowHeight
+      });
+      
+      currentRow = [book];
+      currentRowWidth = bookWidth;
+      currentRowHeight = bookHeight;
+    } else {
+      // Add to current row
+      if (currentRow.length > 0) {
+        currentRowWidth += config.minSpacing;
+      }
+      currentRow.push(book);
+      currentRowWidth += bookWidth;
+      currentRowHeight = Math.max(currentRowHeight, bookHeight);
+    }
+  }
+  
+  // Add the last row
+  if (currentRow.length > 0) {
+    rows.push({
+      books: [...currentRow],
+      totalWidth: currentRowWidth,
+      height: currentRowHeight
+    });
+  }
+  
+  // Second pass: position books with centered rows
+  let currentY = config.padding;
+  let zIndex = 1;
+  
+  for (const row of rows) {
+    // Calculate starting X to center this row
+    const rowStartX = (config.containerWidth - row.totalWidth) / 2;
+    let currentX = rowStartX;
+    
+    for (const book of row.books) {
+      const dimensions = getDimensions(book);
+      const bookWidth = dimensions.width;
+      const bookHeight = dimensions.height;
+      
+      // Add deterministic offset based on book ID for consistent but natural positioning
+      const seedOffset = book.id.charCodeAt(0) + book.id.charCodeAt(book.id.length - 1);
+      const randomOffsetX = ((seedOffset % 13) - 6) * 2; // ±12px deterministic horizontal variance
+      const randomOffsetY = ((seedOffset % 11) - 5) * 1.5; // ±7.5px deterministic vertical variance
+      
+      const position: BookPosition = {
+        book,
+        x: currentX + randomOffsetX,
+        y: currentY + randomOffsetY,
+        width: bookWidth,
+        height: bookHeight,
+        zIndex: zIndex++
+      };
+      
+      positions.push(position);
+      
+      // Move to next position in row
+      currentX += bookWidth + config.minSpacing;
     }
     
-    // Add deterministic offset based on book ID for consistent but natural positioning
-    const seedOffset = book.id.charCodeAt(0) + book.id.charCodeAt(book.id.length - 1);
-    const randomOffsetX = ((seedOffset % 13) - 6) * 2; // ±12px deterministic horizontal variance
-    const randomOffsetY = ((seedOffset % 11) - 5) * 1.5; // ±7.5px deterministic vertical variance
-    
-    const position: BookPosition = {
-      book,
-      x: currentX + randomOffsetX,
-      y: currentY + randomOffsetY,
-      width: bookWidth,
-      height: bookHeight,
-      zIndex: zIndex++
-    };
-    
-    positions.push(position);
-    
-    // Update position for next book
-    currentX += bookWidth + config.minSpacing;
-    currentRowHeight = Math.max(currentRowHeight, bookHeight);
+    // Move to next row
+    currentY += row.height + config.minSpacing;
   }
   
   return positions;
