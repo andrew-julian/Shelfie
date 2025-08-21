@@ -13,7 +13,14 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
   }
 
   try {
-    // Parse various dimension formats like "8.5 x 5.5 x 1.2 inches", "21.6 x 14 x 2.8 cm", etc.
+    // Parse various dimension formats and detect units
+    console.log('Parsing dimensions:', dimensionText);
+    
+    // First check if units are explicitly mentioned
+    const isMetric = /cm|centimeter|millimeter/i.test(dimensionText);
+    const isImperial = /inch|inches|in\b/i.test(dimensionText);
+    
+    // Parse the numbers
     const matches = dimensionText.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
     if (!matches) {
       return { width: null, height: null, depth: null };
@@ -24,11 +31,14 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
     let dim2 = parseFloat(dim2Str);
     let dim3 = parseFloat(dim3Str);
     
-    // Convert to inches if needed (assuming cm if any dimension > 15)
-    if (dim1 > 15 || dim2 > 15 || dim3 > 15) {
+    // Convert to inches based on explicit units or heuristics
+    if (isMetric || (!isImperial && (dim1 > 15 || dim2 > 15 || dim3 > 15))) {
+      console.log('Converting from metric to inches:', { dim1, dim2, dim3 });
       dim1 = dim1 / 2.54; // cm to inches
       dim2 = dim2 / 2.54;
       dim3 = dim3 / 2.54;
+    } else {
+      console.log('Using as inches (imperial or small values):', { dim1, dim2, dim3 });
     }
     
     // Amazon dimensions for books are typically in Height x Depth x Width format
@@ -1001,8 +1011,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 featureBullets = product.feature_bullets.filter((bullet: any) => typeof bullet === 'string' && bullet.trim());
               }
               
-              // Parse individual dimensions intelligently
+              // Parse individual dimensions intelligently  
               const finalDimensions = extractedDimensions || book.dimensions;
+              console.log(`Final dimensions for ${book.title}: "${finalDimensions}"`);
               const parsedDimensions = parseAndAssignDimensions(finalDimensions, book.title);
               
               const updateData = {

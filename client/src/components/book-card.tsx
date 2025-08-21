@@ -39,8 +39,12 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
     let depth = parseFloat(depthStr);
     let height = parseFloat(heightStr);
     
-    // Convert to inches if needed (assuming cm if > 15)
-    if (width > 15) {
+    // Check if units are explicitly mentioned, then convert appropriately
+    const isMetric = /cm|centimeter|millimeter/i.test(book.dimensions);
+    const isImperial = /inch|inches|in\b/i.test(book.dimensions);
+    
+    // Convert to inches if needed
+    if (isMetric || (!isImperial && (width > 15 || height > 15 || depth > 15))) {
       width = width / 2.54; // cm to inches
       height = height / 2.54;
       depth = depth / 2.54;
