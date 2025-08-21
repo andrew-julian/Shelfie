@@ -330,18 +330,48 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       setIsScanning(true);
       console.log('Starting Scanbot scanner...');
       
-      // Show mobile-specific guidance for the cancel button issue
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile) {
-        toast({
-          title: "Scanner Tip",
-          description: "Tap the X Cancel text in the red header to exit the scanner",
-          duration: 4000,
-        });
+      // Create enhanced configuration with better cancel button
+      const config = new window.ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration();
+      
+      // Customize the top bar for better mobile UX
+      if (config.topBar) {
+        // Make the title more prominent
+        if (config.topBar.title) {
+          config.topBar.title.text = "Scan Book";
+          config.topBar.title.color = "#FFFFFF";
+        }
+        
+        // Enhance the cancel button for better touch targets
+        if (config.topBar.cancelButton) {
+          config.topBar.cancelButton.visible = true;
+          config.topBar.cancelButton.text = "✕ Done"; // Use larger X symbol and clearer text
+          config.topBar.cancelButton.accessibilityDescription = "Close scanner";
+          
+          // Make the cancel button more prominent
+          if (config.topBar.cancelButton.foreground) {
+            config.topBar.cancelButton.foreground.color = "#FFFFFF";
+            config.topBar.cancelButton.foreground.iconVisible = true;
+          }
+          
+          // Add background to make it more tappable
+          if (config.topBar.cancelButton.background) {
+            config.topBar.cancelButton.background.fillColor = "#FF3737"; // Red background
+            config.topBar.cancelButton.background.strokeColor = "#FFFFFF";
+            config.topBar.cancelButton.background.strokeWidth = 1.0;
+          }
+        }
+        
+        // Set top bar colors
+        config.topBar.mode = "SOLID";
+        config.topBar.backgroundColor = "#C8193C"; // Primary red color
       }
       
-      // Create minimal configuration that should work reliably
-      const config = new window.ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration();
+      // Also customize the color palette for better visibility
+      if (config.palette) {
+        config.palette.sbColorPrimary = "#C8193C";
+        config.palette.sbColorOnPrimary = "#FFFFFF";
+        config.palette.sbColorNegative = "#FF3737";
+      }
       
       console.log('Creating barcode scanner with config:', config);
       
