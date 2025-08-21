@@ -148,9 +148,10 @@ export default function Home() {
   const getBookDimensions = (book: Book) => {
     // Responsive scale based on container width
     const getResponsiveScale = (containerWidth: number) => {
-      if (containerWidth <= 480) return 32; // Mobile: larger books
-      if (containerWidth <= 768) return 28; // Tablet: medium-large books
-      if (containerWidth <= 1024) return 25; // Small desktop: medium books
+      if (containerWidth <= 400) return 38; // Very narrow: very large books
+      if (containerWidth <= 600) return 34; // Narrow: large books  
+      if (containerWidth <= 800) return 30; // Medium-narrow: medium-large books
+      if (containerWidth <= 1024) return 26; // Small desktop: medium books
       return 22; // Large desktop: standard size
     };
     
@@ -198,8 +199,10 @@ export default function Home() {
     if (finalBooks.length > 0 && containerDimensions.width > 0) {
       // Responsive spacing based on screen width
       const getResponsiveSpacing = (containerWidth: number) => {
-        if (containerWidth <= 480) return { padding: 20, minSpacing: 20 }; // Mobile: tighter spacing
-        if (containerWidth <= 768) return { padding: 24, minSpacing: 24 }; // Tablet: medium spacing
+        if (containerWidth <= 400) return { padding: 16, minSpacing: 18 }; // Very narrow: tight spacing
+        if (containerWidth <= 600) return { padding: 18, minSpacing: 20 }; // Narrow: tight spacing
+        if (containerWidth <= 800) return { padding: 22, minSpacing: 24 }; // Medium-narrow: medium spacing
+        if (containerWidth <= 1024) return { padding: 26, minSpacing: 26 }; // Small desktop: medium spacing
         return { padding: 32, minSpacing: 28 }; // Desktop: original spacing
       };
       
