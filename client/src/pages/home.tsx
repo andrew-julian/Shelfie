@@ -20,11 +20,6 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<SortOption>('date-added');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [showFilters, setShowFilters] = useState(false);
-  
-  // Drag and drop state
-  const [draggedBook, setDraggedBook] = useState<Book | null>(null);
-  const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null);
-  const [customOrder, setCustomOrder] = useState<string[]>([]);
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -67,110 +62,31 @@ export default function Home() {
       filtered = filtered.filter(book => book.status === filterStatus);
     }
 
-    // Sort books - if we have a custom order, use that first
-    if (customOrder.length > 0 && sortBy === 'date-added') {
-      // Apply custom order for default sorting
-      filtered.sort((a, b) => {
-        const aIndex = customOrder.indexOf(a.id);
-        const bIndex = customOrder.indexOf(b.id);
-        
-        // If both books are in custom order, use that order
-        if (aIndex !== -1 && bIndex !== -1) {
-          return aIndex - bIndex;
-        }
-        
-        // If only one is in custom order, prioritize it
-        if (aIndex !== -1) return -1;
-        if (bIndex !== -1) return 1;
-        
-        // Fallback to date added for new books
-        return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
-      });
-    } else {
-      // Standard sorting
-      filtered.sort((a, b) => {
-        switch (sortBy) {
-          case 'title-asc':
-            return a.title.localeCompare(b.title);
-          case 'title-desc':
-            return b.title.localeCompare(a.title);
-          case 'author-asc':
-            return a.author.localeCompare(b.author);
-          case 'author-desc':
-            return b.author.localeCompare(a.author);
-          case 'status':
-            const statusOrder = { 'reading': 0, 'want-to-read': 1, 'read': 2 };
-            return (statusOrder[a.status as keyof typeof statusOrder] || 3) - (statusOrder[b.status as keyof typeof statusOrder] || 3);
-          case 'date-added':
-            return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
-          default:
-            return 0;
-        }
-      });
-    }
+    // Sort books
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'title-asc':
+          return a.title.localeCompare(b.title);
+        case 'title-desc':
+          return b.title.localeCompare(a.title);
+        case 'author-asc':
+          return a.author.localeCompare(b.author);
+        case 'author-desc':
+          return b.author.localeCompare(a.author);
+        case 'status':
+          const statusOrder = { 'reading': 0, 'want-to-read': 1, 'read': 2 };
+          return (statusOrder[a.status as keyof typeof statusOrder] || 3) - (statusOrder[b.status as keyof typeof statusOrder] || 3);
+        case 'date-added':
+          return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
+        default:
+          return 0;
+      }
+    });
 
     return filtered;
-  }, [allBooks, searchTerm, filterStatus, sortBy, customOrder]);
+  }, [allBooks, searchTerm, filterStatus, sortBy]);
 
-  // Drag and drop handlers
-  const handleDragStart = (book: Book, index: number) => {
-    setDraggedBook(book);
-    // Save custom order when dragging starts if we don't have one yet
-    if (customOrder.length === 0) {
-      setCustomOrder(books.map(b => b.id));
-    }
-  };
 
-  const handleDragOver = (index: number) => {
-    if (draggedBook && draggedOverIndex !== index) {
-      setDraggedOverIndex(index);
-    }
-  };
-
-  const handleDragEnd = () => {
-    if (draggedBook && draggedOverIndex !== null) {
-      const currentIndex = books.findIndex(book => book.id === draggedBook.id);
-      if (currentIndex !== draggedOverIndex) {
-        // Create new order array
-        const newOrder = [...customOrder];
-        const draggedId = draggedBook.id;
-        
-        // Remove dragged item from current position
-        const currentOrderIndex = newOrder.indexOf(draggedId);
-        if (currentOrderIndex !== -1) {
-          newOrder.splice(currentOrderIndex, 1);
-        }
-        
-        // Insert at new position
-        newOrder.splice(draggedOverIndex, 0, draggedId);
-        setCustomOrder(newOrder);
-      }
-    }
-    
-    setDraggedBook(null);
-    setDraggedOverIndex(null);
-  };
-
-  // Handle global mouse up for drag end
-  useEffect(() => {
-    const handleGlobalMouseUp = () => {
-      if (draggedBook) {
-        handleDragEnd();
-      }
-    };
-
-    if (draggedBook) {
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
-    };
-  }, [draggedBook]);
-
-  const handleDragLeave = () => {
-    setDraggedOverIndex(null);
-  };
   
   const refreshAllMutation = useMutation({
     mutationFn: async () => {
@@ -286,20 +202,12 @@ export default function Home() {
           </div>
         ) : books.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 justify-items-center" data-testid="books-grid">
-            {books.map((book, index) => (
+            {books.map((book) => (
               <BookCard
                 key={book.id}
                 book={book}
-                index={index}
                 onSelect={handleBookSelect}
                 onUpdate={handleBookUpdate}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDragEnd={handleDragEnd}
-                onDragLeave={handleDragLeave}
-                isDragged={draggedBook?.id === book.id}
-                isDraggedOver={draggedOverIndex === index}
-                isDragging={!!draggedBook}
               />
             ))}
           </div>

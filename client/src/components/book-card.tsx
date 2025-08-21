@@ -127,16 +127,8 @@ function constrainBookDimensions(dims: { width: number; height: number; depth: n
 
 interface BookCardProps {
   book: Book;
-  index: number;
   onSelect: (book: Book) => void;
   onUpdate: () => void;
-  onDragStart: (book: Book, index: number) => void;
-  onDragOver: (index: number) => void;
-  onDragEnd: () => void;
-  onDragLeave: () => void;
-  isDragged: boolean;
-  isDraggedOver: boolean;
-  isDragging: boolean;
 }
 
 const statusConfig = {
@@ -145,19 +137,7 @@ const statusConfig = {
   'read': { label: 'Read', icon: '✅', color: 'bg-green-500' },
 };
 
-export default function BookCard({ 
-  book, 
-  index, 
-  onSelect, 
-  onUpdate, 
-  onDragStart, 
-  onDragOver, 
-  onDragEnd, 
-  onDragLeave, 
-  isDragged, 
-  isDraggedOver, 
-  isDragging 
-}: BookCardProps) {
+export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { toast } = useToast();
   
@@ -220,61 +200,15 @@ export default function BookCard({
     }
   }, [book.coverImage]);
 
-  // Drag handlers
-  const handleMouseDown = (e: React.MouseEvent) => {
-    const startX = e.clientX;
-    const startY = e.clientY;
-    let hasMoved = false;
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      const deltaX = Math.abs(e.clientX - startX);
-      const deltaY = Math.abs(e.clientY - startY);
-      
-      if (deltaX > 5 || deltaY > 5) {
-        hasMoved = true;
-        onDragStart(book, index);
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      }
-    };
-    
-    const handleMouseUp = () => {
-      if (!hasMoved) {
-        onSelect(book);
-      }
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-    
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    if (!isDragged && isDragging) {
-      onDragOver(index);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    if (isDragging) {
-      onDragLeave();
-    }
-  };
 
   return (
-    <div className={`group relative transition-all duration-300 ${
-      isDragged ? 'scale-110 z-50 opacity-80' : ''
-    } ${isDraggedOver && isDragging ? 'scale-105' : ''}`}>
+    <div className="group relative">
       <div 
-        className={`book-3d cursor-pointer transition-all duration-200 ${
-          isDragging && !isDragged ? 'opacity-70' : ''
-        }`}
-        onMouseDown={handleMouseDown}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        className="book-3d cursor-pointer"
+        onClick={() => onSelect(book)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         data-testid={`card-book-${book.id}`}
         style={{
           '--book-thickness': `${bookDimensions.depth * 0.4}px`,
@@ -308,11 +242,6 @@ export default function BookCard({
           )}
         </div>
       </div>
-      
-      {/* Drop indicator */}
-      {isDraggedOver && isDragging && !isDragged && (
-        <div className="absolute inset-0 border-4 border-dashed border-blue-500 rounded-lg bg-blue-50/30 pointer-events-none animate-pulse" />
-      )}
     </div>
   );
 }
