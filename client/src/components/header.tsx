@@ -103,9 +103,10 @@ export default function Header({
 
           {/* Mobile Navigation */}
           <div className="md:hidden flex items-center space-x-4">
-            <span className="text-sm text-gray-600 font-medium" data-testid="text-books-count-mobile">
-              {filteredCount !== booksCount ? `${filteredCount} of ${booksCount}` : booksCount}
-            </span>
+            <div className="flex items-center gap-1 text-sm text-gray-600 font-medium" data-testid="text-books-count-mobile">
+              <BookOpen className="w-4 h-4 text-coral-red" />
+              <span>{filteredCount !== booksCount ? `${filteredCount}/${booksCount}` : booksCount}</span>
+            </div>
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
               className="p-2 text-gray-600 hover:text-coral-red transition-colors"
