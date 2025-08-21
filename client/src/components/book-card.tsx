@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Book } from "@shared/schema";
 import { BookOpen } from "lucide-react";
@@ -155,6 +155,11 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
   const rawDimensions = parseBookDimensions(book);
   const bookDimensions = constrainBookDimensions(rawDimensions);
   
+  // State to track if user is scrolling vs intentionally interacting
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [touchStartPos, setTouchStartPos] = useState<{x: number, y: number} | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
 
 
   const updateStatusMutation = useMutation({
@@ -210,13 +215,59 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
     }
   }, [book.coverImage]);
 
+  // Touch event handlers to detect scrolling vs intentional interaction
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+    setIsScrolling(false);
+    
+    // Clear any existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = null;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartPos) return;
+    
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartPos.x);
+    const deltaY = Math.abs(touch.clientY - touchStartPos.y);
+    
+    // If user moved more than 10px in any direction, consider it scrolling
+    if (deltaX > 10 || deltaY > 10) {
+      setIsScrolling(true);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    // Add a small delay before resetting scroll state to prevent hover effects during scroll
+    scrollTimeoutRef.current = setTimeout(() => {
+      setIsScrolling(false);
+      setTouchStartPos(null);
+    }, 150);
+  };
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
 
 
   return (
     <div className="group relative">
       <div 
-        className="book-3d cursor-pointer"
+        className={`book-3d cursor-pointer ${isScrolling ? 'no-hover' : ''}`}
         onClick={() => onSelect(book)}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         data-testid={`card-book-${book.id}`}
         style={{
           '--book-thickness': `${bookDimensions.depth * 0.4}px`,

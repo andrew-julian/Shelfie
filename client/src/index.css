@@ -172,6 +172,17 @@ body {
       0 30px 50px -20px rgba(0,0,0,.4); /* longer cast shadow */
   }
 
+  /* Disable hover effects when scrolling */
+  .book-3d.no-hover:hover .book-3d__inner {
+    transform: 
+      rotateY(-25deg) 
+      translateZ(1px);
+    /* Keep original shadows */
+    box-shadow:
+      0 6px 10px rgba(0,0,0,.18),   /* ambient occlusion */
+      0 24px 40px -20px rgba(0,0,0,.35); /* directional cast shadow */
+  }
+
   /* Contact shadow using a separate element wrapper */
   .book-3d::before {
     content: "";
