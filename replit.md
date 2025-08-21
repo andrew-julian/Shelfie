@@ -14,6 +14,8 @@ Preferred communication style: Simple, everyday language.
 - **Paper Texture**: Added SVG fractal noise overlay to simulate printed paper grain on book covers
 - **Realistic Shadows**: Implemented layered shadow system with ambient occlusion and contact shadows
 - **Micro-misalignment**: Added subtle random positioning per book for natural, human-like arrangement
+- **Glossy Highlights**: Implemented specular highlights and vignette effects for professional glossy stock appearance
+- **Edge Imperfection**: Added subtle clip-path warp to avoid perfect digital rectangles
 - **Rapid Scanning Queue**: Created non-blocking queue system for continuous book scanning without waiting for API calls
 
 ## System Architecture

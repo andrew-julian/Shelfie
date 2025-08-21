@@ -132,6 +132,10 @@
     /* Subtle highlight on book container */
     box-shadow: 0 1px 0 rgba(255,255,255,.4) inset;
     border-radius: 8px;
+    /* Slight edge warp for die-cut imperfection - avoids perfect digital rectangles */
+    clip-path: polygon(
+      0.5% 0.2%, 99.3% 0.1%, 99.8% 98.9%, 0.2% 99.7%
+    );
   }
 
   .book-3d__inner {
