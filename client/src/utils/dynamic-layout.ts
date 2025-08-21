@@ -38,10 +38,11 @@ export function calculateDynamicLayout(
     const bookWidth = dimensions.width;
     const bookHeight = dimensions.height;
     
-    // Check if book fits on current row
-    if (currentX + bookWidth + config.padding > config.containerWidth) {
-      // Move to next row
-      currentY += currentShelfHeight + config.minSpacing;
+    // Check if book fits on current row with shadow spacing
+    const shadowBuffer = 25; // Extra buffer for shadows
+    if (currentX + bookWidth + config.padding + shadowBuffer > config.containerWidth) {
+      // Move to next row with increased vertical spacing
+      currentY += currentShelfHeight + config.minSpacing + 15;
       currentX = config.padding;
       currentShelfHeight = 0;
       
@@ -54,10 +55,10 @@ export function calculateDynamicLayout(
       });
     }
     
-    // Find the best shelf for this book (lowest available position)
+    // Find the best shelf for this book with enhanced shadow spacing
     let bestShelf = shelves.find(shelf => 
       shelf.y >= currentY - config.minSpacing && 
-      shelf.availableWidth >= bookWidth + config.minSpacing
+      shelf.availableWidth >= bookWidth + config.minSpacing + 20 // Account for shadows
     );
     
     if (!bestShelf) {
@@ -71,13 +72,14 @@ export function calculateDynamicLayout(
       shelves.push(bestShelf);
     }
     
-    // Calculate position within shelf
+    // Calculate position within shelf with enhanced shadow spacing
     const shelfUsedWidth = bestShelf.books.reduce((total, pos) => total + pos.width + config.minSpacing, 0);
     const bookX = config.padding + shelfUsedWidth;
     
-    // Add subtle random offset for natural, non-grid appearance
-    const randomOffsetX = (Math.random() - 0.5) * 12; // ±6px horizontal variance
-    const randomOffsetY = (Math.random() - 0.5) * 10; // ±5px vertical variance
+    // Add deterministic offset based on book ID for consistent but natural positioning
+    const seedOffset = book.id.charCodeAt(0) + book.id.charCodeAt(book.id.length - 1);
+    const randomOffsetX = ((seedOffset % 13) - 6) * 2; // ±12px deterministic horizontal variance
+    const randomOffsetY = ((seedOffset % 11) - 5) * 1.5; // ±7.5px deterministic vertical variance
     
     const position: BookPosition = {
       book,
@@ -90,12 +92,14 @@ export function calculateDynamicLayout(
     
     positions.push(position);
     bestShelf.books.push(position);
-    bestShelf.availableWidth -= bookWidth + config.minSpacing;
+    // Account for shadow area when reducing available width
+    const shadowPadding = 20; // Extra space for shadow visual weight
+    bestShelf.availableWidth -= bookWidth + config.minSpacing + shadowPadding;
     bestShelf.height = Math.max(bestShelf.height, bookHeight);
     
-    // Update current position tracking
-    currentX = bookX + bookWidth + config.minSpacing;
-    currentShelfHeight = Math.max(currentShelfHeight, bookHeight);
+    // Update current position tracking with shadow considerations
+    currentX = bookX + bookWidth + config.minSpacing + 20; // Extra spacing for shadow
+    currentShelfHeight = Math.max(currentShelfHeight, bookHeight + 15); // Extra height for shadow
   }
   
   return positions;
