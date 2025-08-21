@@ -351,8 +351,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   const handleClose = () => {
     stopScanner();
     setManualIsbn("");
-    setQueue([]); // Clear queue when closing
-    setScanCount(0); // Reset scan count
+    // Don't clear queue when closing - let users see the processing status
     onClose();
   };
 
@@ -429,8 +428,8 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
                 </div>
               )}
             </div>
-            <Button variant="ghost" size="icon" onClick={handleClose} data-testid="button-close-scanner">
-              <X className="w-4 h-4" />
+            <Button variant="ghost" onClick={handleClose} data-testid="button-close-scanner">
+              Done
             </Button>
           </DialogTitle>
         </DialogHeader>
@@ -548,6 +547,17 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
             )}
           </div>
         )}
+        
+        {/* Footer with Done button */}
+        <div className="flex justify-end pt-4 border-t">
+          <Button 
+            onClick={handleClose}
+            className="primary-button"
+            data-testid="button-done-scanner"
+          >
+            Done Scanning
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
