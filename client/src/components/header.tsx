@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut, Menu } from "lucide-react";
+import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut, Menu, Users, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
 
@@ -255,8 +255,37 @@ export default function Header({
 function UserMenu() {
   const { user } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showUserSwitcher, setShowUserSwitcher] = useState(false);
+
+  // Mock users for development/testing - in production this would come from an API
+  const availableUsers = [
+    { id: '21869523', name: 'Andrew', email: 'andrew@dcr.vc', profileImageUrl: null },
+    { id: 'demo-user-1', name: 'Demo User', email: 'demo@example.com', profileImageUrl: null },
+    { id: 'test-user-2', name: 'Test User', email: 'test@example.com', profileImageUrl: null },
+  ];
+
+  const switchUser = async (targetUserId: string) => {
+    try {
+      // Call server endpoint to switch user context
+      const response = await fetch(`/api/auth/switch-user/${targetUserId}`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        // Reload the page to refresh the user context
+        window.location.reload();
+      } else {
+        console.error('Failed to switch user');
+      }
+    } catch (error) {
+      console.error('Error switching user:', error);
+    }
+  };
 
   if (!user) return null;
+
+  const currentUser = user as any;
 
   return (
     <div className="relative">
@@ -265,9 +294,9 @@ function UserMenu() {
         className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
         data-testid="button-user-menu"
       >
-        {(user as any)?.profileImageUrl ? (
+        {currentUser?.profileImageUrl ? (
           <img 
-            src={(user as any).profileImageUrl} 
+            src={currentUser.profileImageUrl} 
             alt="Profile" 
             className="h-8 w-8 rounded-full object-cover"
             data-testid="img-user-avatar"
@@ -276,31 +305,82 @@ function UserMenu() {
           <User className="h-8 w-8 text-gray-600" />
         )}
         <span className="text-sm font-medium" data-testid="text-user-name">
-          {(user as any)?.firstName || 'User'}
+          {currentUser?.firstName || 'User'}
         </span>
+        <ChevronDown className="h-4 w-4 text-gray-400" />
       </button>
 
       {showDropdown && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+        <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-50">
           <div className="py-1">
-            <Link href="/settings">
+            {/* Current User Info */}
+            <div className="px-4 py-2 border-b border-gray-100">
+              <p className="text-sm font-medium text-gray-900" data-testid="text-current-user">
+                {currentUser?.firstName || 'User'}
+              </p>
+              <p className="text-xs text-gray-500">{currentUser?.email}</p>
+            </div>
+
+            {/* User Switcher */}
+            <button
+              onClick={() => {
+                setShowUserSwitcher(!showUserSwitcher);
+              }}
+              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              data-testid="button-user-switcher"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Switch User
+              <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${showUserSwitcher ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showUserSwitcher && (
+              <div className="bg-gray-50 border-t border-gray-100">
+                {availableUsers.map((availableUser) => (
+                  <button
+                    key={availableUser.id}
+                    onClick={() => {
+                      switchUser(availableUser.id);
+                      setShowDropdown(false);
+                    }}
+                    className={`flex items-center w-full px-6 py-2 text-sm hover:bg-gray-100 ${
+                      availableUser.id === currentUser?.id ? 'text-coral-red font-medium bg-coral-red/5' : 'text-gray-600'
+                    }`}
+                    data-testid={`button-switch-user-${availableUser.id}`}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    <div className="text-left">
+                      <div className="font-medium">{availableUser.name}</div>
+                      <div className="text-xs text-gray-500">{availableUser.email}</div>
+                    </div>
+                    {availableUser.id === currentUser?.id && (
+                      <div className="ml-auto w-2 h-2 bg-coral-red rounded-full"></div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="border-t border-gray-100">
+              <Link href="/settings">
+                <button 
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  onClick={() => setShowDropdown(false)}
+                  data-testid="button-settings-menu"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </button>
+              </Link>
               <button 
                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                onClick={() => setShowDropdown(false)}
-                data-testid="button-settings-menu"
+                onClick={() => window.location.href = '/api/logout'}
+                data-testid="button-logout-menu"
               >
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
               </button>
-            </Link>
-            <button 
-              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => window.location.href = '/api/logout'}
-              data-testid="button-logout-menu"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </button>
+            </div>
           </div>
         </div>
       )}

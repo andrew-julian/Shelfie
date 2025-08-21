@@ -97,6 +97,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User switching for development/testing
+  app.post('/api/auth/switch-user/:userId', async (req: any, res) => {
+    try {
+      const { userId } = req.params;
+      
+      // In development, allow switching between predefined users
+      const allowedUsers = ['21869523', 'demo-user-1', 'test-user-2'];
+      
+      if (!allowedUsers.includes(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+
+      // Create mock user claims for the switched user
+      const userClaims = {
+        sub: userId,
+        email: userId === '21869523' ? 'andrew@dcr.vc' : `${userId}@example.com`,
+        first_name: userId === '21869523' ? 'Andrew' : userId === 'demo-user-1' ? 'Demo User' : 'Test User',
+        last_name: null,
+        profile_image_url: null,
+      };
+
+      // Update session with new user
+      req.user = {
+        claims: userClaims,
+        access_token: req.user?.access_token || 'mock-token',
+        refresh_token: req.user?.refresh_token || 'mock-refresh',
+        expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
+      };
+
+      // Ensure user exists in database
+      await storage.upsertUser({
+        id: userId,
+        email: userClaims.email,
+        firstName: userClaims.first_name,
+        lastName: userClaims.last_name,
+        profileImageUrl: userClaims.profile_image_url,
+      });
+
+      res.json({ message: "User switched successfully", userId });
+    } catch (error) {
+      console.error("Error switching user:", error);
+      res.status(500).json({ message: "Failed to switch user" });
+    }
+  });
+
   // User preferences routes
   app.get('/api/user/preferences', isAuthenticated, async (req: any, res) => {
     try {
