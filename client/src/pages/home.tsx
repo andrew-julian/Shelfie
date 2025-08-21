@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/header";
 import BookCard from "@/components/book-card";
@@ -10,6 +10,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { Book } from "@shared/schema";
 import { BookOpen, Camera, Book as BookIcon, Eye, CheckCircle } from "lucide-react";
 import { analyzeImageColors, sortBooksByOverallColor } from "@/utils/color-sort";
+import { calculateDynamicLayout, BookPosition, LayoutConfig } from "@/utils/dynamic-layout";
 
 type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
@@ -123,6 +124,11 @@ export default function Home() {
   // Handle color sorting with state
   const [colorSortedBooks, setColorSortedBooks] = useState<Book[]>([]);
   const [isColorSorting, setIsColorSorting] = useState(false);
+  
+  // Dynamic layout state
+  const [bookPositions, setBookPositions] = useState<BookPosition[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerDimensions, setContainerDimensions] = useState({ width: 1200, height: 800 });
 
   useEffect(() => {
     if ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && books.length > 0) {
@@ -137,6 +143,60 @@ export default function Home() {
 
   // Use color-sorted books when appropriate
   const finalBooks = (sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') ? colorSortedBooks : books;
+
+  // Book dimensions calculation function (matching BookCard logic)
+  const getBookDimensions = (book: Book) => {
+    const defaultDimensions = { width: 140, height: 200, depth: 15 };
+    
+    if (book.width && book.height && book.depth) {
+      const width = parseFloat(book.width);
+      const height = parseFloat(book.height);
+      const depth = parseFloat(book.depth);
+      const baseScale = 22;
+      
+      return {
+        width: Math.round(width * baseScale),
+        height: Math.round(height * baseScale),
+        depth: Math.max(Math.round(depth * baseScale * 1.2), 10)
+      };
+    }
+    
+    return defaultDimensions;
+  };
+
+  // Container resize observer
+  useEffect(() => {
+    const updateContainerSize = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setContainerDimensions({ 
+          width: rect.width || 1200, 
+          height: Math.max(rect.height, 600) 
+        });
+      }
+    };
+
+    updateContainerSize();
+    window.addEventListener('resize', updateContainerSize);
+    return () => window.removeEventListener('resize', updateContainerSize);
+  }, []);
+
+  // Calculate dynamic layout when books or container changes
+  useEffect(() => {
+    if (finalBooks.length > 0 && containerDimensions.width > 0) {
+      const config: LayoutConfig = {
+        containerWidth: containerDimensions.width,
+        containerHeight: containerDimensions.height,
+        padding: 20,
+        minSpacing: 16
+      };
+      
+      const positions = calculateDynamicLayout(finalBooks, config, getBookDimensions);
+      setBookPositions(positions);
+    } else {
+      setBookPositions([]);
+    }
+  }, [finalBooks, containerDimensions]);
 
 
   
@@ -242,25 +302,49 @@ export default function Home() {
           )}
         </div>
 
-        {/* Books Grid */}
+        {/* Dynamic Books Layout */}
         {booksLoading || ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && isColorSorting) ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 md:gap-8 justify-items-center">
+          <div className="relative min-h-96" style={{ minHeight: '400px' }}>
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="group">
+              <div 
+                key={i} 
+                className="absolute group"
+                style={{
+                  left: `${(i % 4) * 200 + 40}px`,
+                  top: `${Math.floor(i / 4) * 250 + 40}px`,
+                  transform: `rotate(${(Math.random() - 0.5) * 4}deg)`
+                }}
+              >
                 <div className="relative w-36 h-48 bg-gray-200 rounded-lg mb-2 animate-pulse" />
-                <div className="absolute bottom-2 right-2 w-6 h-6 bg-gray-300 rounded-full animate-pulse" />
               </div>
             ))}
           </div>
         ) : finalBooks.length > 0 ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 md:gap-8 justify-items-center items-center" data-testid="books-grid">
-            {finalBooks.map((book) => (
-              <BookCard
-                key={book.id}
-                book={book}
-                onSelect={handleBookSelect}
-                onUpdate={handleBookUpdate}
-              />
+          <div 
+            ref={containerRef}
+            className="relative w-full overflow-hidden" 
+            style={{ 
+              minHeight: `${Math.max(400, bookPositions.reduce((max, pos) => Math.max(max, pos.y + pos.height + 40), 400))}px` 
+            }}
+            data-testid="books-layout"
+          >
+            {bookPositions.map((position) => (
+              <div
+                key={position.book.id}
+                className="absolute transition-all duration-700 ease-out"
+                style={{
+                  left: `${position.x}px`,
+                  top: `${position.y}px`,
+                  zIndex: position.zIndex,
+                  transform: `rotate(${(Math.random() - 0.5) * 3}deg)` // Subtle random rotation for natural look
+                }}
+              >
+                <BookCard
+                  book={position.book}
+                  onSelect={handleBookSelect}
+                  onUpdate={handleBookUpdate}
+                />
+              </div>
             ))}
           </div>
         ) : (
