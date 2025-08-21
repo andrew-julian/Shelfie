@@ -196,7 +196,7 @@ export default function Home() {
     } else {
       setBookPositions([]);
     }
-  }, [finalBooks, containerDimensions]);
+  }, [finalBooks.map(b => b.id).join(','), containerDimensions.width, containerDimensions.height]); // Use stable book ID string
 
 
   
@@ -312,7 +312,7 @@ export default function Home() {
                 style={{
                   left: `${(i % 4) * 200 + 40}px`,
                   top: `${Math.floor(i / 4) * 250 + 40}px`,
-                  transform: `rotate(${(Math.random() - 0.5) * 4}deg)`
+                  transform: `rotate(${((i * 13) % 7 - 3)}deg)` // Deterministic rotation for loading state
                 }}
               >
                 <div className="relative w-36 h-48 bg-gray-200 rounded-lg mb-2 animate-pulse" />
@@ -336,7 +336,7 @@ export default function Home() {
                   left: `${position.x}px`,
                   top: `${position.y}px`,
                   zIndex: position.zIndex,
-                  transform: `rotate(${(Math.random() - 0.5) * 3}deg)` // Subtle random rotation for natural look
+                  transform: `rotate(${((position.book.id.charCodeAt(0) % 7) - 3)}deg)` // Deterministic rotation based on book ID
                 }}
               >
                 <BookCard
