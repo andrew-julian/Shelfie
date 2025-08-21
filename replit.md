@@ -7,6 +7,7 @@ BookScan is a full-stack digital library management application that allows user
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Development approach: Avoid hardcoded fixes for specific titles or content - build scalable general solutions that handle edge cases through improved logic.
 
 ## Recent Enhancements
 

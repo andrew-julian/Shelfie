@@ -39,41 +39,44 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
     let dim2 = parseFloat(dim2Str);
     let dim3 = parseFloat(dim3Str);
     
-    // Amazon dimensions are typically: length x width x height
-    // For books, we want: width x height x depth (thickness)
-    // Books should typically be taller than they are wide
+    // Amazon provides dimensions in various orders. For books, we need to intelligently
+    // determine which dimension represents width, height, and depth (thickness).
+    // Books are typically: portrait orientation (height > width) and relatively thin
     
-    // Sort dimensions to identify width (smallest horizontal), height (largest), depth (medium)
-    const dims = [dim1, dim2, dim3].sort((a, b) => a - b);
+    const dims = [dim1, dim2, dim3];
+    dims.sort((a, b) => a - b);
     const [smallest, middle, largest] = dims;
     
-    // For books: depth (thickness) should be smallest, width should be smaller than height
-    let width, height, depth;
+    // Heuristic: smallest dimension is usually depth (thickness)
+    // The two larger dimensions represent width and height
+    let width, height, depth = smallest;
     
-    if (dim1 > dim3) {
-      // If first dimension > third dimension, assume: height x depth x width
-      height = dim1;
-      depth = dim2;  
-      width = dim3;
+    // Between the remaining two dimensions, height should be larger for portrait books
+    const remaining = dims.filter(d => d !== smallest);
+    if (remaining.length === 2) {
+      const [smaller, larger] = remaining.sort((a, b) => a - b);
+      
+      // For typical books, assume portrait orientation unless dimensions suggest otherwise
+      // Very wide books (like coffee table books) might be landscape
+      const aspectRatio = larger / smaller;
+      
+      if (aspectRatio > 1.4) {
+        // Clear portrait book
+        width = smaller;
+        height = larger;
+      } else if (aspectRatio < 1.2) {
+        // Nearly square, keep original order preference
+        width = middle;
+        height = largest;
+      } else {
+        // Ambiguous case - use the larger dimension as height for portrait assumption
+        width = smaller;
+        height = larger;
+      }
     } else {
-      // Standard case: length x width x height → width x height x depth
-      width = dim2;   // width (smaller horizontal dimension)
-      height = dim1;  // height (larger dimension)
-      depth = dim3;   // depth (thickness)
-    }
-    
-    // Ensure books are portrait (height > width) for typical books
-    if (width > height && height > 4) { // Don't swap for very thin books
-      [width, height] = [height, width];
-    }
-    
-    // Debug logging for "Offshore" book specifically
-    if (book.title?.includes("Offshore")) {
-      console.log('Offshore dimensions debug:', {
-        original: book.dimensions,
-        parsed: { dim1, dim2, dim3 },
-        final: { width, height, depth }
-      });
+      // Fallback if sorting logic fails
+      width = middle;
+      height = largest;
     }
     
     // Check if units are explicitly mentioned, then convert appropriately
