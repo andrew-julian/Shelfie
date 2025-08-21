@@ -16,21 +16,21 @@ declare global {
 }
 
 const LICENSE_KEY =
-  "Mpyhq9Yxr3GGf71QkTvpTbBG6PIXby" +
-  "GOpm3xLZKbBoXQb0nzg7kFsrOj1p6j" +
-  "62fXcgBHMXh4c8qGHH+b8enoC7C1Gz" +
-  "aLjmDGkNnW5TrFcrxc/gSzGROlwx7M" +
-  "UZBnTpsNKeFKTBbBDlC1EDcTG2xsMZ" +
-  "KWHZD3SDINOsZBgnDLKpk2LtV8ChX5" +
-  "lns/8kVnLNOkXE/TddX6zHIBc+iGH5" +
-  "QrsR97c/WXMkAn5YdPaiPvKgdiwAp/" +
-  "pszIOcrGRZDTkUUmGm4l4oWClQriue" +
-  "AL0z/H7feafqbQ435IZcAwd6AIRhUc" +
-  "IHDSpexl7qk+o1n7OuCD/ZuU9wPjQ2" +
-  "GjtJ/k6+/XZQ==\nU2NhbmJvdFNESw" +
-  "psb2NhbGhvc3R8Ym9va3NjYW4udmFu" +
-  "YWhlaW0uY29tLmF1CjE3NTYzMzkxOT" +
-  "kKODM4ODYwNwo4\n";
+  "hTf/Lg23A0W4/nkpYfNfxzoecc1AbZ" +
+  "fcRMaakHvbBb4ecLcONr21DcjSpjyu" +
+  "pjg7OJrLkc5p/6orGbB7ry5e4Al/Z2" +
+  "qYGXt97JzTnnUiooEoWvOQ8BmvCiPK" +
+  "sMaqDB2sfYqJx3IaR5RD0bcb3ONCBY" +
+  "9eRyuyj17/drfwHfF9EDWe9D6k0qnV" +
+  "QfFc6JHcouwNQUl+8wKkTHQ11dEsyK" +
+  "RocjI8q/XmOT9KDP0CySkpH1wMgOWW" +
+  "MouQGLv7Tg6BG4bVUrc1daFiHlhI5v" +
+  "tWTFqrOR+QjsbcxLnn5D3Ft5IA7u8w" +
+  "XtoltCrAtcHiAU9oGmJsdCURvd7HZx" +
+  "mWCfhFTWIWiw==\nU2NhbmJvdFNESw" +
+  "psb2NhbGhvc3R8cmlrZXIucmVwbGl0" +
+  "LmRldgoxNzU2NDI1NTk5CjgzODg2MD" +
+  "cKOA==\n";
 
 interface ScannerModalProps {
   isOpen: boolean;
