@@ -82,25 +82,8 @@ function constrainBookDimensions(dims: { width: number; height: number; depth: n
   };
 }
 
-// Generate subtle random misalignment for natural, human-like placement
-function generateMicroMisalignment(bookId: string) {
-  // Use book ID as seed for consistent randomness per book
-  const seed = bookId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  
-  // Simple seeded random function
-  const seededRandom = (mult = 1) => {
-    const x = Math.sin(seed * mult) * 10000;
-    return (x - Math.floor(x)) * 2 - 1; // Return value between -1 and 1
-  };
-  
-  return {
-    rotateX: seededRandom(1.1) * 1.5, // -1.5deg to 1.5deg
-    rotateY: seededRandom(2.3) * 0.8, // -0.8deg to 0.8deg  
-    rotateZ: seededRandom(3.7) * 0.6, // -0.6deg to 0.6deg
-    translateX: seededRandom(4.1) * 2, // -2px to 2px
-    translateY: seededRandom(5.2) * 1.5, // -1.5px to 1.5px
-  };
-}
+
+
 
 interface BookCardProps {
   book: Book;
@@ -122,8 +105,7 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
   const rawDimensions = parseBookDimensions(book);
   const bookDimensions = constrainBookDimensions(rawDimensions);
   
-  // Generate subtle micro-misalignment for natural look
-  const misalignment = generateMicroMisalignment(book.id);
+
 
   const updateStatusMutation = useMutation({
     mutationFn: async (newStatus: string) => {
@@ -189,11 +171,6 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
         style={{
           '--book-thickness': `${bookDimensions.depth * 0.4}px`,
           '--cover-color': coverColor,
-          '--rand-rot-x': `${misalignment.rotateX}deg`,
-          '--rand-rot-y': `${misalignment.rotateY}deg`, 
-          '--rand-rot-z': `${misalignment.rotateZ}deg`,
-          '--rand-translate-x': `${misalignment.translateX}px`,
-          '--rand-translate-y': `${misalignment.translateY}px`,
           width: `${bookDimensions.width}px`,
           height: `${bookDimensions.height}px`
         } as React.CSSProperties}
