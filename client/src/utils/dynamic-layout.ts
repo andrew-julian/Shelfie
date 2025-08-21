@@ -26,11 +26,10 @@ export function calculateDynamicLayout(
   getDimensions: (book: Book) => { width: number; height: number; depth: number }
 ): BookPosition[] {
   const positions: BookPosition[] = [];
-  const shelves: Array<{ y: number; height: number; availableWidth: number; books: BookPosition[] }> = [];
   
   let currentX = config.padding;
   let currentY = config.padding;
-  let currentShelfHeight = 0;
+  let currentRowHeight = 0;
   let zIndex = 1;
 
   for (const book of books) {
@@ -38,43 +37,13 @@ export function calculateDynamicLayout(
     const bookWidth = dimensions.width;
     const bookHeight = dimensions.height;
     
-    // Check if book fits on current row with shadow spacing
-    const shadowBuffer = 25; // Extra buffer for shadows
-    if (currentX + bookWidth + config.padding + shadowBuffer > config.containerWidth) {
-      // Move to next row with increased vertical spacing
-      currentY += currentShelfHeight + config.minSpacing + 15;
+    // Check if book fits on current row
+    if (currentX + bookWidth + config.padding > config.containerWidth) {
+      // Move to next row
+      currentY += currentRowHeight + config.minSpacing;
       currentX = config.padding;
-      currentShelfHeight = 0;
-      
-      // Create new shelf
-      shelves.push({
-        y: currentY,
-        height: bookHeight,
-        availableWidth: config.containerWidth - config.padding * 2,
-        books: []
-      });
+      currentRowHeight = 0;
     }
-    
-    // Find the best shelf for this book with enhanced shadow spacing
-    let bestShelf = shelves.find(shelf => 
-      shelf.y >= currentY - config.minSpacing && 
-      shelf.availableWidth >= bookWidth + config.minSpacing + 20 // Account for shadows
-    );
-    
-    if (!bestShelf) {
-      // Create new shelf
-      bestShelf = {
-        y: currentY,
-        height: bookHeight,
-        availableWidth: config.containerWidth - config.padding * 2,
-        books: []
-      };
-      shelves.push(bestShelf);
-    }
-    
-    // Calculate position within shelf with enhanced shadow spacing
-    const shelfUsedWidth = bestShelf.books.reduce((total, pos) => total + pos.width + config.minSpacing, 0);
-    const bookX = config.padding + shelfUsedWidth;
     
     // Add deterministic offset based on book ID for consistent but natural positioning
     const seedOffset = book.id.charCodeAt(0) + book.id.charCodeAt(book.id.length - 1);
@@ -83,23 +52,18 @@ export function calculateDynamicLayout(
     
     const position: BookPosition = {
       book,
-      x: bookX + randomOffsetX,
-      y: bestShelf.y + randomOffsetY,
+      x: currentX + randomOffsetX,
+      y: currentY + randomOffsetY,
       width: bookWidth,
       height: bookHeight,
       zIndex: zIndex++
     };
     
     positions.push(position);
-    bestShelf.books.push(position);
-    // Account for shadow area when reducing available width
-    const shadowPadding = 20; // Extra space for shadow visual weight
-    bestShelf.availableWidth -= bookWidth + config.minSpacing + shadowPadding;
-    bestShelf.height = Math.max(bestShelf.height, bookHeight);
     
-    // Update current position tracking with shadow considerations
-    currentX = bookX + bookWidth + config.minSpacing + 20; // Extra spacing for shadow
-    currentShelfHeight = Math.max(currentShelfHeight, bookHeight + 15); // Extra height for shadow
+    // Update position for next book
+    currentX += bookWidth + config.minSpacing;
+    currentRowHeight = Math.max(currentRowHeight, bookHeight);
   }
   
   return positions;
