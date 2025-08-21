@@ -174,6 +174,45 @@
     box-shadow: -10px 0 50px 10px rgba(0, 0, 0, 0.3);
   }
 
+  /* Book Cover Styles */
+  .book-3d__cover {
+    position: relative;
+    border-radius: 2px 0 0 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    /* Apply paper texture filter */
+    filter: saturate(.97) contrast(1.03) brightness(.99);
+  }
+
+  /* Paper grain texture overlay for book covers */
+  .book-3d__cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 .04'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>") center/cover no-repeat;
+    mix-blend-mode: multiply;
+    opacity: .25;
+    pointer-events: none;
+  }
+
+  /* Apply paper texture to placeholder covers as well */
+  .book-3d__placeholder {
+    position: relative;
+    border-radius: 2px 0 0 2px;
+    overflow: hidden;
+    filter: saturate(.97) contrast(1.03) brightness(.99);
+  }
+
+  .book-3d__placeholder::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><filter id='n2'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 .04'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n2)'/></svg>") center/cover no-repeat;
+    mix-blend-mode: multiply;
+    opacity: .15;
+    pointer-events: none;
+  }
+
   /* Front Cover */
   .book-3d__cover {
     display: block;
