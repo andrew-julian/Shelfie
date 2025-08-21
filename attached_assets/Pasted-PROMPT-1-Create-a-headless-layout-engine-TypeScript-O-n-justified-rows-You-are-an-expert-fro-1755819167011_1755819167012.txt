@@ -1,0 +1,60 @@
+PROMPT 1 — Create a headless layout engine (TypeScript, O(n), justified rows)
+
+You are an expert front-end engineer. Create a new file src/layout/BookScanLayoutEngine.ts that exports:
+
+type Book = { id: string; phys: { width_mm: number; height_mm: number; spine_mm: number } }
+
+type LayoutItem = { id: string; x: number; y: number; z: number; w: number; h: number; d: number; ry: number }
+
+type LayoutConfig = { BASE_HEIGHT: number; targetRowHeight: number; gutterX: number; gutterY: number; jitterX: number; maxTiltY: number; maxDepth: number; raggedLastRow: boolean }
+
+function normaliseBooks(books: Book[], BASE_HEIGHT: number): Map<string, { w_norm: number; d_norm: number }>
+
+function calculateLayout(books: Book[], dims: Map<string, { w_norm: number; d_norm: number }>, containerWidth: number, cfg: LayoutConfig): LayoutItem[]
+
+Rules for calculateLayout:
+
+Single pass row-builder. Natural width at cfg.targetRowHeight is (w_norm * cfg.targetRowHeight) / cfg.BASE_HEIGHT.
+
+Start a new row when adding the next book would exceed containerWidth once gutters are included.
+
+For each completed row, compute scale s = (containerWidth - gutterX*(n-1)) / sumNaturalWidth. Apply w *= s, h = targetRowHeight * s, d = max(2, round(d_norm * s)). For the last row: if cfg.raggedLastRow === true, clamp s = min(1, s); else justify like other rows.
+
+Absolute x accumulates w + gutterX from left padding 0.
+
+Do not centre rows.
+
+Provide deterministic “organic” offsets:
+
+Implement hash32(id: string): number (fast 32-bit).
+
+Implement radicalInverse(i: number, base: number), then halton(seed: number, base: number).
+
+For each book:
+jx = (halton(hash32(id) ^ 0x1, 2) - 0.5) * (cfg.jitterX * 2)
+ry = (halton(hash32(id) ^ 0x2, 3) - 0.5) * (cfg.maxTiltY * 2)
+tz = halton(hash32(id) ^ 0x3, 5) * cfg.maxDepth
+
+Clamp jx so adjacent books never overlap: at placement time, compute intended gap = nextX_nominal - (currentX_nominal + w) and clamp jx to [-gap*0.45, +gap*0.45].
+
+Row stacking:
+
+Maintain yCursor across rows; per-row waviness jy = sin(rowIndex * 1.3) * 4 (px). Add jy to each item’s y. Advance yCursor += rowH + cfg.gutterY.
+
+Export a small default config:
+
+export const DEFAULT_CFG: LayoutConfig = {
+  BASE_HEIGHT: 200, targetRowHeight: 200,
+  gutterX: 12, gutterY: 14,
+  jitterX: 6, maxTiltY: 10, maxDepth: 14,
+  raggedLastRow: true
+}
+
+
+Acceptance criteria:
+
+All functions are pure and side-effect free.
+
+Complexity is O(n) in number of books.
+
+No references to DOM or React.

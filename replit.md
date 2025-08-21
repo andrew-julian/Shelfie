@@ -28,6 +28,14 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 - **Forgiving ISBN Input**: Automatic cleanup of whitespace and hyphens from ISBN inputs across scanning and manual entry
 - **Tidy Up Mode**: Prominent header toggle that reorganizes books by size (height, width, depth) and disables rotations for perfectly organized, grid-like layout when enabled
 
+### Headless Layout Engine (August 2025)
+- **O(n) Complexity**: Single-pass row-building algorithm with justified text-like layout
+- **Halton Sequences**: Deterministic quasi-random positioning using radical inverse functions for organic book arrangement
+- **Justified Rows**: Smart scaling that maintains consistent row heights while preventing text-river effects
+- **Organic Positioning**: Hash-based deterministic jitter, rotation, and depth variations for natural appearance
+- **Configurable Parameters**: Customizable gutters, jitter amounts, tilt angles, and ragged/justified last row options
+- **Pure Functions**: Side-effect free implementation suitable for server-side rendering and testing
+
 ### Book Visual Realism (August 2025)
 - **Paper Texture**: Added SVG fractal noise overlay to simulate printed paper grain on book covers
 - **Realistic Shadows**: Implemented layered shadow system with ambient occlusion and contact shadows
@@ -101,6 +109,7 @@ Implements a sophisticated positioning system that replaces traditional CSS grid
 - **Touch-aware Interactions**: Distinguishes between scroll gestures and intentional book selection
 - **Position Stability**: Maintains consistent layout across re-renders with deterministic calculations
 - **Collision Detection**: Prevents visual overlap while preserving color-sorted arrangements
+- **Headless Layout Engine**: New O(n) TypeScript engine with justified rows, Halton sequences for organic positioning, and configurable parameters
 
 #### API Abstraction
 Implements a centralized API client with standardized error handling, request/response processing, and React Query integration for seamless data fetching.

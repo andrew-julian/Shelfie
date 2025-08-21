@@ -1,0 +1,229 @@
+export type Book = { 
+  id: string; 
+  phys: { width_mm: number; height_mm: number; spine_mm: number } 
+}
+
+export type LayoutItem = { 
+  id: string; 
+  x: number; 
+  y: number; 
+  z: number; 
+  w: number; 
+  h: number; 
+  d: number; 
+  ry: number 
+}
+
+export type LayoutConfig = { 
+  BASE_HEIGHT: number; 
+  targetRowHeight: number; 
+  gutterX: number; 
+  gutterY: number; 
+  jitterX: number; 
+  maxTiltY: number; 
+  maxDepth: number; 
+  raggedLastRow: boolean 
+}
+
+export const DEFAULT_CFG: LayoutConfig = {
+  BASE_HEIGHT: 200, 
+  targetRowHeight: 200,
+  gutterX: 12, 
+  gutterY: 14,
+  jitterX: 6, 
+  maxTiltY: 10, 
+  maxDepth: 14,
+  raggedLastRow: true
+}
+
+/**
+ * Fast 32-bit hash function for deterministic randomness
+ */
+function hash32(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Radical inverse function for Halton sequence generation
+ */
+function radicalInverse(i: number, base: number): number {
+  let result = 0;
+  let f = 1 / base;
+  while (i > 0) {
+    result += f * (i % base);
+    i = Math.floor(i / base);
+    f /= base;
+  }
+  return result;
+}
+
+/**
+ * Halton sequence generator for deterministic quasi-random numbers
+ */
+function halton(seed: number, base: number): number {
+  return radicalInverse(seed, base);
+}
+
+/**
+ * Normalizes book dimensions to a standard base height
+ */
+export function normaliseBooks(books: Book[], BASE_HEIGHT: number): Map<string, { w_norm: number; d_norm: number }> {
+  const dims = new Map<string, { w_norm: number; d_norm: number }>();
+  
+  for (const book of books) {
+    const scale = BASE_HEIGHT / book.phys.height_mm;
+    const w_norm = book.phys.width_mm * scale;
+    const d_norm = book.phys.spine_mm * scale;
+    dims.set(book.id, { w_norm, d_norm });
+  }
+  
+  return dims;
+}
+
+/**
+ * Main layout calculation function with O(n) complexity and justified rows
+ */
+export function calculateLayout(
+  books: Book[], 
+  dims: Map<string, { w_norm: number; d_norm: number }>, 
+  containerWidth: number, 
+  cfg: LayoutConfig
+): LayoutItem[] {
+  if (books.length === 0) return [];
+  
+  const layoutItems: LayoutItem[] = [];
+  let yCursor = 0;
+  let rowIndex = 0;
+  
+  // Single pass row-builder
+  let currentRow: Book[] = [];
+  let currentRowNaturalWidth = 0;
+  
+  for (let i = 0; i < books.length; i++) {
+    const book = books[i];
+    const bookDims = dims.get(book.id);
+    if (!bookDims) continue;
+    
+    // Calculate natural width at target row height
+    const naturalWidth = (bookDims.w_norm * cfg.targetRowHeight) / cfg.BASE_HEIGHT;
+    
+    // Check if adding this book would exceed container width
+    const guttersNeeded = currentRow.length; // Number of gutters if we add this book
+    const totalWidthWithBook = currentRowNaturalWidth + naturalWidth + (guttersNeeded * cfg.gutterX);
+    
+    const shouldStartNewRow = totalWidthWithBook > containerWidth && currentRow.length > 0;
+    
+    if (shouldStartNewRow) {
+      // Process current row
+      processRow(currentRow, dims, containerWidth, cfg, yCursor, rowIndex, layoutItems);
+      
+      // Start new row
+      yCursor += cfg.targetRowHeight + cfg.gutterY;
+      rowIndex++;
+      currentRow = [book];
+      currentRowNaturalWidth = naturalWidth;
+    } else {
+      // Add to current row
+      currentRow.push(book);
+      currentRowNaturalWidth += naturalWidth;
+    }
+  }
+  
+  // Process final row
+  if (currentRow.length > 0) {
+    processRow(currentRow, dims, containerWidth, cfg, yCursor, rowIndex, layoutItems, true);
+  }
+  
+  return layoutItems;
+}
+
+/**
+ * Processes a single row with justification and organic positioning
+ */
+function processRow(
+  rowBooks: Book[],
+  dims: Map<string, { w_norm: number; d_norm: number }>,
+  containerWidth: number,
+  cfg: LayoutConfig,
+  yCursor: number,
+  rowIndex: number,
+  layoutItems: LayoutItem[],
+  isLastRow: boolean = false
+): void {
+  if (rowBooks.length === 0) return;
+  
+  // Calculate total natural width
+  let sumNaturalWidth = 0;
+  const naturalWidths = rowBooks.map(book => {
+    const bookDims = dims.get(book.id)!;
+    const naturalWidth = (bookDims.w_norm * cfg.targetRowHeight) / cfg.BASE_HEIGHT;
+    sumNaturalWidth += naturalWidth;
+    return naturalWidth;
+  });
+  
+  // Calculate scale factor for justification
+  const availableWidth = containerWidth - (cfg.gutterX * (rowBooks.length - 1));
+  let scale = availableWidth / sumNaturalWidth;
+  
+  // Handle last row according to config
+  if (isLastRow && cfg.raggedLastRow) {
+    scale = Math.min(1, scale);
+  }
+  
+  // Row waviness
+  const jy = Math.sin(rowIndex * 1.3) * 4;
+  
+  // Position books in row
+  let currentX = 0;
+  
+  for (let i = 0; i < rowBooks.length; i++) {
+    const book = rowBooks[i];
+    const bookDims = dims.get(book.id)!;
+    const naturalWidth = naturalWidths[i];
+    
+    // Apply scaling
+    const w = naturalWidth * scale;
+    const h = cfg.targetRowHeight * scale;
+    const d = Math.max(2, Math.round(bookDims.d_norm * scale));
+    
+    // Calculate organic offsets using Halton sequences
+    const hashBase = hash32(book.id);
+    
+    // Horizontal jitter with overlap prevention
+    let jx = (halton(hashBase ^ 0x1, 2) - 0.5) * (cfg.jitterX * 2);
+    
+    // Clamp jitter to prevent overlaps
+    if (i < rowBooks.length - 1) {
+      const nextX = currentX + w + cfg.gutterX;
+      const gap = cfg.gutterX;
+      jx = Math.max(-gap * 0.45, Math.min(gap * 0.45, jx));
+    }
+    
+    // Rotation and depth
+    const ry = (halton(hashBase ^ 0x2, 3) - 0.5) * (cfg.maxTiltY * 2);
+    const tz = halton(hashBase ^ 0x3, 5) * cfg.maxDepth;
+    
+    // Create layout item
+    const layoutItem: LayoutItem = {
+      id: book.id,
+      x: currentX + jx,
+      y: yCursor + jy,
+      z: tz,
+      w: w,
+      h: h,
+      d: d,
+      ry: ry
+    };
+    
+    layoutItems.push(layoutItem);
+    
+    // Advance to next position
+    currentX += w + cfg.gutterX;
+  }
+}
