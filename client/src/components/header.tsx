@@ -19,6 +19,8 @@ interface HeaderProps {
   onFilterStatusChange: (status: FilterStatus) => void;
   showFilters: boolean;
   onToggleFilters: () => void;
+  tidyMode: boolean;
+  onToggleTidyMode: () => void;
 }
 
 export default function Header({ 
@@ -33,7 +35,9 @@ export default function Header({
   filterStatus,
   onFilterStatusChange,
   showFilters,
-  onToggleFilters
+  onToggleFilters,
+  tidyMode,
+  onToggleTidyMode
 }: HeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -98,6 +102,17 @@ export default function Header({
               data-testid="button-filter"
             >
               <Filter className="w-5 h-5" />
+            </button>
+            
+            <button 
+              onClick={onToggleTidyMode}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                tidyMode ? 'text-coral-red bg-red-50 font-medium' : 'text-gray-600 hover:text-coral-red hover:bg-gray-50'
+              }`}
+              data-testid="button-tidy-mode"
+            >
+              <SortAsc className="w-5 h-5" />
+              <span className="text-sm font-medium">Tidy Up</span>
             </button>
           </div>
 
@@ -186,6 +201,22 @@ export default function Header({
               >
                 <Filter className="w-4 h-4" />
                 Filters
+              </button>
+
+              <button 
+                onClick={() => {
+                  onToggleTidyMode();
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium border rounded-lg transition-all ${
+                  tidyMode 
+                    ? 'text-coral-red bg-coral-red/10 border-coral-red' 
+                    : 'text-gray-600 hover:text-coral-red border-gray-200'
+                }`}
+                data-testid="button-tidy-mode-mobile"
+              >
+                <SortAsc className="w-4 h-4" />
+                Tidy Up
               </button>
             </div>
           </div>

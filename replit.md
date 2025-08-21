@@ -26,6 +26,7 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 - **Dynamic User Loading**: Fetches all users from database when user switcher is accessed
 - **Session Context Switching**: Properly updates session context to reflect switched user for testing/development
 - **Forgiving ISBN Input**: Automatic cleanup of whitespace and hyphens from ISBN inputs across scanning and manual entry
+- **Tidy Up Mode**: Prominent header toggle that disables book rotations for perfectly aligned, grid-like layout when enabled
 
 ### Book Visual Realism (August 2025)
 - **Paper Texture**: Added SVG fractal noise overlay to simulate printed paper grain on book covers

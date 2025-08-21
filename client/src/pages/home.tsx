@@ -50,6 +50,7 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<SortOption>('date-added');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [tidyMode, setTidyMode] = useState(false);
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -304,6 +305,8 @@ export default function Home() {
           onFilterStatusChange={setFilterStatus}
           showFilters={showFilters}
           onToggleFilters={() => setShowFilters(!showFilters)}
+          tidyMode={tidyMode}
+          onToggleTidyMode={() => setTidyMode(!tidyMode)}
         />
         
         <main className="w-full px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto py-6 sm:py-12">
@@ -372,7 +375,7 @@ export default function Home() {
                   left: `${position.x}px`,
                   top: `${position.y}px`,
                   zIndex: position.zIndex,
-                  transform: `rotate(${((position.book.id.charCodeAt(0) % 7) - 3)}deg)` // Deterministic rotation based on book ID
+                  transform: `rotate(${tidyMode ? 0 : ((position.book.id.charCodeAt(0) % 7) - 3)}deg)` // Deterministic rotation (disabled in tidy mode)
                 }}
               >
                 <BookCard
