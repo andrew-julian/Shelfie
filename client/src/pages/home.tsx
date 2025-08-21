@@ -322,7 +322,7 @@ export default function Home() {
         ) : finalBooks.length > 0 ? (
           <div 
             ref={containerRef}
-            className="relative w-full overflow-hidden" 
+            className="relative w-full" 
             style={{ 
               minHeight: `${Math.max(400, bookPositions.reduce((max, pos) => Math.max(max, pos.y + pos.height + 40), 400))}px` 
             }}
