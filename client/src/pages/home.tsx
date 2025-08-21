@@ -158,33 +158,33 @@ export default function Home() {
         onToggleFilters={() => setShowFilters(!showFilters)}
       />
       
-      <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-12 py-6 sm:py-12">
         {/* Hero Section */}
-        <div className="mb-12 text-center">
-          <h2 className="text-4xl font-bold text-monochrome-black mb-4 tracking-tight leading-tight">Your Digital Library</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-8">
+        <div className="mb-8 sm:mb-12 text-center">
+          <h2 className="text-2xl sm:text-4xl font-bold text-monochrome-black mb-2 sm:mb-4 tracking-tight leading-tight">Your Digital Library</h2>
+          <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-4 sm:mb-8 px-2">
             Scan barcodes to instantly add books to your collection. Browse, organize, and discover your reading journey.
           </p>
           
           {/* Horizontal Tracker Bar */}
           {books.length > 0 && (
-            <div className="inline-flex items-center gap-8 bg-white rounded-full px-8 py-4 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 text-gray-700">
-                <BookIcon className="w-5 h-5 text-coral-red" />
-                <span className="font-semibold text-lg">{books.length}</span>
-                <span className="text-sm text-gray-500">books</span>
+            <div className="inline-flex items-center gap-4 sm:gap-8 bg-white rounded-full px-4 sm:px-8 py-3 sm:py-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-1 sm:gap-2 text-gray-700">
+                <BookIcon className="w-4 h-4 sm:w-5 sm:h-5 text-coral-red" />
+                <span className="font-semibold text-base sm:text-lg">{books.length}</span>
+                <span className="text-xs sm:text-sm text-gray-500">books</span>
               </div>
-              <div className="w-px h-6 bg-gray-200" />
-              <div className="flex items-center gap-2 text-gray-700">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span className="font-semibold text-lg">{books.filter(b => b.status === 'read').length}</span>
-                <span className="text-sm text-gray-500">read</span>
+              <div className="w-px h-4 sm:h-6 bg-gray-200" />
+              <div className="flex items-center gap-1 sm:gap-2 text-gray-700">
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                <span className="font-semibold text-base sm:text-lg">{books.filter(b => b.status === 'read').length}</span>
+                <span className="text-xs sm:text-sm text-gray-500">read</span>
               </div>
-              <div className="w-px h-6 bg-gray-200" />
-              <div className="flex items-center gap-2 text-gray-700">
-                <Eye className="w-5 h-5 text-sky-blue" />
-                <span className="font-semibold text-lg">{books.filter(b => b.status === 'reading').length}</span>
-                <span className="text-sm text-gray-500">reading</span>
+              <div className="w-px h-4 sm:h-6 bg-gray-200" />
+              <div className="flex items-center gap-1 sm:gap-2 text-gray-700">
+                <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-sky-blue" />
+                <span className="font-semibold text-base sm:text-lg">{books.filter(b => b.status === 'reading').length}</span>
+                <span className="text-xs sm:text-sm text-gray-500">reading</span>
               </div>
             </div>
           )}
@@ -192,7 +192,7 @@ export default function Home() {
 
         {/* Books Grid */}
         {booksLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 justify-items-center">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-3 sm:gap-6 md:gap-8 justify-items-center">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="group">
                 <div className="relative w-36 h-48 bg-gray-200 rounded-lg mb-2 animate-pulse" />
@@ -201,7 +201,7 @@ export default function Home() {
             ))}
           </div>
         ) : books.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 justify-items-center" data-testid="books-grid">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-3 sm:gap-6 md:gap-8 justify-items-center" data-testid="books-grid">
             {books.map((book) => (
               <BookCard
                 key={book.id}
@@ -237,10 +237,10 @@ export default function Home() {
       {books.length > 0 && (
         <button
           onClick={() => setIsScannerOpen(true)}
-          className="fixed bottom-8 right-8 bg-coral-red hover:bg-red-600 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 z-50"
+          className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 bg-coral-red hover:bg-red-600 text-white p-3 sm:p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 z-50"
           data-testid="button-floating-scan"
         >
-          <Camera className="w-7 h-7" />
+          <Camera className="w-6 h-6 sm:w-7 sm:h-7" />
         </button>
       )}
 

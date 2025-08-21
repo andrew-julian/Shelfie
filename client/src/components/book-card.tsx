@@ -107,13 +107,15 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
 
 // Calculate aspect ratio constraints for realistic proportions
 function constrainBookDimensions(dims: { width: number; height: number; depth: number }) {
-  // More reasonable book size constraints
-  const minWidth = 90;   // Very narrow books
-  const maxWidth = 200;  // Wide textbooks
-  const minHeight = 130; // Short books
-  const maxHeight = 260; // Tall books
-  const minDepth = 8;    // Thin books  
-  const maxDepth = 50;   // Very thick books
+  // Mobile-responsive book size constraints
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  
+  const minWidth = isMobile ? 70 : 90;
+  const maxWidth = isMobile ? 120 : 200;
+  const minHeight = isMobile ? 100 : 130;
+  const maxHeight = isMobile ? 160 : 260;
+  const minDepth = 8;
+  const maxDepth = isMobile ? 30 : 50;
   
   return {
     width: Math.max(minWidth, Math.min(maxWidth, dims.width)),
