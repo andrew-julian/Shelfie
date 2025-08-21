@@ -17,7 +17,7 @@ export default function Home() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('title-asc');
+  const [sortBy, setSortBy] = useState<SortOption>('date-added');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [showFilters, setShowFilters] = useState(false);
 
