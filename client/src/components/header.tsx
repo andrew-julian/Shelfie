@@ -39,7 +39,7 @@ export default function Header({
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100">
+    <header className="bg-white">
       <div className="w-full px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
