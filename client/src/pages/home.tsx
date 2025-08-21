@@ -201,7 +201,7 @@ export default function Home() {
             ))}
           </div>
         ) : books.length > 0 ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 md:gap-8 justify-items-center items-end" data-testid="books-grid">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 md:gap-8 justify-items-center items-center" data-testid="books-grid">
             {books.map((book) => (
               <BookCard
                 key={book.id}
