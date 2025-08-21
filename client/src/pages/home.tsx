@@ -255,11 +255,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden relative">
-      {/* Seamless gray background for shadow integration */}
-      <div className="absolute inset-0 bg-gray-150 pointer-events-none"></div>
-      
-      <div className="relative z-10">
-        <Header 
+      <Header 
           booksCount={allBooks.length}
           filteredCount={finalBooks.length}
           onRefreshAll={() => refreshAllMutation.mutate()}
@@ -284,7 +280,7 @@ export default function Home() {
           
           {/* Horizontal Tracker Bar */}
           {finalBooks.length > 0 && (
-            <div className="inline-flex items-center gap-4 sm:gap-8 bg-white/90 backdrop-blur-sm rounded-full px-4 sm:px-8 py-3 sm:py-4 shadow-lg border border-gray-200/50">
+            <div className="inline-flex items-center gap-4 sm:gap-8 bg-white rounded-full px-4 sm:px-8 py-3 sm:py-4 shadow-sm border border-gray-100">
               <div className="flex items-center gap-1 sm:gap-2 text-gray-700">
                 <BookIcon className="w-4 h-4 sm:w-5 sm:h-5 text-coral-red" />
                 <span className="font-semibold text-base sm:text-lg">{finalBooks.length}</span>
@@ -372,7 +368,6 @@ export default function Home() {
           </div>
         )}
         </main>
-      </div>
 
       {/* Floating Action Button */}
       {finalBooks.length > 0 && (
