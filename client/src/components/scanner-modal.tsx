@@ -205,10 +205,14 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
 
   // Queue management functions
   const addToQueue = useCallback((isbn: string) => {
-    const id = `${isbn}-${Date.now()}`;
+    // Clean ISBN: remove whitespace and hyphens for consistent processing
+    const cleanedIsbn = isbn.trim().replace(/[\s\-]/g, '');
+    console.log('Adding to queue (cleaned):', cleanedIsbn);
+    
+    const id = `${cleanedIsbn}-${Date.now()}`;
     const newItem: QueueItem = {
       id,
-      isbn,
+      isbn: cleanedIsbn, // Use cleaned ISBN
       status: 'scanning',
       timestamp: Date.now(),
       retryCount: 0
@@ -482,14 +486,16 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   };
 
   const handleManualLookup = () => {
-    const isbn = manualIsbn.trim();
-    if (isbn && (isbn.length === 10 || isbn.length === 13)) {
-      addToQueue(isbn);
+    // Clean ISBN: remove whitespace and hyphens
+    const cleanedIsbn = manualIsbn.trim().replace(/[\s\-]/g, '');
+    
+    if (cleanedIsbn && (cleanedIsbn.length === 10 || cleanedIsbn.length === 13)) {
+      addToQueue(cleanedIsbn);
       setManualIsbn(""); // Clear input after adding to queue
     } else {
       toast({
         title: "Invalid ISBN",
-        description: "Please enter a valid 10 or 13 digit ISBN",
+        description: "Please enter a valid 10 or 13 digit ISBN (hyphens and spaces will be automatically removed)",
         variant: "destructive",
       });
     }

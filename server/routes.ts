@@ -155,7 +155,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Lookup book by ISBN using Rainforest API
   app.get("/api/books/lookup/:isbn", isAuthenticated, async (req: any, res) => {
     try {
-      const { isbn } = req.params;
+      let { isbn } = req.params;
+      // Clean ISBN: remove whitespace and hyphens for consistent processing
+      isbn = isbn.trim().replace(/[\s\-]/g, '');
       const { region } = req.query;
       const userId = req.user.claims.sub;
       
