@@ -548,7 +548,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <div>
-              <span>Rapid Book Scanning</span>
+              <span>Book Scanning</span>
               {scanCount > 0 && (
                 <div className="text-sm font-normal text-gray-500 mt-1">
                   {scanCount} books scanned • {queue.filter(item => item.status === 'success').length} added
@@ -578,7 +578,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
                   data-testid="button-start-scanner"
                 >
                   <Camera className="w-6 h-6 mr-3" />
-                  {isSDKLoaded ? 'Start Rapid Scanning' : 'Loading Scanner...'}
+                  {isSDKLoaded ? 'Start Scanning' : 'Loading Scanner...'}
                 </Button>
                 {queue.length > 0 && (
                   <div className="text-sm text-gray-400">
