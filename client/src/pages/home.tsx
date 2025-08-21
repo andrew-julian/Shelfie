@@ -142,7 +142,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white w-full overflow-x-hidden">
       <Header 
         booksCount={allBooks.length}
         filteredCount={books.length}
@@ -158,7 +158,7 @@ export default function Home() {
         onToggleFilters={() => setShowFilters(!showFilters)}
       />
       
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-12 py-6 sm:py-12">
+      <main className="w-full px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto py-6 sm:py-12">
         {/* Hero Section */}
         <div className="mb-8 sm:mb-12 text-center">
           <h2 className="text-2xl sm:text-4xl font-bold text-monochrome-black mb-2 sm:mb-4 tracking-tight leading-tight">Your Digital Library</h2>
@@ -192,7 +192,7 @@ export default function Home() {
 
         {/* Books Grid */}
         {booksLoading ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-3 sm:gap-6 md:gap-8 justify-items-center">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 md:gap-8 justify-items-center">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="group">
                 <div className="relative w-36 h-48 bg-gray-200 rounded-lg mb-2 animate-pulse" />

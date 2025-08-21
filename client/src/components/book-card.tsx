@@ -110,10 +110,10 @@ function constrainBookDimensions(dims: { width: number; height: number; depth: n
   // Mobile-responsive book size constraints
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
   
-  const minWidth = isMobile ? 70 : 90;
-  const maxWidth = isMobile ? 120 : 200;
-  const minHeight = isMobile ? 100 : 130;
-  const maxHeight = isMobile ? 160 : 260;
+  const minWidth = isMobile ? 80 : 90;
+  const maxWidth = isMobile ? 100 : 200;
+  const minHeight = isMobile ? 115 : 130;
+  const maxHeight = isMobile ? 140 : 260;
   const minDepth = 8;
   const maxDepth = isMobile ? 30 : 50;
   

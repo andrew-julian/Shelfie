@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut } from "lucide-react";
+import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut, Menu } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
 
@@ -36,21 +36,23 @@ export default function Header({
   onToggleFilters
 }: HeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex items-center justify-between h-20">
-          <div className="flex items-center space-x-4">
-            <BookOpen className="text-monochrome-black text-2xl" />
-            <h1 className="text-2xl font-bold text-monochrome-black tracking-tight">BookScan</h1>
+      <div className="w-full px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          {/* Logo */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <BookOpen className="text-monochrome-black text-xl sm:text-2xl" />
+            <h1 className="text-xl sm:text-2xl font-bold text-monochrome-black tracking-tight">BookScan</h1>
           </div>
-          <div className="flex items-center space-x-6">
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-6">
             <span className="text-sm text-gray-600 font-medium" data-testid="text-books-count">
               {filteredCount !== booksCount ? `${filteredCount} of ${booksCount}` : booksCount} {booksCount === 1 ? 'book' : 'books'}
             </span>
-            
-            {/* User Menu */}
             <UserMenu />
             {onRefreshAll && booksCount > 0 && (
               <button 
@@ -63,8 +65,6 @@ export default function Header({
                 {isRefreshing ? 'Refreshing...' : 'Refresh All'}
               </button>
             )}
-            
-            {/* Sort Dropdown */}
             <div className="relative">
               <select 
                 value={sortBy}

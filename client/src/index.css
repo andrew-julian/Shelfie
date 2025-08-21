@@ -3,6 +3,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent horizontal scrolling and ensure full-width mobile layout */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+body {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure all containers respect viewport width */
+* {
+  box-sizing: border-box;
+}
+
 :root {
   /* Tandelo Marketplace Color Palette */
   --monochrome-black: #111111;
