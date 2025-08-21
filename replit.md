@@ -21,6 +21,12 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 - **Centered Row Layout**: Two-pass algorithm that calculates row widths then centers each row as a cohesive unit
 - **Constrained Responsive Scaling**: Dynamic scaling with hard minimum of 2 books per row - automatically reduces book size if needed to maintain this constraint across all screen widths
 
+### User Management System (August 2025)
+- **Database-Connected User Switcher**: Real-time user switching connected to actual database users, replacing hardcoded test data
+- **Dynamic User Loading**: Fetches all users from database when user switcher is accessed
+- **Session Context Switching**: Properly updates session context to reflect switched user for testing/development
+- **Forgiving ISBN Input**: Automatic cleanup of whitespace and hyphens from ISBN inputs across scanning and manual entry
+
 ### Book Visual Realism (August 2025)
 - **Paper Texture**: Added SVG fractal noise overlay to simulate printed paper grain on book covers
 - **Realistic Shadows**: Implemented layered shadow system with ambient occlusion and contact shadows

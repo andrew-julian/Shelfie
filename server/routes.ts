@@ -97,25 +97,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all users for user switcher
+  app.get('/api/auth/users', isAuthenticated, async (req: any, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
   // User switching for development/testing
   app.post('/api/auth/switch-user/:userId', async (req: any, res) => {
     try {
       const { userId } = req.params;
       
-      // In development, allow switching between predefined users
-      const allowedUsers = ['21869523', 'demo-user-1', 'test-user-2'];
-      
-      if (!allowedUsers.includes(userId)) {
-        return res.status(400).json({ message: "Invalid user ID" });
+      // Verify the user exists in the database
+      const targetUser = await storage.getUser(userId);
+      if (!targetUser) {
+        return res.status(400).json({ message: "User not found" });
       }
 
-      // Create mock user claims for the switched user
+      // Create user claims based on database user
       const userClaims = {
-        sub: userId,
-        email: userId === '21869523' ? 'andrew@dcr.vc' : `${userId}@example.com`,
-        first_name: userId === '21869523' ? 'Andrew' : userId === 'demo-user-1' ? 'Demo User' : 'Test User',
-        last_name: null,
-        profile_image_url: null,
+        sub: targetUser.id,
+        email: targetUser.email,
+        first_name: targetUser.firstName,
+        last_name: targetUser.lastName,
+        profile_image_url: targetUser.profileImageUrl,
       };
 
       // Update session with new user
@@ -126,16 +136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
       };
 
-      // Ensure user exists in database
-      await storage.upsertUser({
-        id: userId,
-        email: userClaims.email,
-        firstName: userClaims.first_name,
-        lastName: userClaims.last_name,
-        profileImageUrl: userClaims.profile_image_url,
-      });
-
-      res.json({ message: "User switched successfully", userId });
+      res.json({ message: "User switched successfully", userId: targetUser.id });
     } catch (error) {
       console.error("Error switching user:", error);
       res.status(500).json({ message: "Failed to switch user" });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut, Menu, Users, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
@@ -256,13 +256,28 @@ function UserMenu() {
   const { user } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showUserSwitcher, setShowUserSwitcher] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState<any[]>([]);
 
-  // Mock users for development/testing - in production this would come from an API
-  const availableUsers = [
-    { id: '21869523', name: 'Andrew', email: 'andrew@dcr.vc', profileImageUrl: null },
-    { id: 'demo-user-1', name: 'Demo User', email: 'demo@example.com', profileImageUrl: null },
-    { id: 'test-user-2', name: 'Test User', email: 'test@example.com', profileImageUrl: null },
-  ];
+  // Fetch all users when user switcher is shown
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('/api/auth/users', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const users = await response.json();
+          setAvailableUsers(users);
+        }
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+      }
+    };
+    
+    if (showUserSwitcher && availableUsers.length === 0) {
+      fetchUsers();
+    }
+  }, [showUserSwitcher, availableUsers.length]);
 
   const switchUser = async (targetUserId: string) => {
     try {
@@ -350,7 +365,7 @@ function UserMenu() {
                   >
                     <User className="h-4 w-4 mr-2" />
                     <div className="text-left">
-                      <div className="font-medium">{availableUser.name}</div>
+                      <div className="font-medium">{availableUser.firstName || 'User'}</div>
                       <div className="text-xs text-gray-500">{availableUser.email}</div>
                     </div>
                     {availableUser.id === currentUser?.id && (
