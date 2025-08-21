@@ -107,21 +107,30 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
 
 // Calculate aspect ratio constraints for realistic proportions
 function constrainBookDimensions(dims: { width: number; height: number; depth: number }) {
-  // Mobile-responsive book size constraints
+  // Mobile-responsive scaling that maintains proportions
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
   
-  const minWidth = isMobile ? 80 : 90;
-  const maxWidth = isMobile ? 100 : 200;
-  const minHeight = isMobile ? 115 : 130;
-  const maxHeight = isMobile ? 140 : 260;
-  const minDepth = 8;
-  const maxDepth = isMobile ? 30 : 50;
-  
-  return {
-    width: Math.max(minWidth, Math.min(maxWidth, dims.width)),
-    height: Math.max(minHeight, Math.min(maxHeight, dims.height)),
-    depth: Math.max(minDepth, Math.min(maxDepth, dims.depth))
-  };
+  if (isMobile) {
+    // On mobile, scale down proportionally but maintain relative sizes
+    const mobileScale = 0.75;
+    const scaledWidth = dims.width * mobileScale;
+    const scaledHeight = dims.height * mobileScale;
+    const scaledDepth = dims.depth * mobileScale;
+    
+    // Apply minimal constraints only to prevent unusably small books
+    return {
+      width: Math.max(70, scaledWidth),
+      height: Math.max(95, scaledHeight),
+      depth: Math.max(8, scaledDepth)
+    };
+  } else {
+    // Desktop constraints - more liberal to show variety
+    return {
+      width: Math.max(90, Math.min(200, dims.width)),
+      height: Math.max(130, Math.min(260, dims.height)),
+      depth: Math.max(8, Math.min(50, dims.depth))
+    };
+  }
 }
 
 
