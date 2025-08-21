@@ -134,7 +134,14 @@
   .book-3d__inner {
     position: relative;
     transform-style: preserve-3d;
-    transform: rotateY(-25deg);
+    /* Subtle micro-misalignment for human, non-CAD feel */
+    transform: 
+      rotateX(var(--rand-rot-x, 0deg)) 
+      rotateY(calc(-25deg + var(--rand-rot-y, 0deg))) 
+      rotateZ(var(--rand-rot-z, 0deg))
+      translateX(var(--rand-translate-x, 0px))
+      translateY(var(--rand-translate-y, 0px))
+      translateZ(1px);
     transition: transform 0.8s ease;
     /* Layered realistic shadows */
     box-shadow:
@@ -143,7 +150,14 @@
   }
 
   .book-3d:hover .book-3d__inner {
-    transform: rotateY(0deg);
+    /* Preserve micro-misalignment even on hover for consistent feel */
+    transform: 
+      rotateX(var(--rand-rot-x, 0deg))
+      rotateY(var(--rand-rot-y, 0deg))
+      rotateZ(var(--rand-rot-z, 0deg))
+      translateX(var(--rand-translate-x, 0px))
+      translateY(var(--rand-translate-y, 0px))
+      translateZ(2px);
     /* Enhanced shadows on hover */
     box-shadow:
       0 8px 15px rgba(0,0,0,.22),   /* stronger ambient */
