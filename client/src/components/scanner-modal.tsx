@@ -373,6 +373,19 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
         config.palette.sbColorNegative = "#FF3737";
       }
       
+      // Add user guidance and UI improvements
+      if (config.userGuidance) {
+        config.userGuidance.title.text = "Move the finder over a barcode";
+        config.userGuidance.title.color = "#FFFFFF";
+      }
+      
+      // Disable problematic mobile interactions that can interfere with touch targets
+      const bodyStyle = document.body.style as any;
+      bodyStyle.userSelect = 'none';
+      bodyStyle.webkitUserSelect = 'none';
+      bodyStyle.webkitTouchCallout = 'none';
+      bodyStyle.webkitTapHighlightColor = 'transparent';
+      
       console.log('Creating barcode scanner with config:', config);
       
       // Create and present the scanner with a timeout fallback
@@ -441,13 +454,24 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
           variant: "destructive",
         });
       }
+    } finally {
+      // Always clean up mobile interaction styles when scanner closes
+      const bodyStyle = document.body.style as any;
+      bodyStyle.userSelect = '';
+      bodyStyle.webkitUserSelect = '';
+      bodyStyle.webkitTouchCallout = '';
+      bodyStyle.webkitTapHighlightColor = '';
     }
   };
 
   const stopScanner = () => {
-    // Scanbot SDK handles scanner lifecycle automatically
-    // No need to manually dispose when using UI components
     setIsScanning(false);
+    // Clean up mobile interaction styles
+    const bodyStyle = document.body.style as any;
+    bodyStyle.userSelect = '';
+    bodyStyle.webkitUserSelect = '';
+    bodyStyle.webkitTouchCallout = '';
+    bodyStyle.webkitTapHighlightColor = '';
   };
 
   const handleClose = () => {
