@@ -243,14 +243,16 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
 
       </div>
       
-      {/* Title overlay on hover */}
-      <div className={`absolute -bottom-8 left-0 right-0 text-center transform transition-all duration-300 ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
-        <h3 className="font-bold text-monochrome-black text-sm line-clamp-2 leading-tight mb-1" data-testid={`text-book-title-${book.id}`}>
-          {book.title}
-        </h3>
-        <p className="text-gray-600 text-xs font-medium" data-testid={`text-book-author-${book.id}`}>
-          {book.author === 'Unknown Author' ? 'Author unknown' : book.author}
-        </p>
+      {/* Enhanced title overlay on hover */}
+      <div className={`absolute -bottom-10 left-0 right-0 text-center transform transition-all duration-300 ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+        <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border border-gray-200/50 mx-auto max-w-[200px]">
+          <h3 className="font-bold text-gray-900 text-sm line-clamp-2 leading-tight mb-1" data-testid={`text-book-title-${book.id}`}>
+            {book.title}
+          </h3>
+          <p className="text-gray-600 text-xs font-medium line-clamp-1" data-testid={`text-book-author-${book.id}`}>
+            {book.author === 'Unknown Author' ? 'Author unknown' : book.author}
+          </p>
+        </div>
       </div>
     </div>
   );
