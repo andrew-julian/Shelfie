@@ -240,16 +240,7 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
           )}
         </div>
         
-        {/* Status Tag */}
-        <button
-          onClick={handleStatusClick}
-          className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full text-white font-bold text-sm ${statusInfo.color} hover:scale-110 transition-all duration-200 shadow-lg flex items-center justify-center z-10`}
-          disabled={updateStatusMutation.isPending}
-          title={statusInfo.label}
-          data-testid={`button-status-${book.id}`}
-        >
-          {updateStatusMutation.isPending ? '⏳' : statusInfo.icon}
-        </button>
+
       </div>
       
       {/* Title overlay on hover */}
