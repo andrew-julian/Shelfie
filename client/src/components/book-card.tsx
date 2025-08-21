@@ -217,9 +217,6 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
               <span className="text-xs font-medium text-center px-2 leading-tight">{book.title}</span>
             </div>
           )}
-          
-          {/* Page edges block */}
-          <div className="book-3d__pages"></div>
         </div>
         
         {/* Status Tag */}
