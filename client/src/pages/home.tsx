@@ -225,7 +225,8 @@ export default function Home() {
         containerWidth: containerDimensions.width,
         containerHeight: containerDimensions.height,
         padding: spacing.padding,
-        minSpacing: spacing.minSpacing
+        minSpacing: spacing.minSpacing,
+        tidyMode: tidyMode
       };
       
       const positions = calculateDynamicLayout(finalBooks, config, getBookDimensions);
@@ -233,7 +234,7 @@ export default function Home() {
     } else {
       setBookPositions([]);
     }
-  }, [finalBooks.map(b => b.id).join(','), containerDimensions.width, containerDimensions.height]); // Use stable book ID string
+  }, [finalBooks.map(b => b.id).join(','), containerDimensions.width, containerDimensions.height, tidyMode]); // Include tidyMode to trigger re-layout
 
 
   

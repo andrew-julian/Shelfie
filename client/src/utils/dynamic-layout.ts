@@ -14,11 +14,13 @@ export interface LayoutConfig {
   containerHeight: number;
   padding: number;
   minSpacing: number;
+  tidyMode?: boolean;
 }
 
 /**
  * Dynamic layout algorithm that preserves color order while preventing overlaps.
  * Uses a bin-packing inspired approach with shelving for optimal space utilization.
+ * In tidy mode, sorts books by size (height, width, depth) for organized arrangement.
  */
 export function calculateDynamicLayout(
   books: Book[], 
@@ -28,12 +30,31 @@ export function calculateDynamicLayout(
   const positions: BookPosition[] = [];
   const rows: Array<{ books: Book[]; totalWidth: number; height: number }> = [];
   
+  // In tidy mode, sort books by size for organized arrangement
+  const sortedBooks = config.tidyMode 
+    ? [...books].sort((a, b) => {
+        const aDim = getDimensions(a);
+        const bDim = getDimensions(b);
+        
+        // Primary sort: by height (tallest first)
+        const heightDiff = bDim.height - aDim.height;
+        if (Math.abs(heightDiff) > 10) return heightDiff;
+        
+        // Secondary sort: by width (widest first) 
+        const widthDiff = bDim.width - aDim.width;
+        if (Math.abs(widthDiff) > 5) return widthDiff;
+        
+        // Tertiary sort: by depth for final organization
+        return bDim.depth - aDim.depth;
+      })
+    : books;
+  
   // First pass: organize books into rows with minimum 2 books per row
   let currentRow: Book[] = [];
   let currentRowWidth = 0;
   let currentRowHeight = 0;
   
-  for (const book of books) {
+  for (const book of sortedBooks) {
     const dimensions = getDimensions(book);
     const bookWidth = dimensions.width;
     const bookHeight = dimensions.height;
