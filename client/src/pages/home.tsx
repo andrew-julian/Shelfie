@@ -187,8 +187,8 @@ export default function Home() {
       const config: LayoutConfig = {
         containerWidth: containerDimensions.width,
         containerHeight: containerDimensions.height,
-        padding: 20,
-        minSpacing: 16
+        padding: 32,
+        minSpacing: 28
       };
       
       const positions = calculateDynamicLayout(finalBooks, config, getBookDimensions);

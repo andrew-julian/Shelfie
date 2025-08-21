@@ -76,8 +76,8 @@ export function calculateDynamicLayout(
     const bookX = config.padding + shelfUsedWidth;
     
     // Add subtle random offset for natural, non-grid appearance
-    const randomOffsetX = (Math.random() - 0.5) * 8; // ±4px horizontal variance
-    const randomOffsetY = (Math.random() - 0.5) * 6; // ±3px vertical variance
+    const randomOffsetX = (Math.random() - 0.5) * 12; // ±6px horizontal variance
+    const randomOffsetY = (Math.random() - 0.5) * 10; // ±5px vertical variance
     
     const position: BookPosition = {
       book,
