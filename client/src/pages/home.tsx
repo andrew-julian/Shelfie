@@ -11,6 +11,14 @@ import { Book } from "@shared/schema";
 import { BookOpen, Camera, Book as BookIcon, Eye, CheckCircle } from "lucide-react";
 import { analyzeImageColors, sortBooksByOverallColor } from "@/utils/color-sort";
 import { calculateDynamicLayout, BookPosition, LayoutConfig } from "@/utils/dynamic-layout";
+import { 
+  calculateLayout, 
+  normaliseBooks, 
+  DEFAULT_CFG,
+  type Book as LayoutBook, 
+  type LayoutItem, 
+  type LayoutConfig as EngineConfig 
+} from '@/layout/BookScanLayoutEngine';
 
 type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
@@ -128,8 +136,15 @@ export default function Home() {
   
   // Dynamic layout state
   const [bookPositions, setBookPositions] = useState<BookPosition[]>([]);
+  const [layoutItems, setLayoutItems] = useState<LayoutItem[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerDimensions, setContainerDimensions] = useState({ width: 1200, height: 800 });
+  
+  // Layout engine configuration
+  const engineConfig: EngineConfig = {
+    ...DEFAULT_CFG,
+    raggedLastRow: !tidyMode // Use justified rows in tidy mode
+  };
 
   useEffect(() => {
     if ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && books.length > 0) {
@@ -145,51 +160,36 @@ export default function Home() {
   // Use color-sorted books when appropriate
   const finalBooks = (sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') ? colorSortedBooks : books;
 
-  // Book dimensions calculation function with responsive scaling
-  const getBookDimensions = (book: Book) => {
-    // Responsive scale ensuring minimum 2 books per row
-    const getResponsiveScale = (containerWidth: number) => {
-      // Calculate maximum book width to ensure at least 2 books fit
-      const padding = containerWidth <= 390 ? 16 : (containerWidth <= 1400 ? 32 : 40);
-      const minSpacing = 12;
-      const maxBookWidth = (containerWidth - (padding * 2) - minSpacing) / 2;
-      
-      if (containerWidth <= 390) {
-        // Mobile: scale for 2-column with padding constraints
-        const calculatedScale = Math.min(26, (maxBookWidth / 140) * 22);
-        return Math.max(calculatedScale, 16); // Never below 16
+  // Convert books to layout engine format
+  const convertToLayoutBooks = (books: Book[]): LayoutBook[] => {
+    return books.map(book => ({
+      id: book.id,
+      phys: {
+        width_mm: book.width ? parseFloat(book.width) : 140,
+        height_mm: book.height ? parseFloat(book.height) : 200, 
+        spine_mm: book.depth ? parseFloat(book.depth) : 15
       }
-      if (containerWidth <= 600) return Math.min(34, (maxBookWidth / 140) * 22);
-      if (containerWidth <= 800) return Math.min(30, (maxBookWidth / 140) * 22);
-      if (containerWidth <= 1024) return Math.min(26, (maxBookWidth / 140) * 22);
-      if (containerWidth <= 1400) return Math.min(22, (maxBookWidth / 140) * 22);
-      if (containerWidth <= 1800) return Math.min(20, (maxBookWidth / 140) * 22);
-      return Math.min(18, (maxBookWidth / 140) * 22); // Ultra-wide with constraint
-    };
-    
-    const baseScale = getResponsiveScale(containerDimensions.width);
-    const defaultDimensions = { 
-      width: Math.round(140 * baseScale / 22), 
-      height: Math.round(200 * baseScale / 22), 
-      depth: Math.round(15 * baseScale / 22) 
-    };
-    
-    if (book.width && book.height && book.depth) {
-      const width = parseFloat(book.width);
-      const height = parseFloat(book.height);
-      const depth = parseFloat(book.depth);
-      
-      return {
-        width: Math.round(width * baseScale),
-        height: Math.round(height * baseScale),
-        depth: Math.max(Math.round(depth * baseScale * 1.2), 10)
-      };
-    }
-    
-    return defaultDimensions;
+    }));
   };
 
-  // Container resize observer
+  // Memoized book normalization
+  const normalizedDimensions = useMemo(() => {
+    const layoutBooks = convertToLayoutBooks(finalBooks);
+    return normaliseBooks(layoutBooks, engineConfig.BASE_HEIGHT);
+  }, [finalBooks, engineConfig.BASE_HEIGHT]);
+
+  // Memoized layout calculation using new engine
+  const newLayoutItems = useMemo(() => {
+    if (finalBooks.length === 0 || containerDimensions.width === 0) return [];
+    
+    const layoutBooks = convertToLayoutBooks(finalBooks);
+    return calculateLayout(layoutBooks, normalizedDimensions, containerDimensions.width, engineConfig);
+  }, [finalBooks, normalizedDimensions, containerDimensions.width, engineConfig]);
+
+  // Legacy dimension calculation (no longer used with new layout engine)
+  // Kept for reference but replaced by the headless layout engine
+
+  // Container resize observer with ResizeObserver
   useEffect(() => {
     const updateContainerSize = () => {
       if (containerRef.current) {
@@ -202,39 +202,35 @@ export default function Home() {
     };
 
     updateContainerSize();
+    
+    // Use ResizeObserver for better performance
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setContainerDimensions({ 
+          width: width || 1200, 
+          height: Math.max(height, 600) 
+        });
+      }
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    // Fallback for window resize
     window.addEventListener('resize', updateContainerSize);
-    return () => window.removeEventListener('resize', updateContainerSize);
+    
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateContainerSize);
+    };
   }, []);
 
-  // Calculate dynamic layout when books or container changes
+  // Update layout items state when new layout is calculated
   useEffect(() => {
-    if (finalBooks.length > 0 && containerDimensions.width > 0) {
-      // Responsive spacing based on screen width - optimized for all sizes
-      const getResponsiveSpacing = (containerWidth: number) => {
-        if (containerWidth <= 390) return { padding: 16, minSpacing: 12 }; // Mobile: tighter spacing for better use of space
-        if (containerWidth <= 600) return { padding: 18, minSpacing: 20 }; // Narrow: tight spacing
-        if (containerWidth <= 800) return { padding: 22, minSpacing: 24 }; // Medium-narrow: medium spacing
-        if (containerWidth <= 1024) return { padding: 26, minSpacing: 26 }; // Small desktop: medium spacing
-        if (containerWidth <= 1400) return { padding: 32, minSpacing: 28 }; // Standard desktop: original spacing
-        if (containerWidth <= 1800) return { padding: 40, minSpacing: 24 }; // Large desktop: more padding, tighter book spacing
-        return { padding: 48, minSpacing: 22 }; // Ultra-wide: generous padding with tight book spacing
-      };
-      
-      const spacing = getResponsiveSpacing(containerDimensions.width);
-      const config: LayoutConfig = {
-        containerWidth: containerDimensions.width,
-        containerHeight: containerDimensions.height,
-        padding: spacing.padding,
-        minSpacing: spacing.minSpacing,
-        tidyMode: tidyMode
-      };
-      
-      const positions = calculateDynamicLayout(finalBooks, config, getBookDimensions);
-      setBookPositions(positions);
-    } else {
-      setBookPositions([]);
-    }
-  }, [finalBooks.map(b => b.id).join(','), containerDimensions.width, containerDimensions.height, tidyMode]); // Include tidyMode to trigger re-layout
+    setLayoutItems(newLayoutItems);
+  }, [newLayoutItems]);
 
 
   
@@ -364,28 +360,47 @@ export default function Home() {
             ref={containerRef}
             className="relative w-full" 
             style={{ 
-              minHeight: `${Math.max(400, bookPositions.reduce((max, pos) => Math.max(max, pos.y + pos.height + 40), 400))}px` 
+              minHeight: `${Math.max(400, layoutItems.reduce((max, item) => Math.max(max, item.y + item.h + 40), 400))}px` 
             }}
             data-testid="books-layout"
           >
-            {bookPositions.map((position) => (
-              <div
-                key={position.book.id}
-                className="absolute transition-all duration-700 ease-out"
-                style={{
-                  left: `${position.x}px`,
-                  top: `${position.y}px`,
-                  zIndex: position.zIndex,
-                  transform: `rotate(${tidyMode ? 0 : ((position.book.id.charCodeAt(0) % 7) - 3)}deg)` // Deterministic rotation (disabled in tidy mode)
-                }}
-              >
-                <BookCard
-                  book={position.book}
-                  onSelect={handleBookSelect}
-                  onUpdate={handleBookUpdate}
-                />
-              </div>
-            ))}
+            {layoutItems.map((item) => {
+              const book = finalBooks.find(b => b.id === item.id);
+              if (!book) return null;
+              
+              return (
+                <div
+                  key={item.id}
+                  className="absolute transition-all duration-700 ease-out"
+                  style={{
+                    '--x': `${item.x}px`,
+                    '--y': `${item.y}px`,
+                    '--z': item.z,
+                    '--w': `${item.w}px`,
+                    '--h': `${item.h}px`,
+                    '--d': `${item.d}px`,
+                    '--ry': `${tidyMode ? 0 : item.ry}deg`,
+                    left: `var(--x)`,
+                    top: `var(--y)`,
+                    zIndex: Math.round(item.z * 100),
+                    transform: `rotateY(var(--ry))`,
+                    width: `var(--w)`,
+                    height: `var(--h)`
+                  } as React.CSSProperties}
+                >
+                  <BookCard
+                    book={book}
+                    onSelect={handleBookSelect}
+                    onUpdate={handleBookUpdate}
+                    customDimensions={{
+                      width: item.w,
+                      height: item.h,
+                      depth: item.d
+                    }}
+                  />
+                </div>
+              );
+            })}
           </div>
         ) : (
           /* Empty State */

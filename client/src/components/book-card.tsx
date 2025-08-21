@@ -140,6 +140,11 @@ interface BookCardProps {
   book: Book;
   onSelect: (book: Book) => void;
   onUpdate: () => void;
+  customDimensions?: {
+    width: number;
+    height: number;
+    depth: number;
+  };
 }
 
 const statusConfig = {
@@ -148,12 +153,23 @@ const statusConfig = {
   'read': { label: 'Read', icon: '✅', color: 'bg-green-500' },
 };
 
-export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
+export default function BookCard({ book, onSelect, onUpdate, customDimensions }: BookCardProps) {
   const { toast } = useToast();
   
-  // Calculate book dimensions based on real-world data
-  const rawDimensions = parseBookDimensions(book);
-  const bookDimensions = constrainBookDimensions(rawDimensions);
+  // Use custom dimensions if provided, otherwise calculate responsive dimensions
+  const bookDimensions = useMemo(() => {
+    if (customDimensions) {
+      return {
+        width: Math.round(customDimensions.width),
+        height: Math.round(customDimensions.height),
+        depth: Math.max(Math.round(customDimensions.depth), 8)
+      };
+    }
+    
+    // Fallback: use the existing dimension calculation
+    const rawDimensions = parseBookDimensions(book);
+    return constrainBookDimensions(rawDimensions);
+  }, [book, customDimensions]);
   
   // State to track if user is scrolling vs intentionally interacting
   const [isScrolling, setIsScrolling] = useState(false);
