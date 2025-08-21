@@ -43,7 +43,7 @@ export default function Header({
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center space-x-4">
             <BookOpen className="text-monochrome-black text-2xl" />
-            <h1 className="text-2xl font-bold text-monochrome-black tracking-tight">BookCatalog</h1>
+            <h1 className="text-2xl font-bold text-monochrome-black tracking-tight">BookScan</h1>
           </div>
           <div className="flex items-center space-x-6">
             <span className="text-sm text-gray-600 font-medium" data-testid="text-books-count">

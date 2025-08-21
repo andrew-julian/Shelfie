@@ -1,8 +1,8 @@
-# BookCatalog Application
+# BookScan Application
 
 ## Overview
 
-BookCatalog is a full-stack digital library management application that allows users to build and organize their personal book collection. The application features barcode scanning capabilities for easy book addition, comprehensive book metadata management, and a clean, responsive user interface built with modern web technologies.
+BookScan is a full-stack digital library management application that allows users to build and organize their personal book collection. The application features barcode scanning capabilities for easy book addition, comprehensive book metadata management, and a clean, responsive user interface built with modern web technologies.
 
 ## User Preferences
 
