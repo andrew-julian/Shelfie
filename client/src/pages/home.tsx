@@ -19,6 +19,7 @@ import {
   type LayoutItem, 
   type LayoutConfig as EngineConfig 
 } from '@/layout/BookScanLayoutEngine';
+import VirtualizedBookGrid from '@/components/virtualized-book-grid';
 
 type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
@@ -59,6 +60,7 @@ export default function Home() {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [showFilters, setShowFilters] = useState(false);
   const [tidyMode, setTidyMode] = useState(false);
+  const [useVirtualization, setUseVirtualization] = useState(false);
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -219,7 +221,7 @@ export default function Home() {
     
     const layoutBooks = convertToLayoutBooks(finalBooks);
     return calculateLayout(layoutBooks, normalizedDimensions, containerDimensions.width, responsiveConfig);
-  }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig]);
+  }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig.targetRowHeight, responsiveConfig.gutterX, responsiveConfig.gutterY, responsiveConfig.raggedLastRow]);
 
   // Legacy dimension calculation (no longer used with new layout engine)
   // Kept for reference but replaced by the headless layout engine
@@ -265,6 +267,8 @@ export default function Home() {
   // Update layout items state when new layout is calculated
   useEffect(() => {
     setLayoutItems(newLayoutItems);
+    // Enable virtualization for large libraries (>1000 books)
+    setUseVirtualization(newLayoutItems.length > 1000);
   }, [newLayoutItems]);
 
 
@@ -391,56 +395,68 @@ export default function Home() {
             ))}
           </div>
         ) : finalBooks.length > 0 ? (
-          <div 
-            ref={containerRef}
-            className="gridContainer relative w-full" 
-            style={{ 
-              containerType: 'inline-size',
-              minHeight: `${Math.max(400, layoutItems.reduce((max, item) => Math.max(max, item.y + item.h + 40), 400))}px`,
-              '--rowH': `${responsiveConfig.targetRowHeight}px`,
-              '--gutterX': `${responsiveConfig.gutterX}px`,
-              '--gutterY': `${responsiveConfig.gutterY}px`
-            } as React.CSSProperties}
-            data-testid="books-layout"
-          >
-            {layoutItems.map((item) => {
-              const book = finalBooks.find(b => b.id === item.id);
-              if (!book) return null;
-              
-              return (
-                <div
-                  key={item.id}
-                  className="absolute transition-all duration-700 ease-out"
-                  style={{
-                    '--x': `${item.x}px`,
-                    '--y': `${item.y}px`,
-                    '--z': item.z,
-                    '--w': `${item.w}px`,
-                    '--h': `${item.h}px`,
-                    '--d': `${item.d}px`,
-                    '--ry': `${tidyMode ? 0 : item.ry}deg`,
-                    left: `var(--x)`,
-                    top: `var(--y)`,
-                    zIndex: Math.round(item.z * 100),
-                    transform: `rotateY(var(--ry))`,
-                    width: `var(--w)`,
-                    height: `var(--h)`
-                  } as React.CSSProperties}
-                >
-                  <BookCard
-                    book={book}
-                    onSelect={handleBookSelect}
-                    onUpdate={handleBookUpdate}
-                    customDimensions={{
-                      width: item.w,
-                      height: item.h,
-                      depth: item.d
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
+          useVirtualization ? (
+            <VirtualizedBookGrid
+              layoutItems={layoutItems}
+              books={finalBooks}
+              onBookSelect={handleBookSelect}
+              onBookUpdate={handleBookUpdate}
+              tidyMode={tidyMode}
+              chunkSize={200}
+              bufferSize={2}
+            />
+          ) : (
+            <div 
+              ref={containerRef}
+              className="gridContainer relative w-full" 
+              style={{ 
+                containerType: 'inline-size',
+                minHeight: `${Math.max(400, layoutItems.reduce((max, item) => Math.max(max, item.y + item.h + 40), 400))}px`,
+                '--rowH': `${responsiveConfig.targetRowHeight}px`,
+                '--gutterX': `${responsiveConfig.gutterX}px`,
+                '--gutterY': `${responsiveConfig.gutterY}px`
+              } as React.CSSProperties}
+              data-testid="books-layout"
+            >
+              {layoutItems.map((item) => {
+                const book = finalBooks.find(b => b.id === item.id);
+                if (!book) return null;
+                
+                return (
+                  <div
+                    key={item.id}
+                    className="absolute transition-all duration-700 ease-out"
+                    style={{
+                      '--x': `${item.x}px`,
+                      '--y': `${item.y}px`,
+                      '--z': item.z,
+                      '--w': `${item.w}px`,
+                      '--h': `${item.h}px`,
+                      '--d': `${item.d}px`,
+                      '--ry': `${tidyMode ? 0 : item.ry}deg`,
+                      left: `var(--x)`,
+                      top: `var(--y)`,
+                      zIndex: Math.round(item.z * 100),
+                      transform: `rotateY(var(--ry))`,
+                      width: `var(--w)`,
+                      height: `var(--h)`
+                    } as React.CSSProperties}
+                  >
+                    <BookCard
+                      book={book}
+                      onSelect={handleBookSelect}
+                      onUpdate={handleBookUpdate}
+                      customDimensions={{
+                        width: item.w,
+                        height: item.h,
+                        depth: item.d
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )
         ) : (
           /* Empty State */
           <div className="text-center py-20" data-testid="empty-state">
