@@ -146,7 +146,7 @@ export default function Home() {
 
   // Book dimensions calculation function with responsive scaling
   const getBookDimensions = (book: Book) => {
-    // Responsive scale based on container width - optimized mobile scaling
+    // Responsive scale based on container width - more columns on wide screens
     const getResponsiveScale = (containerWidth: number) => {
       if (containerWidth <= 390) {
         // Mobile: larger scale to fill space better in 2-column layout
@@ -155,7 +155,9 @@ export default function Home() {
       if (containerWidth <= 600) return 34; // Narrow desktop: large books  
       if (containerWidth <= 800) return 30; // Medium-narrow: medium-large books
       if (containerWidth <= 1024) return 26; // Small desktop: medium books
-      return 22; // Large desktop: standard size
+      if (containerWidth <= 1400) return 22; // Standard desktop: standard size
+      if (containerWidth <= 1800) return 20; // Large desktop: smaller books for more columns
+      return 18; // Ultra-wide: very small books for maximum columns
     };
     
     const baseScale = getResponsiveScale(containerDimensions.width);
@@ -200,13 +202,15 @@ export default function Home() {
   // Calculate dynamic layout when books or container changes
   useEffect(() => {
     if (finalBooks.length > 0 && containerDimensions.width > 0) {
-      // Responsive spacing based on screen width - tighter mobile spacing
+      // Responsive spacing based on screen width - optimized for all sizes
       const getResponsiveSpacing = (containerWidth: number) => {
         if (containerWidth <= 390) return { padding: 16, minSpacing: 12 }; // Mobile: tighter spacing for better use of space
         if (containerWidth <= 600) return { padding: 18, minSpacing: 20 }; // Narrow: tight spacing
         if (containerWidth <= 800) return { padding: 22, minSpacing: 24 }; // Medium-narrow: medium spacing
         if (containerWidth <= 1024) return { padding: 26, minSpacing: 26 }; // Small desktop: medium spacing
-        return { padding: 32, minSpacing: 28 }; // Desktop: original spacing
+        if (containerWidth <= 1400) return { padding: 32, minSpacing: 28 }; // Standard desktop: original spacing
+        if (containerWidth <= 1800) return { padding: 40, minSpacing: 24 }; // Large desktop: more padding, tighter book spacing
+        return { padding: 48, minSpacing: 22 }; // Ultra-wide: generous padding with tight book spacing
       };
       
       const spacing = getResponsiveSpacing(containerDimensions.width);
