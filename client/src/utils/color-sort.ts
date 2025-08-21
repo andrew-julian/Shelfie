@@ -135,8 +135,8 @@ function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: n
 }
 
 // Sort books by overall visual appeal and color harmony
-export function sortBooksByOverallColor(booksWithProfiles: Array<{ book: any; profile: ColorProfile }>): any[] {
-  return booksWithProfiles
+export function sortBooksByOverallColor(booksWithProfiles: Array<{ book: any; profile: ColorProfile }>, reverse: boolean = false): any[] {
+  const sorted = booksWithProfiles
     .sort((a, b) => {
       const profileA = a.profile;
       const profileB = b.profile;
@@ -164,6 +164,12 @@ export function sortBooksByOverallColor(booksWithProfiles: Array<{ book: any; pr
       
       // Final sort: colorfulness (vivid before muted within same hue)
       return profileB.colorfulness - profileA.colorfulness;
-    })
-    .map(item => item.book);
+    });
+    
+  // Reverse the order if requested (for dark to light sorting)
+  if (reverse) {
+    sorted.reverse();
+  }
+  
+  return sorted.map(item => item.book);
 }

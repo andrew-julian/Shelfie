@@ -11,11 +11,11 @@ import { Book } from "@shared/schema";
 import { BookOpen, Camera, Book as BookIcon, Eye, CheckCircle } from "lucide-react";
 import { analyzeImageColors, sortBooksByOverallColor } from "@/utils/color-sort";
 
-type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color';
+type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
 
 // Function to sort books by overall visual color profile
-async function sortBooksByColor(books: Book[]): Promise<Book[]> {
+async function sortBooksByColor(books: Book[], reverse: boolean = false): Promise<Book[]> {
   // Analyze color profiles for all books
   const booksWithProfiles = await Promise.all(
     books.map(async (book) => {
@@ -39,7 +39,7 @@ async function sortBooksByColor(books: Book[]): Promise<Book[]> {
   );
 
   // Sort by overall visual appeal and color harmony
-  return sortBooksByOverallColor(booksWithProfiles);
+  return sortBooksByOverallColor(booksWithProfiles, reverse);
 }
 
 export default function Home() {
@@ -92,7 +92,7 @@ export default function Home() {
     }
 
     // Handle color sorting separately since it's async
-    if (sortBy === 'color') {
+    if (sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') {
       return filtered; // Will be sorted by useEffect below
     }
 
@@ -125,9 +125,10 @@ export default function Home() {
   const [isColorSorting, setIsColorSorting] = useState(false);
 
   useEffect(() => {
-    if (sortBy === 'color' && books.length > 0) {
+    if ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && books.length > 0) {
       setIsColorSorting(true);
-      sortBooksByColor(books).then(sorted => {
+      const reverse = sortBy === 'color-dark-to-light';
+      sortBooksByColor(books, reverse).then(sorted => {
         setColorSortedBooks(sorted);
         setIsColorSorting(false);
       });
@@ -135,7 +136,7 @@ export default function Home() {
   }, [sortBy, books]);
 
   // Use color-sorted books when appropriate
-  const finalBooks = sortBy === 'color' ? colorSortedBooks : books;
+  const finalBooks = (sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') ? colorSortedBooks : books;
 
 
   
@@ -242,7 +243,7 @@ export default function Home() {
         </div>
 
         {/* Books Grid */}
-        {booksLoading || (sortBy === 'color' && isColorSorting) ? (
+        {booksLoading || ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && isColorSorting) ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 md:gap-8 justify-items-center">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="group">
