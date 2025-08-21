@@ -180,22 +180,39 @@
     z-index: -1;
   }
 
-  /* Book Pages - using ::before on inner element */
+  /* Spine thickness with realistic bevel and gradient */
   .book-3d__inner::before {
+    content: "";
     position: absolute;
-    content: ' ';
-    left: 100%;
-    top: 1%;
-    width: calc(var(--book-thickness) * 2);
-    height: 98%;
-    transform: translate(-55%, 0) rotateY(90deg);
-    background: linear-gradient(90deg, 
-      #fff 0%, hsl(0, 0%, 94%) 5%, #fff 10%, hsl(0, 0%, 94%) 15%, #fff 20%, 
-      hsl(0, 0%, 94%) 25%, #fff 30%, hsl(0, 0%, 94%) 35%, #fff 40%, 
-      hsl(0, 0%, 94%) 45%, #fff 50%, hsl(0, 0%, 94%) 55%, #fff 60%, 
-      hsl(0, 0%, 94%) 65%, #fff 70%, hsl(0, 0%, 94%) 75%, #fff 80%, 
-      hsl(0, 0%, 94%) 85%, #fff 90%, hsl(0, 0%, 94%) 95%, #fff 100%);
-    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+    top: 0;
+    bottom: 0;
+    left: calc(-1 * var(--book-thickness));
+    width: var(--book-thickness);
+    background: linear-gradient(90deg, #2a2a2a, #0f0f0f 60%, #2d2d2d);
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    box-shadow: inset -1px 0 0 rgba(255,255,255,.05);
+    transform: translateZ(2px) rotateY(-90deg);
+    transform-origin: right;
+  }
+
+  /* Page edges block showing realistic page layers */
+  .book-3d__pages {
+    position: absolute;
+    right: calc(-1 * var(--book-thickness) * 0.6);
+    top: 4px;
+    bottom: 4px;
+    width: calc(var(--book-thickness) * 0.6);
+    background: repeating-linear-gradient(
+      0deg,
+      #ececec 0 2px,
+      #dcdcdc 2px 3px
+    );
+    filter: contrast(1.1) brightness(.98);
+    border-radius: 0 6px 6px 0;
+    transform: translateZ(1px) rotateY(90deg);
+    transform-origin: left;
+    box-shadow: inset 1px 0 0 rgba(255,255,255,.1);
   }
 
   /* Rear Cover - using pseudo-element */
@@ -214,12 +231,17 @@
 
   /* Book Cover Styles */
   .book-3d__cover {
-    position: relative;
-    border-radius: 2px 0 0 2px;
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    backface-visibility: hidden;
+    border-radius: 8px 2px 2px 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     /* Apply paper texture filter */
     filter: saturate(.97) contrast(1.03) brightness(.99);
+    /* Fallback background while image loads */
+    background-color: #ddd;
   }
 
   /* Paper grain texture overlay for book covers */
