@@ -285,16 +285,8 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       setIsScanning(true);
       console.log('Starting Scanbot scanner...');
       
-      // Create configuration with basic settings that work reliably
+      // Create minimal configuration that should work reliably
       const config = new window.ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration();
-      
-      // Try to set basic properties that are known to work
-      if (config.topBar) {
-        config.topBar.cancelButton = {
-          visible: true,
-          text: "Cancel"
-        };
-      }
       
       console.log('Creating barcode scanner with config:', config);
       
