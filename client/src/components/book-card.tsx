@@ -34,10 +34,47 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
     const matches = book.dimensions.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
     if (!matches) return defaultDimensions;
     
-    let [, widthStr, depthStr, heightStr] = matches;
-    let width = parseFloat(widthStr);
-    let depth = parseFloat(depthStr);
-    let height = parseFloat(heightStr);
+    let [, dim1Str, dim2Str, dim3Str] = matches;
+    let dim1 = parseFloat(dim1Str);
+    let dim2 = parseFloat(dim2Str);
+    let dim3 = parseFloat(dim3Str);
+    
+    // Amazon dimensions are typically: length x width x height
+    // For books, we want: width x height x depth (thickness)
+    // Books should typically be taller than they are wide
+    
+    // Sort dimensions to identify width (smallest horizontal), height (largest), depth (medium)
+    const dims = [dim1, dim2, dim3].sort((a, b) => a - b);
+    const [smallest, middle, largest] = dims;
+    
+    // For books: depth (thickness) should be smallest, width should be smaller than height
+    let width, height, depth;
+    
+    if (dim1 > dim3) {
+      // If first dimension > third dimension, assume: height x depth x width
+      height = dim1;
+      depth = dim2;  
+      width = dim3;
+    } else {
+      // Standard case: length x width x height → width x height x depth
+      width = dim2;   // width (smaller horizontal dimension)
+      height = dim1;  // height (larger dimension)
+      depth = dim3;   // depth (thickness)
+    }
+    
+    // Ensure books are portrait (height > width) for typical books
+    if (width > height && height > 4) { // Don't swap for very thin books
+      [width, height] = [height, width];
+    }
+    
+    // Debug logging for "Offshore" book specifically
+    if (book.title?.includes("Offshore")) {
+      console.log('Offshore dimensions debug:', {
+        original: book.dimensions,
+        parsed: { dim1, dim2, dim3 },
+        final: { width, height, depth }
+      });
+    }
     
     // Check if units are explicitly mentioned, then convert appropriately
     const isMetric = /cm|centimeter|millimeter/i.test(book.dimensions);
