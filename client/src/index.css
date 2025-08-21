@@ -125,7 +125,7 @@
 
 @layer components {
   .book-3d {
-    perspective: 1000px;
+    perspective: 1200px;
     max-width: 250px;
     margin: 0 auto;
     cursor: pointer;
@@ -136,13 +136,37 @@
     transform-style: preserve-3d;
     transform: rotateY(-25deg);
     transition: transform 0.8s ease;
+    /* Layered realistic shadows */
+    box-shadow:
+      0 6px 10px rgba(0,0,0,.18),   /* ambient occlusion */
+      0 24px 40px -20px rgba(0,0,0,.35); /* directional cast shadow */
   }
 
   .book-3d:hover .book-3d__inner {
     transform: rotateY(0deg);
+    /* Enhanced shadows on hover */
+    box-shadow:
+      0 8px 15px rgba(0,0,0,.22),   /* stronger ambient */
+      0 30px 50px -20px rgba(0,0,0,.4); /* longer cast shadow */
   }
 
-  /* Book Pages - using pseudo-element */
+  /* Contact shadow using a separate element wrapper */
+  .book-3d::before {
+    content: "";
+    position: absolute;
+    top: auto;
+    left: -8%;
+    right: -8%;
+    bottom: -10%;
+    height: 22px;
+    background: radial-gradient(50% 100% at 50% 0,
+                rgba(0,0,0,.35), rgba(0,0,0,0) 70%);
+    transform: translateZ(-1px);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Book Pages - using ::before on inner element */
   .book-3d__inner::before {
     position: absolute;
     content: ' ';

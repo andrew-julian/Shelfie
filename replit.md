@@ -8,6 +8,13 @@ BookCatalog is a full-stack digital library management application that allows u
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Enhancements
+
+### Book Visual Realism (August 2025)
+- **Paper Texture**: Added SVG fractal noise overlay to simulate printed paper grain on book covers
+- **Realistic Shadows**: Implemented layered shadow system with ambient occlusion and contact shadows
+- **Rapid Scanning Queue**: Created non-blocking queue system for continuous book scanning without waiting for API calls
+
 ## System Architecture
 
 ### Frontend Architecture
