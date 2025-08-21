@@ -43,6 +43,7 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 - **Keyboard Navigation**: Progressive chunk mounting when navigating with arrow keys through virtualized content
 - **No Collision Detection**: Eliminated O(n²) AABB collision checks in favor of gap-aware jitter clamping during placement
 - **Single DOM Commit**: Reflow cost dominated by single pass calculation and one DOM update, even with 1,000+ books
+- **Single DOM Commit**: Reflow cost dominated by single pass calculation and one DOM update, even with 1,000+ books
 
 ### Book Visual Realism (August 2025)
 - **Paper Texture**: Added SVG fractal noise overlay to simulate printed paper grain on book covers

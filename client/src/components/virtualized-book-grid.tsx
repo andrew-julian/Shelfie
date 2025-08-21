@@ -155,7 +155,7 @@ export default function VirtualizedBookGrid({
           chunk.items.some(item => item.id === nextItem.id)
         );
         if (containingChunk) {
-          setVisibleChunks(prev => new Set([...prev, containingChunk.id]));
+          setVisibleChunks(prev => new Set([...Array.from(prev), containingChunk.id]));
         }
         
         // Scroll to item if needed

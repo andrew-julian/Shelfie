@@ -20,6 +20,7 @@ import {
   type LayoutConfig as EngineConfig 
 } from '@/layout/BookScanLayoutEngine';
 import VirtualizedBookGrid from '@/components/virtualized-book-grid';
+import { usePerformanceTelemetry } from '@/hooks/usePerformanceTelemetry';
 
 type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
@@ -61,6 +62,9 @@ export default function Home() {
   const [showFilters, setShowFilters] = useState(false);
   const [tidyMode, setTidyMode] = useState(false);
   const [useVirtualization, setUseVirtualization] = useState(false);
+  
+  // Performance telemetry
+  const { measureLayout, scheduleCommit } = usePerformanceTelemetry();
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -215,13 +219,17 @@ export default function Home() {
     return normaliseBooks(layoutBooks, responsiveConfig.BASE_HEIGHT);
   }, [finalBooks, responsiveConfig.BASE_HEIGHT]);
 
-  // Memoized layout calculation using new engine
+  // Memoized layout calculation using new engine with performance measurement
   const newLayoutItems = useMemo(() => {
     if (finalBooks.length === 0 || containerDimensions.width === 0) return [];
     
     const layoutBooks = convertToLayoutBooks(finalBooks);
-    return calculateLayout(layoutBooks, normalizedDimensions, containerDimensions.width, responsiveConfig);
-  }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig.targetRowHeight, responsiveConfig.gutterX, responsiveConfig.gutterY, responsiveConfig.raggedLastRow]);
+    return measureLayout(
+      () => calculateLayout(layoutBooks, normalizedDimensions, containerDimensions.width, responsiveConfig),
+      finalBooks.length,
+      'BookScan Layout Engine'
+    );
+  }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig.targetRowHeight, responsiveConfig.gutterX, responsiveConfig.gutterY, responsiveConfig.raggedLastRow, measureLayout]);
 
   // Legacy dimension calculation (no longer used with new layout engine)
   // Kept for reference but replaced by the headless layout engine
@@ -425,22 +433,17 @@ export default function Home() {
                 return (
                   <div
                     key={item.id}
-                    className="absolute transition-all duration-700 ease-out"
+                    className="absolute"
                     style={{
-                      '--x': `${item.x}px`,
-                      '--y': `${item.y}px`,
-                      '--z': item.z,
-                      '--w': `${item.w}px`,
-                      '--h': `${item.h}px`,
-                      '--d': `${item.d}px`,
-                      '--ry': `${tidyMode ? 0 : item.ry}deg`,
-                      left: `var(--x)`,
-                      top: `var(--y)`,
+                      left: `${item.x}px`,
+                      top: `${item.y}px`,
                       zIndex: Math.round(item.z * 100),
-                      transform: `rotateY(var(--ry))`,
-                      width: `var(--w)`,
-                      height: `var(--h)`
-                    } as React.CSSProperties}
+                      transform: `rotateY(${tidyMode ? 0 : item.ry}deg)`,
+                      width: `${item.w}px`,
+                      height: `${item.h}px`,
+                      transition: 'transform 0.7s ease-out',
+                      willChange: 'transform'
+                    }}
                   >
                     <BookCard
                       book={book}
