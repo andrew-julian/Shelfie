@@ -3,6 +3,69 @@
 @tailwind components;
 @tailwind utilities;
 
+/* GPU-Friendly 3D Book Presentation */
+.stage, .bookstage {
+  perspective: 1200px;
+  perspective-origin: 50% 40%;
+  transform-style: preserve-3d;
+}
+
+.book {
+  position: absolute;
+  width: var(--w); 
+  height: var(--h);
+  transform: translate3d(var(--x), var(--y), var(--z)) rotateY(var(--ry));
+  transform-origin: 50% 50%;
+  will-change: transform;
+  content-visibility: auto;
+  contain: layout paint size;
+  background: center/cover no-repeat var(--cover);
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+
+.book::before { /* spine */ 
+  content: "";
+  position: absolute; 
+  left: 0; 
+  top: 0; 
+  height: 100%;
+  width: var(--d);
+  transform: translateX(calc(var(--d) * -0.5)) rotateY(90deg);
+  transform-origin: left center;
+  background: var(--spine, var(--cover));
+  filter: brightness(.95);
+  border-radius: 2px;
+}
+
+.book::after { /* page block hint */
+  content: "";
+  position: absolute; 
+  right: 0; 
+  top: 2px; 
+  bottom: 2px; 
+  width: 3px;
+  background: linear-gradient(90deg,#eee,#f8f8f8 50%,#e9e9e9);
+  opacity: .85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book { 
+    transform: translate3d(var(--x), var(--y), 0) rotateY(0deg) !important; 
+  }
+}
+
+/* Enhance book hover effects for 3D presentation */
+.book:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,.3);
+}
+
+.book:hover::before {
+  filter: brightness(.9);
+}
+
+
+
 /* Prevent horizontal scrolling and ensure full-width mobile layout */
 html, body {
   overflow-x: hidden;
@@ -27,6 +90,10 @@ body {
   --sky-blue: #449CFF;
   --light-grey: #F8F9FA;
   --medium-grey: #6C757D;
+  
+  /* Default cover and spine colors for books without images */
+  --default-cover: linear-gradient(135deg, #4a5568, #2d3748);
+  --default-spine: linear-gradient(135deg, #2d3748, #1a202c);
   
   /* Updated System Colors */
   --background: #FFFFFF;

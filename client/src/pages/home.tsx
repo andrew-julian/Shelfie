@@ -358,7 +358,7 @@ export default function Home() {
         ) : finalBooks.length > 0 ? (
           <div 
             ref={containerRef}
-            className="relative w-full" 
+            className="relative w-full stage" 
             style={{ 
               minHeight: `${Math.max(400, layoutItems.reduce((max, item) => Math.max(max, item.y + item.h + 40), 400))}px` 
             }}
@@ -371,33 +371,29 @@ export default function Home() {
               return (
                 <div
                   key={item.id}
-                  className="absolute transition-all duration-700 ease-out"
+                  className="book transition-all duration-700 ease-out"
                   style={{
                     '--x': `${item.x}px`,
                     '--y': `${item.y}px`,
-                    '--z': item.z,
+                    '--z': `${item.z}px`,
                     '--w': `${item.w}px`,
                     '--h': `${item.h}px`,
                     '--d': `${item.d}px`,
                     '--ry': `${tidyMode ? 0 : item.ry}deg`,
-                    left: `var(--x)`,
-                    top: `var(--y)`,
-                    zIndex: Math.round(item.z * 100),
-                    transform: `rotateY(var(--ry))`,
-                    width: `var(--w)`,
-                    height: `var(--h)`
+                    '--cover': book.coverImage ? `url(${book.coverImage})` : 'var(--default-cover)',
+                    '--spine': book.coverImage ? `url(${book.coverImage})` : 'var(--default-spine)',
+                    zIndex: Math.round(item.z * 100)
                   } as React.CSSProperties}
+                  onClick={() => handleBookSelect(book)}
+                  data-testid={`card-book-${book.id}`}
                 >
-                  <BookCard
-                    book={book}
-                    onSelect={handleBookSelect}
-                    onUpdate={handleBookUpdate}
-                    customDimensions={{
-                      width: item.w,
-                      height: item.h,
-                      depth: item.d
-                    }}
-                  />
+                  {/* Book content now handled by CSS pseudo-elements */}
+                  {!book.coverImage && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-700 text-white text-xs p-2 rounded">
+                      <BookOpen className="w-6 h-6 mb-1" />
+                      <span className="text-center leading-tight">{book.title}</span>
+                    </div>
+                  )}
                 </div>
               );
             })}
