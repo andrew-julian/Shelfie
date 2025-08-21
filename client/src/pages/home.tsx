@@ -146,18 +146,11 @@ export default function Home() {
 
   // Book dimensions calculation function with responsive scaling
   const getBookDimensions = (book: Book) => {
-    // Responsive scale based on container width - ensures 2+ columns minimum
+    // Responsive scale based on container width - mobile-first approach
     const getResponsiveScale = (containerWidth: number) => {
-      // Calculate optimal scale for 2-column layout with proper sizing
-      const padding = containerWidth <= 390 ? 24 : 32;
-      const minSpacing = containerWidth <= 390 ? 16 : 20;
-      const availableWidth = containerWidth - (padding * 2);
-      const maxBookWidth = (availableWidth - minSpacing) / 2;
-      
       if (containerWidth <= 390) {
-        // Mobile: scale to use most of available space while fitting 2 books
-        const calculatedScale = (maxBookWidth / 140) * 22;
-        return Math.max(Math.min(calculatedScale, 24), 18); // Range: 18-24
+        // Mobile: fixed scale that ensures clean 2-column layout
+        return 20; // Conservative scale for reliable mobile layout
       }
       if (containerWidth <= 600) return 34; // Narrow desktop: large books  
       if (containerWidth <= 800) return 30; // Medium-narrow: medium-large books
@@ -207,9 +200,9 @@ export default function Home() {
   // Calculate dynamic layout when books or container changes
   useEffect(() => {
     if (finalBooks.length > 0 && containerDimensions.width > 0) {
-      // Responsive spacing based on screen width - optimized for mobile centering
+      // Responsive spacing based on screen width - fixed mobile spacing
       const getResponsiveSpacing = (containerWidth: number) => {
-        if (containerWidth <= 390) return { padding: 24, minSpacing: 16 }; // Mobile: balanced spacing for centering
+        if (containerWidth <= 390) return { padding: 20, minSpacing: 20 }; // Mobile: generous spacing for clean layout
         if (containerWidth <= 600) return { padding: 18, minSpacing: 20 }; // Narrow: tight spacing
         if (containerWidth <= 800) return { padding: 22, minSpacing: 24 }; // Medium-narrow: medium spacing
         if (containerWidth <= 1024) return { padding: 26, minSpacing: 26 }; // Small desktop: medium spacing
