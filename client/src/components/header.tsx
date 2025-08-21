@@ -3,7 +3,7 @@ import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
 
-type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added';
+type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
 
 interface HeaderProps {
@@ -78,6 +78,7 @@ export default function Header({
                 <option value="author-desc">Author Z-A</option>
                 <option value="status">Status</option>
                 <option value="date-added">Date Added</option>
+                <option value="color">Colour Sort</option>
               </select>
               <SortAsc className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>

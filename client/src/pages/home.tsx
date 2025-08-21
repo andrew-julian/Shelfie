@@ -9,9 +9,74 @@ import { useAuth } from "@/hooks/useAuth";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Book } from "@shared/schema";
 import { BookOpen, Camera, Book as BookIcon, Eye, CheckCircle } from "lucide-react";
+import { getCachedDominantColor } from "@/utils/color-extractor";
 
-type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added';
+type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
+
+// Helper function to convert hex color to HSL for better color sorting
+function hexToHsl(hex: string): { h: number; s: number; l: number } {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+
+  return { h: h * 360, s: s * 100, l: l * 100 };
+}
+
+// Function to sort books by color aesthetically
+async function sortBooksByColor(books: Book[]): Promise<Book[]> {
+  // Get colors for all books
+  const booksWithColors = await Promise.all(
+    books.map(async (book) => {
+      let color = '#2d3748'; // default
+      if (book.coverImage) {
+        try {
+          color = await getCachedDominantColor(book.coverImage);
+        } catch (e) {
+          // Use default color if extraction fails
+        }
+      }
+      const hsl = hexToHsl(color);
+      return { book, color, hsl };
+    })
+  );
+
+  // Sort by aesthetic appeal: group similar hues, then by saturation and lightness
+  return booksWithColors
+    .sort((a, b) => {
+      // First sort by hue groups (creating color families)
+      const hueA = Math.floor(a.hsl.h / 30) * 30; // Group into 30-degree segments
+      const hueB = Math.floor(b.hsl.h / 30) * 30;
+      
+      if (hueA !== hueB) {
+        return hueA - hueB;
+      }
+      
+      // Within same hue group, sort by saturation (vivid colors first)
+      if (Math.abs(a.hsl.s - b.hsl.s) > 20) {
+        return b.hsl.s - a.hsl.s;
+      }
+      
+      // Finally by lightness (lighter to darker)
+      return a.hsl.l - b.hsl.l;
+    })
+    .map(item => item.book);
+}
 
 export default function Home() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -62,7 +127,12 @@ export default function Home() {
       filtered = filtered.filter(book => book.status === filterStatus);
     }
 
-    // Sort books
+    // Handle color sorting separately since it's async
+    if (sortBy === 'color') {
+      return filtered; // Will be sorted by useEffect below
+    }
+
+    // Sort books for other sort options
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'title-asc':
@@ -85,6 +155,23 @@ export default function Home() {
 
     return filtered;
   }, [allBooks, searchTerm, filterStatus, sortBy]);
+
+  // Handle color sorting with state
+  const [colorSortedBooks, setColorSortedBooks] = useState<Book[]>([]);
+  const [isColorSorting, setIsColorSorting] = useState(false);
+
+  useEffect(() => {
+    if (sortBy === 'color' && books.length > 0) {
+      setIsColorSorting(true);
+      sortBooksByColor(books).then(sorted => {
+        setColorSortedBooks(sorted);
+        setIsColorSorting(false);
+      });
+    }
+  }, [sortBy, books]);
+
+  // Use color-sorted books when appropriate
+  const finalBooks = sortBy === 'color' ? colorSortedBooks : books;
 
 
   
@@ -145,7 +232,7 @@ export default function Home() {
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
       <Header 
         booksCount={allBooks.length}
-        filteredCount={books.length}
+        filteredCount={finalBooks.length}
         onRefreshAll={() => refreshAllMutation.mutate()}
         isRefreshing={refreshAllMutation.isPending}
         searchTerm={searchTerm}
@@ -167,23 +254,23 @@ export default function Home() {
           </p>
           
           {/* Horizontal Tracker Bar */}
-          {books.length > 0 && (
+          {finalBooks.length > 0 && (
             <div className="inline-flex items-center gap-4 sm:gap-8 bg-white rounded-full px-4 sm:px-8 py-3 sm:py-4 shadow-sm border border-gray-100">
               <div className="flex items-center gap-1 sm:gap-2 text-gray-700">
                 <BookIcon className="w-4 h-4 sm:w-5 sm:h-5 text-coral-red" />
-                <span className="font-semibold text-base sm:text-lg">{books.length}</span>
+                <span className="font-semibold text-base sm:text-lg">{finalBooks.length}</span>
                 <span className="text-xs sm:text-sm text-gray-500">books</span>
               </div>
               <div className="w-px h-4 sm:h-6 bg-gray-200" />
               <div className="flex items-center gap-1 sm:gap-2 text-gray-700">
                 <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-                <span className="font-semibold text-base sm:text-lg">{books.filter(b => b.status === 'read').length}</span>
+                <span className="font-semibold text-base sm:text-lg">{finalBooks.filter(b => b.status === 'read').length}</span>
                 <span className="text-xs sm:text-sm text-gray-500">read</span>
               </div>
               <div className="w-px h-4 sm:h-6 bg-gray-200" />
               <div className="flex items-center gap-1 sm:gap-2 text-gray-700">
                 <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-sky-blue" />
-                <span className="font-semibold text-base sm:text-lg">{books.filter(b => b.status === 'reading').length}</span>
+                <span className="font-semibold text-base sm:text-lg">{finalBooks.filter(b => b.status === 'reading').length}</span>
                 <span className="text-xs sm:text-sm text-gray-500">reading</span>
               </div>
             </div>
@@ -191,7 +278,7 @@ export default function Home() {
         </div>
 
         {/* Books Grid */}
-        {booksLoading ? (
+        {booksLoading || (sortBy === 'color' && isColorSorting) ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 md:gap-8 justify-items-center">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="group">
@@ -200,9 +287,9 @@ export default function Home() {
               </div>
             ))}
           </div>
-        ) : books.length > 0 ? (
+        ) : finalBooks.length > 0 ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 md:gap-8 justify-items-center items-center" data-testid="books-grid">
-            {books.map((book) => (
+            {finalBooks.map((book) => (
               <BookCard
                 key={book.id}
                 book={book}
@@ -234,7 +321,7 @@ export default function Home() {
       </main>
 
       {/* Floating Action Button */}
-      {books.length > 0 && (
+      {finalBooks.length > 0 && (
         <button
           onClick={() => setIsScannerOpen(true)}
           className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 bg-coral-red hover:bg-red-600 text-white p-3 sm:p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 z-50"
