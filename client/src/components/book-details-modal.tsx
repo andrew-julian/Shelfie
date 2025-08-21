@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -23,6 +24,18 @@ const statusConfig = {
 
 export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: BookDetailsModalProps) {
   const { toast } = useToast();
+  
+  // Track the current cover state within the modal
+  const [currentCoverIndex, setCurrentCoverIndex] = useState(book?.selectedCoverIndex || 0);
+  const [currentCoverImage, setCurrentCoverImage] = useState(book?.coverImage || '');
+  
+  // Update local state when book prop changes (modal opens with new book)
+  useEffect(() => {
+    if (book) {
+      setCurrentCoverIndex(book.selectedCoverIndex || 0);
+      setCurrentCoverImage(book.coverImage || '');
+    }
+  }, [book]);
 
   const updateStatusMutation = useMutation({
     mutationFn: async (newStatus: string) => {
@@ -73,7 +86,13 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
       
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data, selectedCoverIndex) => {
+      // Update local state immediately for responsive UI
+      if (book?.coverImages && book.coverImages[selectedCoverIndex]) {
+        setCurrentCoverIndex(selectedCoverIndex);
+        setCurrentCoverImage(book.coverImages[selectedCoverIndex]);
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['/api/books'] });
       onUpdate();
       toast({
@@ -160,7 +179,7 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
       return null;
     }
 
-    const currentIndex = book.selectedCoverIndex || 0;
+    const currentIndex = currentCoverIndex;
 
     return (
       <div className={`${className}`}>
@@ -226,9 +245,9 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
           <div className="flex gap-4">
             {/* Mobile Book Cover - Smaller */}
             <div className="flex-shrink-0 w-24 sm:w-32">
-              {book.coverImage ? (
+              {currentCoverImage ? (
                 <img 
-                  src={book.coverImage} 
+                  src={currentCoverImage} 
                   alt={`${book.title} book cover`}
                   className="w-full rounded-lg shadow-lg"
                   data-testid="img-book-cover-mobile"
@@ -275,9 +294,9 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
           {/* Left Column - Cover Image (Desktop Only) */}
           <div className="lg:col-span-1 hidden md:block">
             <div className="sticky top-4">
-              {book.coverImage ? (
+              {currentCoverImage ? (
                 <img 
-                  src={book.coverImage} 
+                  src={currentCoverImage} 
                   alt={`${book.title} book cover`}
                   className="w-full rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300"
                   data-testid="img-book-cover"
