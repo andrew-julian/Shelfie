@@ -9,73 +9,37 @@ import { useAuth } from "@/hooks/useAuth";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Book } from "@shared/schema";
 import { BookOpen, Camera, Book as BookIcon, Eye, CheckCircle } from "lucide-react";
-import { getCachedDominantColor } from "@/utils/color-extractor";
+import { analyzeImageColors, sortBooksByOverallColor } from "@/utils/color-sort";
 
 type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
 
-// Helper function to convert hex color to HSL for better color sorting
-function hexToHsl(hex: string): { h: number; s: number; l: number } {
-  const r = parseInt(hex.slice(1, 3), 16) / 255;
-  const g = parseInt(hex.slice(3, 5), 16) / 255;
-  const b = parseInt(hex.slice(5, 7), 16) / 255;
-
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  let h = 0, s = 0, l = (max + min) / 2;
-
-  if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-    h /= 6;
-  }
-
-  return { h: h * 360, s: s * 100, l: l * 100 };
-}
-
-// Function to sort books by color aesthetically
+// Function to sort books by overall visual color profile
 async function sortBooksByColor(books: Book[]): Promise<Book[]> {
-  // Get colors for all books
-  const booksWithColors = await Promise.all(
+  // Analyze color profiles for all books
+  const booksWithProfiles = await Promise.all(
     books.map(async (book) => {
-      let color = '#2d3748'; // default
+      let profile = {
+        averageLightness: 50,
+        dominantHue: 0,
+        colorfulness: 50,
+        warmth: 0
+      };
+      
       if (book.coverImage) {
         try {
-          color = await getCachedDominantColor(book.coverImage);
+          profile = await analyzeImageColors(book.coverImage);
         } catch (e) {
-          // Use default color if extraction fails
+          // Use default profile if analysis fails
         }
       }
-      const hsl = hexToHsl(color);
-      return { book, color, hsl };
+      
+      return { book, profile };
     })
   );
 
-  // Sort by aesthetic appeal: group similar hues, then by saturation and lightness
-  return booksWithColors
-    .sort((a, b) => {
-      // First sort by hue groups (creating color families)
-      const hueA = Math.floor(a.hsl.h / 30) * 30; // Group into 30-degree segments
-      const hueB = Math.floor(b.hsl.h / 30) * 30;
-      
-      if (hueA !== hueB) {
-        return hueA - hueB;
-      }
-      
-      // Within same hue group, sort by saturation (vivid colors first)
-      if (Math.abs(a.hsl.s - b.hsl.s) > 20) {
-        return b.hsl.s - a.hsl.s;
-      }
-      
-      // Finally by lightness (lighter to darker)
-      return a.hsl.l - b.hsl.l;
-    })
-    .map(item => item.book);
+  // Sort by overall visual appeal and color harmony
+  return sortBooksByOverallColor(booksWithProfiles);
 }
 
 export default function Home() {
