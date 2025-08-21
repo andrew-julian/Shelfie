@@ -39,8 +39,8 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
               // Skip transparent pixels
               if (a < 128) continue;
               
-              // Skip pure white pixels but allow off-white/cream colors
-              if (r > 250 && g > 250 && b > 250) continue;
+              // Skip only pure white pixels (255,255,255) but allow off-white/cream colors
+              if (r === 255 && g === 255 && b === 255) continue;
               
               // Convert to single number for frequency counting
               samples.push((r << 16) | (g << 8) | b);
@@ -61,7 +61,7 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
               const a = pixel[3];
               
               if (a < 128) continue;
-              if (r > 250 && g > 250 && b > 250) continue;
+              if (r === 255 && g === 255 && b === 255) continue;
               
               samples.push((r << 16) | (g << 8) | b);
             } catch (e) {
@@ -81,7 +81,7 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
               const a = pixel[3];
               
               if (a < 128) continue;
-              if (r > 250 && g > 250 && b > 250) continue;
+              if (r === 255 && g === 255 && b === 255) continue;
               
               samples.push((r << 16) | (g << 8) | b);
             } catch (e) {
@@ -101,7 +101,7 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
               const a = pixel[3];
               
               if (a < 128) continue;
-              if (r > 250 && g > 250 && b > 250) continue;
+              if (r === 255 && g === 255 && b === 255) continue;
               
               samples.push((r << 16) | (g << 8) | b);
             } catch (e) {
@@ -111,7 +111,8 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
         }
         
         if (samples.length === 0) {
-          resolve('#2d3748'); // Fallback if no samples
+          // If no valid samples, create a subtle off-white spine color
+          resolve('#f7f7f5'); // Light gray fallback that works for white covers
           return;
         }
         
@@ -137,13 +138,36 @@ export const extractDominantColor = async (imageUrl: string): Promise<string> =>
         let g = ((dominantColor >> 8) & 255);
         let b = (dominantColor & 255);
         
-        // For light colors, darken less aggressively to avoid making white covers black
+        // Smart darkening strategy based on the lightness of the dominant color
         const lightness = (r + g + b) / 3;
-        const darkenFactor = lightness > 200 ? 0.92 : 0.8; // Less darkening for light colors
+        let darkenFactor;
+        
+        if (lightness > 230) {
+          // Very light colors: minimal darkening to preserve the light aesthetic
+          darkenFactor = 0.95;
+        } else if (lightness > 200) {
+          // Light colors: gentle darkening
+          darkenFactor = 0.88;
+        } else if (lightness > 150) {
+          // Medium colors: moderate darkening
+          darkenFactor = 0.82;
+        } else {
+          // Dark colors: standard darkening
+          darkenFactor = 0.75;
+        }
         
         r = Math.floor(r * darkenFactor);
         g = Math.floor(g * darkenFactor);
         b = Math.floor(b * darkenFactor);
+        
+        // Ensure minimum contrast: if the result is too light, darken further
+        const finalLightness = (r + g + b) / 3;
+        if (finalLightness > 200) {
+          const additionalDarkening = 0.9;
+          r = Math.floor(r * additionalDarkening);
+          g = Math.floor(g * additionalDarkening);
+          b = Math.floor(b * additionalDarkening);
+        }
         
         resolve(`rgb(${r}, ${g}, ${b})`);
         
