@@ -138,7 +138,6 @@ const statusConfig = {
 };
 
 export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
   const { toast } = useToast();
   
   // Calculate book dimensions based on real-world data
@@ -207,8 +206,6 @@ export default function BookCard({ book, onSelect, onUpdate }: BookCardProps) {
       <div 
         className="book-3d cursor-pointer"
         onClick={() => onSelect(book)}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         data-testid={`card-book-${book.id}`}
         style={{
           '--book-thickness': `${bookDimensions.depth * 0.4}px`,
