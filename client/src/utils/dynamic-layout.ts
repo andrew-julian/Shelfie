@@ -28,7 +28,7 @@ export function calculateDynamicLayout(
   const positions: BookPosition[] = [];
   const rows: Array<{ books: Book[]; totalWidth: number; height: number }> = [];
   
-  // First pass: organize books into rows
+  // First pass: organize books into rows with minimum 2 books per row
   let currentRow: Book[] = [];
   let currentRowWidth = 0;
   let currentRowHeight = 0;
@@ -40,7 +40,10 @@ export function calculateDynamicLayout(
     
     // Check if book fits on current row
     const spaceNeeded = currentRowWidth + (currentRow.length > 0 ? config.minSpacing : 0) + bookWidth;
-    if (spaceNeeded > config.containerWidth - (config.padding * 2) && currentRow.length > 0) {
+    const availableWidth = config.containerWidth - (config.padding * 2);
+    
+    // Only break to new row if we have at least 2 books AND it doesn't fit
+    if (spaceNeeded > availableWidth && currentRow.length >= 2) {
       // Save current row and start new one
       rows.push({
         books: [...currentRow],

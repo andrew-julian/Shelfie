@@ -146,9 +146,18 @@ export default function Home() {
 
   // Book dimensions calculation function with responsive scaling
   const getBookDimensions = (book: Book) => {
-    // Responsive scale based on container width - optimized for mobile layout
+    // Responsive scale based on container width - ensures 2+ columns minimum
     const getResponsiveScale = (containerWidth: number) => {
-      if (containerWidth <= 390) return 19; // Mobile: smaller books for 2-column layout
+      // Calculate scale to ensure at least 2 books fit per row
+      const availableWidth = containerWidth - 48; // Account for padding (24px each side)
+      const minSpacing = 14;
+      const maxBookWidth = (availableWidth - minSpacing) / 2; // Force 2-column minimum
+      
+      if (containerWidth <= 390) {
+        // Mobile: ensure 2 books fit comfortably
+        const mobileScale = Math.min(19, maxBookWidth / 140 * 22);
+        return Math.max(mobileScale, 16); // Never go below 16 scale
+      }
       if (containerWidth <= 600) return 34; // Narrow desktop: large books  
       if (containerWidth <= 800) return 30; // Medium-narrow: medium-large books
       if (containerWidth <= 1024) return 26; // Small desktop: medium books
