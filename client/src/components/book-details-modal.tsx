@@ -307,7 +307,10 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
                 {currentCoverImage && (
                   <div className="absolute top-1 right-1">
                     <Button
-                      onClick={() => setShowCropper(true)}
+                      onClick={() => {
+                        console.log('Opening crop modal with image:', currentCoverImage);
+                        setShowCropper(true);
+                      }}
                       size="sm"
                       variant="secondary"
                       className="bg-white/90 hover:bg-white text-gray-700 shadow-md h-5 w-5 p-0"
@@ -376,7 +379,10 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
                 {currentCoverImage && (
                   <div className="absolute top-3 right-3">
                     <Button
-                      onClick={() => setShowCropper(true)}
+                      onClick={() => {
+                        console.log('Opening crop modal with image:', currentCoverImage);
+                        setShowCropper(true);
+                      }}
                       size="sm"
                       variant="secondary"
                       className="bg-white/90 hover:bg-white text-gray-700 shadow-md"

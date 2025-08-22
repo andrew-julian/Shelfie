@@ -29,12 +29,14 @@ export function ImageCropper({ isOpen, onClose, imageUrl, onCropComplete }: Imag
 
   useEffect(() => {
     if (isOpen && imageUrl) {
+      console.log('ImageCropper: Starting to load image:', imageUrl);
       setIsLoading(true);
       setImageLoaded(false);
       setHasError(false);
       
       const img = new Image();
       img.onload = () => {
+        console.log('ImageCropper: Image loaded successfully');
         if (canvasRef.current) {
           const canvas = canvasRef.current;
           const ctx = canvas.getContext('2d');
@@ -65,11 +67,15 @@ export function ImageCropper({ isOpen, onClose, imageUrl, onCropComplete }: Imag
           
           setImageLoaded(true);
           setIsLoading(false);
-          drawCanvas();
+          
+          // Use setTimeout to ensure the state update has happened
+          setTimeout(() => {
+            drawCanvas();
+          }, 0);
         }
       };
-      img.onerror = () => {
-        console.error('Failed to load image for cropping:', imageUrl);
+      img.onerror = (e) => {
+        console.error('Failed to load image for cropping:', imageUrl, e);
         setIsLoading(false);
         setHasError(true);
       };
@@ -78,17 +84,31 @@ export function ImageCropper({ isOpen, onClose, imageUrl, onCropComplete }: Imag
   }, [isOpen, imageUrl]);
 
   useEffect(() => {
-    if (imageLoaded) {
+    if (imageLoaded && imageElement && canvasRef.current) {
       drawCanvas();
     }
-  }, [cropArea, imageLoaded]);
+  }, [cropArea, imageLoaded, imageElement]);
 
   const drawCanvas = () => {
-    if (!canvasRef.current || !imageElement) return;
+    console.log('drawCanvas called', { 
+      canvasRef: !!canvasRef.current, 
+      imageElement: !!imageElement,
+      cropArea 
+    });
+    
+    if (!canvasRef.current || !imageElement) {
+      console.log('drawCanvas: Missing canvas or image element');
+      return;
+    }
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.log('drawCanvas: Failed to get canvas context');
+      return;
+    }
+    
+    console.log('drawCanvas: Drawing image with canvas size:', canvas.width, 'x', canvas.height);
     
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
