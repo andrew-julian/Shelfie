@@ -379,23 +379,28 @@ export default function Home() {
 
   // Memoized layout calculation using new engine with performance measurement
   const newLayoutItems = useMemo(() => {
-    // Use fallback width if container hasn't been measured yet but we have books
-    const effectiveWidth = containerDimensions.width > 0 ? containerDimensions.width : 1200;
-    const canCalculateLayout = finalBooks.length > 0 && (isContainerMeasured || effectiveWidth > 0);
-    
-    if (!canCalculateLayout) {
-      console.log('Layout calculation skipped:', { 
-        booksCount: finalBooks.length, 
-        containerMeasured: isContainerMeasured, 
-        containerWidth: containerDimensions.width,
-        effectiveWidth,
-        canCalculateLayout
-      });
+    // Only use measured width to ensure consistent centering - wait for measurement if needed
+    if (finalBooks.length === 0) {
       return [];
     }
     
+    // For small screens (mobile), use a more conservative fallback to prevent overflow
+    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const conservativeFallback = Math.min(screenWidth - 40, 800); // Account for mobile padding
+    
+    const effectiveWidth = isContainerMeasured && containerDimensions.width > 0 
+      ? containerDimensions.width 
+      : conservativeFallback;
+    
+    console.log('Layout calculation:', { 
+      booksCount: finalBooks.length, 
+      containerMeasured: isContainerMeasured, 
+      containerWidth: containerDimensions.width,
+      effectiveWidth,
+      screenWidth
+    });
+    
     const layoutBooks = convertToLayoutBooks(finalBooks);
-    console.log('Calculating layout with container width:', effectiveWidth, 'measured:', isContainerMeasured);
     return measureLayout(
       () => calculateLayout(layoutBooks, normalizedDimensions, effectiveWidth, responsiveConfig),
       finalBooks.length,
@@ -622,7 +627,7 @@ export default function Home() {
         </div>
 
         {/* Dynamic Books Layout */}
-        {booksLoading || ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && isColorSorting) || newLayoutItems.length === 0 ? (
+        {booksLoading || ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && isColorSorting) || (finalBooks.length > 0 && newLayoutItems.length === 0) ? (
           <div className="relative min-h-96" style={{ minHeight: '400px' }}>
             {[...Array(6)].map((_, i) => (
               <div 

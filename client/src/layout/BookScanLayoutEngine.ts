@@ -219,9 +219,9 @@ function processRow(
     x += w + cfg.gutterX;
   }
   
-  // Calculate row centering offset
+  // Calculate row centering offset with better precision
   const totalRowWidth = x - cfg.gutterX; // Remove last gutter
-  const centerOffset = (containerWidth - totalRowWidth) / 2;
+  const centerOffset = Math.max(0, (containerWidth - totalRowWidth) / 2);
   
   // Apply safe jitter that prevents overlaps
   for (let i = 0; i < nominalItems.length; i++) {
