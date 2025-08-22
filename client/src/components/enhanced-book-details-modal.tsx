@@ -757,12 +757,19 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                         Bestseller Rankings
                       </h3>
                       <div className="space-y-2">
-                        {Object.entries(extendedData.bestsellers_rank).map(([category, rank]: [string, any]) => (
-                          <div key={category} className="flex justify-between p-3 bg-gray-50 rounded">
-                            <span className="text-gray-600">{category}</span>
-                            <span className="font-medium">#{rank}</span>
-                          </div>
-                        ))}
+                        {Object.entries(extendedData.bestsellers_rank).map(([category, rankData]: [string, any]) => {
+                          // Handle different possible data structures for rank
+                          const rank = typeof rankData === 'object' 
+                            ? (rankData?.rank || rankData?.category || JSON.stringify(rankData))
+                            : rankData;
+                          
+                          return (
+                            <div key={category} className="flex justify-between p-3 bg-gray-50 rounded">
+                              <span className="text-gray-600">{category}</span>
+                              <span className="font-medium">#{rank}</span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
