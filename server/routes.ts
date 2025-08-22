@@ -59,10 +59,22 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
     if (remaining.length === 2) {
       const [smaller, larger] = remaining.sort((a, b) => a - b);
       
-      // Default assumption: books are usually portrait (height > width)
-      // Unless it's clearly a landscape format like coffee table books
-      width = smaller;
-      height = larger;
+      // Use the original order from Amazon to determine width vs height
+      // Find which of the original dimensions correspond to our smaller/larger values
+      const originalDims = [dim1, dim2, dim3];
+      const depthIndex = originalDims.indexOf(smallest);
+      const remainingOriginal = originalDims.filter((_, index) => index !== depthIndex);
+      
+      // Amazon typically lists dimensions as Width × Height × Depth
+      // So we should preserve the original relative order of the first two dimensions
+      if (remainingOriginal.length === 2) {
+        width = remainingOriginal[0];  // First dimension is width
+        height = remainingOriginal[1]; // Second dimension is height
+      } else {
+        // Fallback to the original logic if we can't determine order
+        width = smaller;
+        height = larger;
+      }
     } else {
       // Fallback if logic fails
       width = middle;
