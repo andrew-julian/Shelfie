@@ -366,6 +366,7 @@ export function CoverEditorModal({
                         alt="Crop preview"
                         className="w-full h-full object-contain"
                         draggable={false}
+                        crossOrigin="anonymous"
                       />
                       
                       {/* Draggable Crop Box */}
