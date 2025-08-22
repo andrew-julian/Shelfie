@@ -25,14 +25,15 @@ export function ImageCropper({ isOpen, onClose, imageUrl, onCropComplete }: Imag
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     if (isOpen && imageUrl) {
       setIsLoading(true);
       setImageLoaded(false);
+      setHasError(false);
       
       const img = new Image();
-      img.crossOrigin = "anonymous";
       img.onload = () => {
         if (canvasRef.current) {
           const canvas = canvasRef.current;
@@ -66,6 +67,11 @@ export function ImageCropper({ isOpen, onClose, imageUrl, onCropComplete }: Imag
           setIsLoading(false);
           drawCanvas();
         }
+      };
+      img.onerror = () => {
+        console.error('Failed to load image for cropping:', imageUrl);
+        setIsLoading(false);
+        setHasError(true);
       };
       img.src = imageUrl;
     }
@@ -232,6 +238,12 @@ export function ImageCropper({ isOpen, onClose, imageUrl, onCropComplete }: Imag
           {isLoading ? (
             <div className="flex items-center justify-center h-96">
               <div className="text-gray-500">Loading image...</div>
+            </div>
+          ) : hasError ? (
+            <div className="flex flex-col items-center justify-center h-96 gap-4">
+              <div className="text-red-500">Failed to load image</div>
+              <div className="text-sm text-gray-500">This image cannot be cropped due to security restrictions</div>
+              <Button onClick={onClose} variant="outline">Close</Button>
             </div>
           ) : (
             <>
