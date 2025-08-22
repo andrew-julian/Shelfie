@@ -221,7 +221,7 @@ export default function VirtualizedBookGrid({
                   '--ry': `${tidyMode ? 0 : item.ry}deg`,
                   left: `var(--x)`,
                   top: `var(--y)`,
-                  zIndex: Math.round(item.z * 100),
+                  zIndex: Math.min(Math.round(item.z * 100), 100),
                   transform: `rotateY(${tidyMode ? 0 : item.ry}deg)`,
                   transition: 'transform 220ms cubic-bezier(.2,.8,.2,1)',
                   width: `var(--w)`,

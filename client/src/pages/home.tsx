@@ -641,7 +641,7 @@ export default function Home() {
       {finalBooks.length > 0 && (
         <button
           onClick={() => setIsScannerOpen(true)}
-          className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 bg-coral-red hover:bg-red-600 text-white p-3 sm:p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 z-50"
+          className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 bg-coral-red hover:bg-red-600 text-white p-3 sm:p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 z-[9997]"
           data-testid="button-floating-scan"
         >
           <Camera className="w-6 h-6 sm:w-7 sm:h-7" />

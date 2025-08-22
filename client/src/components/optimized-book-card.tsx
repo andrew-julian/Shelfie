@@ -52,7 +52,7 @@ export default function OptimizedBookCard({
       
       // Apply all transforms in a single property update
       cardRef.current.style.transform = transform;
-      cardRef.current.style.zIndex = Math.round(position.z * 100).toString();
+      cardRef.current.style.zIndex = Math.min(Math.round(position.z * 100), 100).toString();
       
       if (customDimensions) {
         cardRef.current.style.width = `${customDimensions.width}px`;
