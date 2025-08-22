@@ -142,16 +142,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User switching for development/testing
+  // User switching for development/testing (skip auth check for this endpoint)
   app.post('/api/auth/switch-user/:userId', async (req: any, res) => {
     try {
       const { userId } = req.params;
       
+      console.log(`Attempting to switch to user: ${userId}`);
+      
       // Verify the user exists in the database
       const targetUser = await storage.getUser(userId);
       if (!targetUser) {
+        console.log(`User not found: ${userId}`);
         return res.status(400).json({ message: "User not found" });
       }
+
+      console.log(`Target user found:`, targetUser);
 
       // Create user claims based on database user
       const userClaims = {
@@ -164,13 +169,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
       };
 
-      // Update session with new user context
+      // Update the user object in the request
       req.user = {
         claims: userClaims,
         access_token: req.user?.access_token || 'dev-token-' + targetUser.id,
         refresh_token: req.user?.refresh_token || 'dev-refresh-' + targetUser.id,
         expires_at: userClaims.exp,
       };
+
+      // Also update the passport session user
+      if (req.session.passport) {
+        req.session.passport.user = req.user;
+      } else {
+        req.session.passport = { user: req.user };
+      }
+
+      console.log(`Updated session user:`, req.session.passport.user.claims);
 
       // Force session save to persist the user switch
       req.session.save((err: any) => {
@@ -179,7 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ message: "Failed to save session" });
         }
         
-        console.log(`User switched from ${req.session.passport?.user?.claims?.sub || 'unknown'} to ${targetUser.id}`);
+        console.log(`User successfully switched to ${targetUser.id} (${targetUser.firstName} - ${targetUser.email})`);
         res.json({ 
           message: "User switched successfully", 
           userId: targetUser.id,

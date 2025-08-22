@@ -295,12 +295,17 @@ function UserMenu() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        console.log('Fetching users for switcher...');
         const response = await fetch('/api/auth/users', {
           credentials: 'include'
         });
+        console.log('Users fetch response:', response.status);
         if (response.ok) {
           const users = await response.json();
+          console.log('Available users:', users);
           setAvailableUsers(users);
+        } else {
+          console.error('Failed to fetch users:', response.status, response.statusText);
         }
       } catch (error) {
         console.error('Failed to fetch users:', error);
@@ -314,7 +319,7 @@ function UserMenu() {
 
   const switchUser = async (targetUserId: string) => {
     try {
-      console.log(`Switching to user: ${targetUserId}`);
+      console.log(`Frontend: Switching to user: ${targetUserId}`);
       
       // Call server endpoint to switch user context
       const response = await fetch(`/api/auth/switch-user/${targetUserId}`, {
@@ -324,6 +329,8 @@ function UserMenu() {
           'Content-Type': 'application/json',
         },
       });
+      
+      console.log(`Switch response status: ${response.status}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -336,7 +343,7 @@ function UserMenu() {
         window.location.reload();
       } else {
         const errorData = await response.json();
-        console.error('Failed to switch user:', errorData);
+        console.error('Failed to switch user:', response.status, errorData);
       }
     } catch (error) {
       console.error('Error switching user:', error);
