@@ -119,16 +119,25 @@ const progressClients = new Map<string, Set<any>>();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Serve Scanbot SDK files statically (before auth middleware to avoid auth issues)
-  app.use('/scanbot-sdk', express.static(path.join(process.cwd(), 'client/public/scanbot-sdk'), {
-    maxAge: '1d',
-    setHeaders: (res, path) => {
-      if (path.endsWith('.js')) {
-        res.setHeader('Content-Type', 'application/javascript');
-      } else if (path.endsWith('.wasm')) {
-        res.setHeader('Content-Type', 'application/wasm');
-      }
+  app.get('/scanbot-sdk/*', (req, res, next) => {
+    // Remove query parameters for file path resolution
+    const filePath = req.path.replace('/scanbot-sdk/', '');
+    const fullPath = path.join(process.cwd(), 'client/public/scanbot-sdk', filePath);
+    
+    // Set proper MIME types
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (filePath.endsWith('.wasm')) {
+      res.setHeader('Content-Type', 'application/wasm');
     }
-  }));
+    
+    res.sendFile(fullPath, (err) => {
+      if (err) {
+        console.error('Error serving Scanbot file:', err);
+        res.status(404).send('File not found');
+      }
+    });
+  });
 
   // Auth middleware
   await setupAuth(app);
