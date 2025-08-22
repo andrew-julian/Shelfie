@@ -29,7 +29,10 @@ import {
   ChevronRight,
   Building,
   Languages,
-  Bookmark
+  Bookmark,
+  FileText,
+  MessageSquare,
+  BarChart3
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -320,15 +323,6 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700"
-                data-testid="button-close-modal"
-              >
-                <X className="w-4 h-4" />
-              </Button>
             </div>
           </DialogHeader>
 
@@ -545,13 +539,66 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
             <div className="space-y-6">
                   {activeTab === 'overview' && (
                     <>
-                      {/* Description */}
-                      {book.description && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-3">Description</h3>
-                          <p className="text-gray-700 leading-relaxed">{book.description}</p>
+                      {/* Description & Overview */}
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                          <FileText className="w-5 h-5" />
+                          Overview
+                        </h3>
+                        <div className="space-y-4">
+                          {extendedData?.feature_bullets && extendedData.feature_bullets.length > 0 && (
+                            <div>
+                              <h4 className="font-semibold text-gray-900 mb-2">Key Features</h4>
+                              <ul className="list-disc list-inside space-y-1">
+                                {extendedData.feature_bullets.map((bullet, index) => (
+                                  <li key={index} className="text-gray-700">{bullet}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {extendedData?.about_this_item && extendedData.about_this_item.length > 0 && (
+                            <div>
+                              <h4 className="font-semibold text-gray-900 mb-2">About This Item</h4>
+                              <ul className="list-disc list-inside space-y-1">
+                                {extendedData.about_this_item.map((item, index) => (
+                                  <li key={index} className="text-gray-700">{item}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {book.description && (
+                            <div>
+                              <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
+                              <p className="text-gray-700 leading-relaxed">
+                                {book.description}
+                              </p>
+                            </div>
+                          )}
+
+                          {extendedData?.editorial_reviews && extendedData.editorial_reviews.length > 0 && (
+                            <div>
+                              <h4 className="font-semibold text-gray-900 mb-2">Editorial Reviews</h4>
+                              {extendedData.editorial_reviews.map((review, index) => (
+                                <div key={index} className="mb-3 p-3 bg-gray-50 rounded">
+                                  {review.source && <p className="font-medium text-sm text-gray-600 mb-1">{review.source}</p>}
+                                  <p className="text-gray-700 text-sm">{review.body}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {extendedData?.book_description && (
+                            <div>
+                              <h4 className="font-semibold text-gray-900 mb-2">Product Description</h4>
+                              <p className="text-gray-700 leading-relaxed">
+                                {extendedData.book_description}
+                              </p>
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
 
                       {/* Categories */}
                       {book.categories && book.categories.length > 0 && (
@@ -581,9 +628,13 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                             {extendedData.also_bought.map((item, index) => (
                               <div key={index} className="flex gap-3 p-3 border rounded-lg hover:shadow-md transition-shadow">
                                 <img
-                                  src={item.image}
+                                  src={item.image || "/api/placeholder/80/120"}
                                   alt={item.title}
                                   className="w-16 h-20 object-cover rounded"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = "/api/placeholder/80/120";
+                                  }}
                                 />
                                 <div className="flex-1 min-w-0">
                                   <h4 className="font-medium text-sm line-clamp-2">{item.title}</h4>
@@ -769,7 +820,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
         isOpen={showCropper}
         onClose={() => setShowCropper(false)}
         imageUrl={currentCoverImage}
-        onSave={handleCroppedImageSave}
+        onCroppedImageSave={handleCroppedImageSave}
         isLoading={uploadCroppedImageMutation.isPending}
       />
     </>
