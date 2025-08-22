@@ -86,6 +86,123 @@ export function CoverEditorModal({
     setActiveTab("crop");
   };
 
+  const handleMouseDown = useCallback((e: React.MouseEvent, handle: string) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setDragHandle(handle);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging || !dragHandle || !cropContainerRef.current) return;
+
+    const container = cropContainerRef.current;
+    const rect = container.getBoundingClientRect();
+    const deltaX = ((e.clientX - dragStart.x) / rect.width) * 100;
+    const deltaY = ((e.clientY - dragStart.y) / rect.height) * 100;
+
+    setCropSettings(prev => {
+      let newSettings = { ...prev };
+
+      switch (dragHandle) {
+        case 'move':
+          // Move the entire crop box
+          newSettings.x = Math.max(0, Math.min(100 - prev.width, prev.x + deltaX));
+          newSettings.y = Math.max(0, Math.min(100 - prev.height, prev.y + deltaY));
+          break;
+        case 'nw': // Northwest corner
+          const newWidth = prev.width - deltaX;
+          const newHeight = prev.height - deltaY;
+          if (newWidth > 10 && newHeight > 10) {
+            newSettings.x = prev.x + deltaX;
+            newSettings.y = prev.y + deltaY;
+            newSettings.width = newWidth;
+            newSettings.height = newHeight;
+          }
+          break;
+        case 'ne': // Northeast corner
+          const neWidth = prev.width + deltaX;
+          const neHeight = prev.height - deltaY;
+          if (neWidth > 10 && neHeight > 10) {
+            newSettings.y = prev.y + deltaY;
+            newSettings.width = neWidth;
+            newSettings.height = neHeight;
+          }
+          break;
+        case 'sw': // Southwest corner
+          const swWidth = prev.width - deltaX;
+          const swHeight = prev.height + deltaY;
+          if (swWidth > 10 && swHeight > 10) {
+            newSettings.x = prev.x + deltaX;
+            newSettings.width = swWidth;
+            newSettings.height = swHeight;
+          }
+          break;
+        case 'se': // Southeast corner
+          const seWidth = prev.width + deltaX;
+          const seHeight = prev.height + deltaY;
+          if (seWidth > 10 && seHeight > 10) {
+            newSettings.width = seWidth;
+            newSettings.height = seHeight;
+          }
+          break;
+        case 'n': // North edge
+          const nHeight = prev.height - deltaY;
+          if (nHeight > 10) {
+            newSettings.y = prev.y + deltaY;
+            newSettings.height = nHeight;
+          }
+          break;
+        case 's': // South edge
+          const sHeight = prev.height + deltaY;
+          if (sHeight > 10) {
+            newSettings.height = sHeight;
+          }
+          break;
+        case 'w': // West edge
+          const wWidth = prev.width - deltaX;
+          if (wWidth > 10) {
+            newSettings.x = prev.x + deltaX;
+            newSettings.width = wWidth;
+          }
+          break;
+        case 'e': // East edge
+          const eWidth = prev.width + deltaX;
+          if (eWidth > 10) {
+            newSettings.width = eWidth;
+          }
+          break;
+      }
+
+      // Constrain to bounds
+      newSettings.x = Math.max(0, Math.min(100 - newSettings.width, newSettings.x));
+      newSettings.y = Math.max(0, Math.min(100 - newSettings.height, newSettings.y));
+      newSettings.width = Math.max(10, Math.min(100 - newSettings.x, newSettings.width));
+      newSettings.height = Math.max(10, Math.min(100 - newSettings.y, newSettings.height));
+
+      return newSettings;
+    });
+
+    setDragStart({ x: e.clientX, y: e.clientY });
+  }, [isDragging, dragHandle, dragStart]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+    setDragHandle(null);
+  }, []);
+
+  // Add event listeners for mouse move and up
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
+
   const handleCropApply = () => {
     const canvas = canvasRef.current;
     const img = imageRef.current;
