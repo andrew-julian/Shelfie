@@ -181,10 +181,16 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
       
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Update local state immediately with the new cropped image
+      if (data?.croppedImageUrl) {
+        setCurrentCoverImage(data.croppedImageUrl);
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['/api/books'] });
       onUpdate();
       setShowCropper(false);
+      setShowCoverEditor(false);
       toast({
         title: "Success", 
         description: "Cover image updated successfully",
@@ -798,7 +804,6 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
         }}
         onCustomCover={(croppedImageData) => {
           uploadCroppedImageMutation.mutate(croppedImageData);
-          setShowCoverEditor(false);
         }}
         isUpdating={updateCoverMutation.isPending || uploadCroppedImageMutation.isPending}
       />

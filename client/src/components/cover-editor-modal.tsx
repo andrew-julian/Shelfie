@@ -237,7 +237,7 @@ export function CoverEditorModal({
     const croppedImageData = canvas.toDataURL('image/jpeg', 0.9);
     onCustomCover(croppedImageData);
     setCropMode(false);
-    onClose();
+    // Don't close immediately - let the parent handle closure after successful upload
   };
 
   const resetCropSettings = () => {
