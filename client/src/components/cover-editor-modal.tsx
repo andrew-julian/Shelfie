@@ -140,7 +140,7 @@ export function CoverEditorModal({
 
   return (
     <>
-      <Dialog open={isOpen && !showCropper} onOpenChange={onClose}>
+      <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
