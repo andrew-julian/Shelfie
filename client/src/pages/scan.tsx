@@ -592,7 +592,7 @@ export default function ScanPage() {
                   </div>
                   
                   <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {queue.map((item) => (
+                    {queue.slice().reverse().map((item) => (
                       <QueueItemCard 
                         key={item.id} 
                         item={item} 
