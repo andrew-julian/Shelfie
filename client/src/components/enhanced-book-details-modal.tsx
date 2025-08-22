@@ -304,154 +304,162 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
-          <DialogHeader className="flex flex-row items-center justify-between mb-6">
-            <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <BookOpen className="w-6 h-6 text-coral-red" />
-              Book Details
-            </DialogTitle>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => refreshBookDataMutation.mutate()}
-                disabled={refreshBookDataMutation.isPending}
-                className="text-green-600 hover:text-green-800 hover:bg-green-50"
-                data-testid="button-refresh-book"
-              >
-                <CheckCircle className={`w-4 h-4 ${refreshBookDataMutation.isPending ? 'animate-spin' : ''}`} />
-                Refresh Data
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowCoverEditor(true)}
-                className="text-gray-500 hover:text-coral-red"
-                data-testid="button-edit-cover"
-              >
-                <Crop className="w-4 h-4" />
-                Edit Cover
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => deleteBookMutation.mutate()}
-                className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                data-testid="button-delete-book"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          </DialogHeader>
+        <DialogContent className="w-full max-w-4xl max-h-[95vh] overflow-hidden p-0 sm:p-6">
+          <div className="flex flex-col h-full max-h-[95vh]">
+            <DialogHeader className="flex-shrink-0 px-4 pt-4 pb-2 sm:px-6 sm:pt-6 sm:pb-4 border-b">
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-1 sm:gap-2">
+                  <BookOpen className="w-4 h-4 sm:w-6 sm:h-6 text-coral-red" />
+                  <span className="hidden sm:inline">Book Details</span>
+                  <span className="sm:hidden">Details</span>
+                </DialogTitle>
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => refreshBookDataMutation.mutate()}
+                    disabled={refreshBookDataMutation.isPending}
+                    className="text-green-600 hover:text-green-800 hover:bg-green-50 px-1 sm:px-3"
+                    data-testid="button-refresh-book"
+                  >
+                    <CheckCircle className={`w-4 h-4 ${refreshBookDataMutation.isPending ? 'animate-spin' : ''}`} />
+                    <span className="hidden sm:inline ml-1">Refresh Data</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowCoverEditor(true)}
+                    className="text-gray-500 hover:text-coral-red px-1 sm:px-3"
+                    data-testid="button-edit-cover"
+                  >
+                    <Crop className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1">Edit Cover</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteBookMutation.mutate()}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 px-1 sm:px-3"
+                    data-testid="button-delete-book"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </DialogHeader>
 
-          <div className="space-y-6">
-            {/* Compact Header */}
-            <div className="flex gap-4 pb-4 border-b border-gray-200">
-              {/* Small Book Cover */}
-              <div className="flex-shrink-0">
-                <div className="relative group">
-                  <img
-                    src={currentCoverImage || "/api/placeholder/300/400"}
-                    alt={book.title}
-                    className="w-24 h-32 object-cover rounded shadow-md transition-all duration-300 hover:shadow-lg"
-                    data-testid="book-cover-main"
-                  />
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6">
+              <div className="space-y-4 sm:space-y-6">
+                {/* Compact Header */}
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pb-4 border-b border-gray-200">
+                  {/* Book Cover and Title */}
+                  <div className="flex gap-3 sm:gap-4">
+                    {/* Small Book Cover */}
+                    <div className="flex-shrink-0">
+                      <div className="relative group">
+                        <img
+                          src={currentCoverImage || "/api/placeholder/300/400"}
+                          alt={book.title}
+                          className="w-20 h-28 sm:w-24 sm:h-32 object-cover rounded shadow-md transition-all duration-300 hover:shadow-lg"
+                          data-testid="book-cover-main"
+                        />
+                        {book.coverImages && book.coverImages.length > 1 && (
+                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded flex items-center justify-center">
+                            <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Title and Key Info */}
+                    <div className="flex-1 min-w-0">
+                      <h1 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 leading-tight line-clamp-2">{book.title}</h1>
+                      <p className="text-gray-600 mb-2 text-sm sm:text-base line-clamp-1">{book.author}</p>
+                      
+                      {/* Star Rating */}
+                      {book.rating && (
+                        <div className="flex items-center gap-2 mb-2">
+                          {renderStarRating(parseFloat(book.rating), "sm")}
+                          <span className="text-xs sm:text-sm text-gray-600">
+                            ({book.ratingsTotal || 'No reviews'})
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Reading Status */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                        <Select value={book.status} onValueChange={(value) => updateStatusMutation.mutate(value)}>
+                          <SelectTrigger className="w-full sm:w-40 h-8 text-xs sm:text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="want-to-read">Want to Read</SelectItem>
+                            <SelectItem value="reading">Currently Reading</SelectItem>
+                            <SelectItem value="read">Read</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        {book.price && (
+                          <Badge variant="secondary" className="text-xs sm:text-sm">
+                            ${book.price}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cover Options - Mobile: Below, Desktop: Right */}
                   {book.coverImages && book.coverImages.length > 1 && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded flex items-center justify-center">
-                      <Eye className="w-4 h-4 text-white" />
+                    <div className="sm:flex-shrink-0">
+                      <p className="text-xs text-gray-500 mb-1">Other Covers</p>
+                      <div className="flex gap-1 overflow-x-auto pb-1">
+                        {book.coverImages.slice(0, 4).map((coverImage, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleCoverSelect(index)}
+                            className={`relative rounded border flex-shrink-0 transition-all ${
+                              index === currentCoverIndex 
+                                ? 'border-coral-red shadow-sm' 
+                                : 'border-gray-200 hover:border-coral-red/50'
+                            }`}
+                            data-testid={`cover-option-${index}`}
+                          >
+                            <img
+                              src={coverImage}
+                              alt={`Cover ${index + 1}`}
+                              className="w-6 h-8 sm:w-7 sm:h-10 object-cover rounded-sm"
+                            />
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
-              </div>
 
-              {/* Title and Key Info */}
-              <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-bold text-gray-900 mb-1 leading-tight">{book.title}</h1>
-                <p className="text-gray-600 mb-2">{book.author}</p>
-                
-                {/* Star Rating */}
-                {book.rating && (
-                  <div className="flex items-center gap-2 mb-2">
-                    {renderStarRating(parseFloat(book.rating), "sm")}
-                    <span className="text-sm text-gray-600">
-                      ({book.ratingsTotal || 'No reviews'})
-                    </span>
-                  </div>
-                )}
-
-                {/* Reading Status */}
-                <div className="flex items-center gap-2">
-                  <Select value={book.status} onValueChange={(value) => updateStatusMutation.mutate(value)}>
-                    <SelectTrigger className="w-40 h-8">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="want-to-read">Want to Read</SelectItem>
-                      <SelectItem value="reading">Currently Reading</SelectItem>
-                      <SelectItem value="read">Read</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  {book.price && (
-                    <Badge variant="secondary" className="text-sm">
-                      ${book.price}
-                    </Badge>
-                  )}
+                {/* Navigation Tabs */}
+                <div className="flex border-b overflow-x-auto">
+                  {[
+                    { id: 'overview', label: 'Overview', icon: Eye },
+                    { id: 'reviews', label: 'Reviews', icon: Star },
+                    { id: 'details', label: 'Details', icon: BookOpen }
+                  ].map(({ id, label, icon: Icon }) => (
+                    <button
+                      key={id}
+                      onClick={() => setActiveTab(id as any)}
+                      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${
+                        activeTab === id
+                          ? 'border-coral-red text-coral-red'
+                          : 'border-transparent text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
+                      {label}
+                    </button>
+                  ))}
                 </div>
-              </div>
 
-              {/* Cover Options - Horizontal Strip */}
-              {book.coverImages && book.coverImages.length > 1 && (
-                <div className="flex-shrink-0">
-                  <p className="text-xs text-gray-500 mb-1">Other Covers</p>
-                  <div className="flex gap-1 max-w-32 overflow-x-auto">
-                    {book.coverImages.slice(0, 4).map((coverImage, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleCoverSelect(index)}
-                        className={`relative rounded border flex-shrink-0 transition-all ${
-                          index === currentCoverIndex 
-                            ? 'border-coral-red shadow-sm' 
-                            : 'border-gray-200 hover:border-coral-red/50'
-                        }`}
-                        data-testid={`cover-option-${index}`}
-                      >
-                        <img
-                          src={coverImage}
-                          alt={`Cover ${index + 1}`}
-                          className="w-7 h-10 object-cover rounded-sm"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Navigation Tabs */}
-            <div className="flex gap-4 mb-6 border-b">
-              {[
-                { id: 'overview', label: 'Overview', icon: Eye },
-                { id: 'reviews', label: 'Reviews', icon: Star },
-                { id: 'details', label: 'Details', icon: BookOpen }
-              ].map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => setActiveTab(id as any)}
-                  className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
-                    activeTab === id
-                      ? 'border-coral-red text-coral-red'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {/* Tab Content */}
-            <div className="space-y-6">
+                {/* Tab Content */}
+                <div className="space-y-4 sm:space-y-6 pb-4">
               {activeTab === 'overview' && (
                 <div className="space-y-6">
                   {/* Description & Overview */}
@@ -757,10 +765,10 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                           <span className="font-medium">{book.isbn}</span>
                         </div>
                       )}
-                      {book.isbn13 && (
+                      {book.isbn && book.isbn.length > 10 && (
                         <div className="flex justify-between p-3 bg-gray-50 rounded">
                           <span className="text-gray-600">ISBN-13</span>
-                          <span className="font-medium">{book.isbn13}</span>
+                          <span className="font-medium">{book.isbn}</span>
                         </div>
                       )}
                     </div>
@@ -863,6 +871,8 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                   )}
                 </div>
               )}
+                </div>
+              </div>
             </div>
           </div>
         </DialogContent>
