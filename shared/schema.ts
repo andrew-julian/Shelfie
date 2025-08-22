@@ -36,6 +36,17 @@ export const books = pgTable("books", {
   userId: varchar("user_id"), // nullable initially to preserve existing data
   status: varchar("status", { length: 20 }).notNull().default("want-to-read"),
   addedAt: timestamp("added_at").defaultNow().notNull(),
+  
+  // Extended Amazon/Rainforest API data
+  aboutThisItem: text("about_this_item").array(),
+  bookDescription: text("book_description"),
+  editorialReviews: jsonb("editorial_reviews"), // Array of {source, body}
+  ratingBreakdown: jsonb("rating_breakdown"), // Object with star ratings breakdown
+  topReviews: jsonb("top_reviews"), // Array of review objects
+  bestsellersRank: jsonb("bestsellers_rank"), // Array of rank objects
+  alsoBought: jsonb("also_bought"), // Array of related product objects
+  variants: jsonb("variants"), // Array of format variant objects
+  amazonData: jsonb("amazon_data"), // Full API response for future use
 }, (table) => ({
   // Create a composite unique constraint for ISBN per user (but allow null userId)
   userIsbnUnique: index("user_isbn_idx").on(table.userId, table.isbn),

@@ -973,6 +973,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ratingsTotal: product.ratings_total || product.rating_breakdown?.total || existingBook.ratingsTotal,
         categories: categories.length > 0 ? categories : existingBook.categories,
         featureBullets: product.feature_bullets || existingBook.featureBullets,
+        
+        // New comprehensive API fields
+        aboutThisItem: product.about_this_item || null,
+        bookDescription: product.book_description || product.description || null,
+        editorialReviews: product.editorial_reviews || null,
+        ratingBreakdown: product.rating_breakdown || null,
+        topReviews: product.top_reviews || null,
+        bestsellersRank: product.bestsellers_rank || null,
+        alsoBought: product.also_bought || null,
+        variants: product.variants || null,
+        amazonData: data, // Store full API response for future reference
       }, userId);
       
       if (!updatedBook) {
@@ -1291,6 +1302,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 width: parsedDimensions.width?.toString() || null,
                 height: parsedDimensions.height?.toString() || null,
                 depth: parsedDimensions.depth?.toString() || null,
+                
+                // New comprehensive API fields for refresh-all
+                aboutThisItem: product.about_this_item || null,
+                bookDescription: product.book_description || product.description || null,
+                editorialReviews: product.editorial_reviews || null,
+                ratingBreakdown: product.rating_breakdown || null,
+                topReviews: product.top_reviews || null,
+                bestsellersRank: product.bestsellers_rank || null,
+                alsoBought: product.also_bought || null,
+                variants: product.variants || null,
+                amazonData: data, // Store full API response for future reference
               };
               
               const updatedBook = await storage.updateBookData(book.id, updateData, userId);

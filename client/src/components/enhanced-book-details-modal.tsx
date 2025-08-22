@@ -51,75 +51,18 @@ const statusConfig = {
   'read': { label: 'Read', color: 'bg-gray-100 text-gray-800' },
 };
 
-// Mock data for demonstration - in real implementation this would come from API
+// Get actual extended book data from database fields
 const getExtendedBookData = (book: Book) => {
   return {
-    feature_bullets: [
-      "Comprehensive coverage of industry fundamentals",
-      "Real-world examples and case studies", 
-      "Updated for 2024 market conditions",
-      "Includes digital transformation insights"
-    ],
-    about_this_item: [
-      "Essential reading for business professionals",
-      "Perfect for students and practitioners",
-      "Includes access to online resources",
-      "Written by industry experts"
-    ],
-    editorial_reviews: [
-      {
-        source: "Publishers Weekly",
-        body: "A masterful examination of contemporary business practices with actionable insights for modern professionals."
-      },
-      {
-        source: "Business Week",
-        body: "Essential reading that bridges theory and practice in today's rapidly evolving marketplace."
-      }
-    ],
-    book_description: "This comprehensive guide provides deep insights into the modern business landscape, offering practical strategies and theoretical frameworks for success in today's competitive environment.",
-    variants: [
-      { title: "Hardcover", price: "$24.99", asin: "1234567890", is_current_product: book.isbn === "1234567890" },
-      { title: "Paperback", price: "$16.99", asin: "1234567891", is_current_product: book.isbn === "1234567891" },
-      { title: "Kindle", price: "$12.99", asin: "1234567892", is_current_product: false },
-      { title: "Audiobook", price: "$19.95", asin: "1234567893", is_current_product: false }
-    ],
-    rating_breakdown: {
-      five_star: { percentage: 65, count: 3420 },
-      four_star: { percentage: 22, count: 1156 },
-      three_star: { percentage: 8, count: 420 },
-      two_star: { percentage: 3, count: 158 },
-      one_star: { percentage: 2, count: 105 }
-    },
-    top_reviews: [
-      {
-        id: "1",
-        title: "Exceptional insight into modern challenges",
-        body: "This book provides remarkable clarity on complex issues affecting our daily lives. The research is thorough and the writing engaging...",
-        rating: 5,
-        verified_purchase: true,
-        date: "2024-01-15",
-        helpful_votes: 42
-      },
-      {
-        id: "2", 
-        title: "Well-researched but lengthy",
-        body: "While the content is valuable, I found some sections repetitive. However, the core insights are genuinely helpful...",
-        rating: 4,
-        verified_purchase: true,
-        date: "2024-01-10",
-        helpful_votes: 28
-      }
-    ],
-    bestsellers_rank: [
-      { rank: 15, category: "Psychology & Mental Health" },
-      { rank: 3, category: "Personal Development" },
-      { rank: 127, category: "All Books" }
-    ],
-    also_bought: [
-      { title: "Deep Work", author: "Cal Newport", price: "$15.99", image: null },
-      { title: "Atomic Habits", author: "James Clear", price: "$18.99", image: null },
-      { title: "The Power of Now", author: "Eckhart Tolle", price: "$16.99", image: null }
-    ]
+    feature_bullets: book.featureBullets || [],
+    about_this_item: book.aboutThisItem || [],
+    editorial_reviews: book.editorialReviews || [],
+    book_description: book.bookDescription || book.description || "",
+    variants: book.variants || [],
+    rating_breakdown: book.ratingBreakdown || null,
+    top_reviews: book.topReviews || [],
+    bestsellers_rank: book.bestsellersRank || [],
+    also_bought: book.alsoBought || []
   };
 };
 
