@@ -218,7 +218,7 @@ export default function ScanPage() {
         status: 'adding',
         title: bookData.title,
         author: bookData.author,
-        coverUrl: bookData.coverUrl
+        coverUrl: bookData.coverImage
       });
 
       const addResponse = await fetch('/api/books', {
@@ -230,13 +230,24 @@ export default function ScanPage() {
           isbn: item.isbn,
           title: bookData.title,
           author: bookData.author,
-          coverUrl: bookData.coverUrl,
+          coverImage: bookData.coverImage,
+          coverImages: bookData.coverImages || [],
+          selectedCoverIndex: bookData.selectedCoverIndex || 0,
           description: bookData.description || '',
-          publishedDate: bookData.publishedDate || '',
-          pageCount: bookData.pageCount || 0,
+          publishYear: bookData.publishYear,
+          publishDate: bookData.publishDate,
+          publisher: bookData.publisher,
+          language: bookData.language,
+          pages: bookData.pages,
+          dimensions: bookData.dimensions,
+          weight: bookData.weight,
+          rating: bookData.rating,
+          ratingsTotal: bookData.ratingsTotal,
           categories: bookData.categories || [],
-          averageRating: bookData.averageRating || 0,
-          ratingsCount: bookData.ratingsCount || 0,
+          featureBullets: bookData.featureBullets || [],
+          amazonDomain: bookData.amazonDomain,
+          userId: bookData.userId,
+          status: bookData.status
         })
       });
       
