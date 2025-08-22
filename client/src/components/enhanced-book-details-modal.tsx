@@ -788,20 +788,34 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                         <BarChart3 className="w-5 h-5" />
                         Bestseller Rankings
                       </h3>
-                      <div className="space-y-2">
-                        {Object.entries(extendedData.bestsellers_rank).map(([category, rankData]: [string, any]) => {
-                          // Handle different possible data structures for rank
-                          const rank = typeof rankData === 'object' 
-                            ? (rankData?.rank || rankData?.category || JSON.stringify(rankData))
-                            : rankData;
-                          
-                          return (
-                            <div key={category} className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">{category}</span>
-                              <span className="font-medium">#{rank}</span>
-                            </div>
-                          );
-                        })}
+                      <div className="space-y-0">
+                        {Array.isArray(extendedData.bestsellers_rank) ? 
+                          extendedData.bestsellers_rank.map((rankItem: any, index: number) => {
+                            // Extract category and rank from array item
+                            const category = rankItem.category || rankItem.name || rankItem.title || `Category ${index + 1}`;
+                            const rank = rankItem.rank || rankItem.position || rankItem.number || 'N/A';
+                            
+                            return (
+                              <div key={index} className="flex justify-between py-3 border-b border-gray-200 last:border-b-0">
+                                <span className="text-gray-700">{category}</span>
+                                <span className="font-medium text-gray-900">#{rank}</span>
+                              </div>
+                            );
+                          }) :
+                          Object.entries(extendedData.bestsellers_rank).map(([category, rankData]: [string, any]) => {
+                            // Handle object structure (fallback)
+                            const rank = typeof rankData === 'object' 
+                              ? (rankData?.rank || rankData?.category || JSON.stringify(rankData))
+                              : rankData;
+                            
+                            return (
+                              <div key={category} className="flex justify-between py-3 border-b border-gray-200 last:border-b-0">
+                                <span className="text-gray-700">{category}</span>
+                                <span className="font-medium text-gray-900">#{rank}</span>
+                              </div>
+                            );
+                          })
+                        }
                       </div>
                     </div>
                   )}
