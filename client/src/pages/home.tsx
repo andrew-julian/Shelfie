@@ -146,7 +146,8 @@ export default function Home() {
   const [bookPositions, setBookPositions] = useState<BookPosition[]>([]);
   const [layoutItems, setLayoutItems] = useState<LayoutItem[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerDimensions, setContainerDimensions] = useState({ width: 1200, height: 800 });
+  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
+  const [isContainerMeasured, setIsContainerMeasured] = useState(false);
   
   // Container-based responsive configuration
   const [responsiveConfig, setResponsiveConfig] = useState<EngineConfig>({
@@ -378,15 +379,23 @@ export default function Home() {
 
   // Memoized layout calculation using new engine with performance measurement
   const newLayoutItems = useMemo(() => {
-    if (finalBooks.length === 0 || containerDimensions.width === 0) return [];
+    if (finalBooks.length === 0 || !isContainerMeasured || containerDimensions.width === 0) {
+      console.log('Layout calculation skipped:', { 
+        booksCount: finalBooks.length, 
+        containerMeasured: isContainerMeasured, 
+        containerWidth: containerDimensions.width 
+      });
+      return [];
+    }
     
     const layoutBooks = convertToLayoutBooks(finalBooks);
+    console.log('Calculating layout with container width:', containerDimensions.width);
     return measureLayout(
       () => calculateLayout(layoutBooks, normalizedDimensions, containerDimensions.width, responsiveConfig),
       finalBooks.length,
       'BookScan Layout Engine'
     );
-  }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig.targetRowHeight, responsiveConfig.gutterX, responsiveConfig.gutterY, responsiveConfig.raggedLastRow, measureLayout]);
+  }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig.targetRowHeight, responsiveConfig.gutterX, responsiveConfig.gutterY, responsiveConfig.raggedLastRow, measureLayout, isContainerMeasured]);
 
   // Legacy dimension calculation (no longer used with new layout engine)
   // Kept for reference but replaced by the headless layout engine
@@ -396,23 +405,38 @@ export default function Home() {
     const updateContainerSize = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        setContainerDimensions({ 
-          width: rect.width || 1200, 
-          height: Math.max(rect.height, 600) 
-        });
+        const newWidth = rect.width || 1200;
+        const newHeight = Math.max(rect.height, 600);
+        
+        console.log('Container size updated:', { width: newWidth, height: newHeight });
+        setContainerDimensions({ width: newWidth, height: newHeight });
+        setIsContainerMeasured(true);
       }
     };
 
-    updateContainerSize();
+    // Initial measurement with a slight delay to ensure container is rendered
+    const initialMeasurement = () => {
+      updateContainerSize();
+      // If container still has no width, try again after a short delay
+      if (containerRef.current && containerRef.current.getBoundingClientRect().width === 0) {
+        setTimeout(() => {
+          updateContainerSize();
+        }, 100);
+      }
+    };
+
+    initialMeasurement();
     
     // Use ResizeObserver for better performance
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
-        setContainerDimensions({ 
-          width: width || 1200, 
-          height: Math.max(height, 600) 
-        });
+        const newWidth = width || 1200;
+        const newHeight = Math.max(height, 600);
+        
+        console.log('ResizeObserver update:', { width: newWidth, height: newHeight });
+        setContainerDimensions({ width: newWidth, height: newHeight });
+        setIsContainerMeasured(true);
       }
     });
 
@@ -549,7 +573,7 @@ export default function Home() {
         </div>
 
         {/* Dynamic Books Layout */}
-        {booksLoading || ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && isColorSorting) ? (
+        {booksLoading || !isContainerMeasured || ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && isColorSorting) ? (
           <div className="relative min-h-96" style={{ minHeight: '400px' }}>
             {[...Array(6)].map((_, i) => (
               <div 
@@ -568,7 +592,7 @@ export default function Home() {
         ) : finalBooks.length > 0 ? (
           useVirtualization ? (
             <VirtualizedBookGrid
-              layoutItems={layoutItems}
+              layoutItems={newLayoutItems}
               books={finalBooks}
               onBookSelect={handleBookSelect}
               onBookUpdate={handleBookUpdate}
@@ -582,14 +606,14 @@ export default function Home() {
               className="gridContainer relative w-full" 
               style={{ 
                 containerType: 'inline-size',
-                minHeight: `${Math.max(400, layoutItems.reduce((max, item) => Math.max(max, item.y + item.h + 40), 400))}px`,
+                minHeight: `${Math.max(400, newLayoutItems.reduce((max, item) => Math.max(max, item.y + item.h + 40), 400))}px`,
                 '--rowH': `${responsiveConfig.targetRowHeight}px`,
                 '--gutterX': `${responsiveConfig.gutterX}px`,
                 '--gutterY': `${responsiveConfig.gutterY}px`
               } as React.CSSProperties}
               data-testid="books-layout"
             >
-              {layoutItems.map((item) => {
+              {newLayoutItems.map((item) => {
                 const book = finalBooks.find(b => b.id === item.id);
                 if (!book) return null;
                 
