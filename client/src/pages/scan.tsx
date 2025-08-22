@@ -416,8 +416,8 @@ export default function ScanPage() {
             console.log('ScanbotSDK available:', !!window.ScanbotSDK);
             console.log('ScanbotSDK.initialize available:', !!window.ScanbotSDK.initialize);
             
-            // Use local files for better reliability
-            const enginePath = "/scanbot-sdk/";
+            // Use local files for better reliability - absolute URL to avoid path issues
+            const enginePath = `${window.location.origin}/scanbot-sdk/`;
             
             console.log('Using enginePath:', enginePath);
             const initResult = await window.ScanbotSDK.initialize({

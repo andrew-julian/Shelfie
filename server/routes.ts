@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import express from "express";
+import path from "path";
 
 // Intelligent dimension parsing utility
 function parseAndAssignDimensions(dimensionText: string | null, title?: string): {
@@ -116,6 +118,18 @@ const progressStore = new Map<string, RefreshProgress>();
 const progressClients = new Map<string, Set<any>>();
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve Scanbot SDK files statically (before auth middleware to avoid auth issues)
+  app.use('/scanbot-sdk', express.static(path.join(process.cwd(), 'client/public/scanbot-sdk'), {
+    maxAge: '1d',
+    setHeaders: (res, path) => {
+      if (path.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      } else if (path.endsWith('.wasm')) {
+        res.setHeader('Content-Type', 'application/wasm');
+      }
+    }
+  }));
+
   // Auth middleware
   await setupAuth(app);
 
