@@ -196,7 +196,7 @@ export default function Home() {
   useEffect(() => {
     if ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && books.length > 0) {
       setIsColorSorting(true);
-      const reverse = sortBy === 'color-dark-to-light';
+      const reverse = sortBy === 'color-light-to-dark'; // Light-to-Dark needs reverse=true since default is dark-to-light
       sortBooksByColor(books, reverse).then(sorted => {
         setColorSortedBooks(sorted);
         setIsColorSorting(false);
