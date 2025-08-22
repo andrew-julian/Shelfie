@@ -21,6 +21,7 @@ import {
 } from '@/layout/BookScanLayoutEngine';
 import VirtualizedBookGrid from '@/components/virtualized-book-grid';
 import { usePerformanceTelemetry } from '@/hooks/usePerformanceTelemetry';
+import { useLocation } from "wouter";
 
 type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
@@ -69,6 +70,7 @@ export default function Home() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
+  const [, setLocation] = useLocation();
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -449,11 +451,17 @@ export default function Home() {
       return response.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/books"] });
-      toast({
-        title: "Success",
-        description: data.message || "All books have been refreshed with latest data",
-      });
+      // Navigate to progress page if redirect URL is provided
+      if (data.redirectTo) {
+        setLocation(data.redirectTo);
+      } else {
+        // Fallback to old behavior
+        queryClient.invalidateQueries({ queryKey: ["/api/books"] });
+        toast({
+          title: "Success",
+          description: data.message || "All books have been refreshed with latest data",
+        });
+      }
     },
     onError: (error) => {
       if (isUnauthorizedError(error as Error)) {

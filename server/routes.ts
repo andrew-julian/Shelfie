@@ -100,6 +100,19 @@ import { insertBookSchema } from "@shared/schema";
 import { z } from "zod";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
+// Global progress tracker for refresh operations
+interface RefreshProgress {
+  total: number;
+  current: number;
+  completed: string[];
+  currentBook: string | null;
+  errors: Array<{ book: string; error: string }>;
+  status: 'running' | 'completed' | 'error';
+}
+
+const progressStore = new Map<string, RefreshProgress>();
+const progressClients = new Map<string, Set<any>>();
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
@@ -915,18 +928,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Refresh all books
+  // Progress tracking endpoint (Server-Sent Events)
+  app.get("/api/refresh-progress", isAuthenticated, (req: any, res) => {
+    const userId = req.user.claims.sub;
+    
+    // Set up SSE headers
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+    });
+
+    // Add client to progress tracking
+    if (!progressClients.has(userId)) {
+      progressClients.set(userId, new Set());
+    }
+    progressClients.get(userId)!.add(res);
+
+    // Send current progress if exists
+    const currentProgress = progressStore.get(userId);
+    if (currentProgress) {
+      res.write(`data: ${JSON.stringify(currentProgress)}\n\n`);
+    }
+
+    // Clean up on client disconnect
+    req.on('close', () => {
+      const clients = progressClients.get(userId);
+      if (clients) {
+        clients.delete(res);
+        if (clients.size === 0) {
+          progressClients.delete(userId);
+        }
+      }
+    });
+  });
+
+  // Refresh all books with progress tracking
   app.post("/api/books/refresh-all", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const allBooks = await storage.getAllBooks(userId);
-      const refreshedBooks = [];
       const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
       
-      console.log(`Starting refresh of ${allBooks.length} books...`);
+      // Redirect to progress page immediately
+      res.json({ 
+        message: "Refresh started", 
+        redirectTo: "/refresh-progress",
+        totalBooks: allBooks.length 
+      });
+
+      // Initialize progress tracking
+      const progress: RefreshProgress = {
+        total: allBooks.length,
+        current: 0,
+        completed: [],
+        currentBook: null,
+        errors: [],
+        status: 'running'
+      };
       
-      for (const book of allBooks) {
-        try {
+      progressStore.set(userId, progress);
+      
+      // Helper function to broadcast progress updates
+      const broadcastProgress = () => {
+        const clients = progressClients.get(userId);
+        if (clients) {
+          const data = `data: ${JSON.stringify(progress)}\n\n`;
+          clients.forEach(client => {
+            try {
+              client.write(data);
+            } catch (error) {
+              clients.delete(client);
+            }
+          });
+        }
+      };
+
+      console.log(`Starting refresh of ${allBooks.length} books for user ${userId}...`);
+      broadcastProgress();
+      
+      // Process books asynchronously
+      setImmediate(async () => {
+        const refreshedBooks = [];
+        
+        for (const book of allBooks) {
+          progress.currentBook = book.title;
+          broadcastProgress();
+          
+          try {
           // Call Rainforest API for fresh data using book's stored region
           const amazonDomain = book.amazonDomain || "amazon.com.au"; // Use stored region or default to Australia
           const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${book.isbn}&amazon_domain=${amazonDomain}`;
@@ -1136,20 +1226,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         } catch (error) {
           console.error(`Failed to refresh book ${book.title}:`, error);
-          // Keep original book if refresh fails
+          progress.errors.push({ book: book.title, error: error instanceof Error ? error.message : 'Unknown error' });
           refreshedBooks.push(book);
         }
+        
+        // Update progress
+        progress.current++;
+        progress.completed.push(book.title);
+        broadcastProgress();
       }
       
-      console.log(`Completed refresh of ${refreshedBooks.length} books`);
+      // Mark as completed
+      progress.status = 'completed';
+      progress.currentBook = null;
+      broadcastProgress();
       
-      res.json({ 
-        message: `Refreshed ${refreshedBooks.length} books`,
-        books: refreshedBooks
-      });
+      console.log(`Completed refresh of ${refreshedBooks.length} books for user ${userId}`);
+      
+      // Clean up progress after 5 minutes
+      setTimeout(() => {
+        progressStore.delete(userId);
+      }, 300000);
+    });
+      
     } catch (error) {
-      console.error('Failed to refresh all books:', error);
-      res.status(500).json({ message: "Failed to refresh books" });
+      console.error('Failed to start refresh operation:', error);
+      res.status(500).json({ message: "Failed to start refresh" });
     }
   });
 

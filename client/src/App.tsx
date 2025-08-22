@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Home from "@/pages/home";
 import Landing from "@/pages/Landing";
 import Settings from "@/pages/Settings";
+import RefreshProgress from "@/pages/refresh-progress";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
         <>
           <Route path="/" component={Home} />
           <Route path="/settings" component={Settings} />
+          <Route path="/refresh-progress" component={RefreshProgress} />
         </>
       )}
       <Route component={NotFound} />
