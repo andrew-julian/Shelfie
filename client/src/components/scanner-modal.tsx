@@ -549,7 +549,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   }, [isOpen]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen && !isScanning} onOpenChange={handleClose}>
       <DialogContent className="max-w-md" data-testid="modal-scanner">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
@@ -572,7 +572,8 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
           <div className="relative bg-gray-900 rounded-lg overflow-hidden" style={{ aspectRatio: '4/3' }}>
             <div 
               ref={scannerRef} 
-              className="w-full h-full" 
+              className="w-full h-full relative z-10" 
+              style={{ position: 'relative', zIndex: 10 }}
               data-testid="camera-preview" 
             />
             {!isScanning && (
@@ -595,7 +596,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
             )}
             {isScanning && (
               <>
-                <div className="absolute top-4 left-4 bg-black bg-opacity-75 text-white text-sm px-3 py-2 rounded-lg">
+                <div className="absolute top-4 left-4 bg-black bg-opacity-75 text-white text-sm px-3 py-2 rounded-lg z-20">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-coral-red rounded-full animate-pulse"></div>
                     <span>Scanning for barcodes...</span>
@@ -603,7 +604,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
                 </div>
                 <Button
                   onClick={stopScanner}
-                  className="absolute top-4 right-4 bg-coral-red text-white hover:bg-red-600"
+                  className="absolute top-4 right-4 bg-coral-red text-white hover:bg-red-600 z-20"
                   size="sm"
                   data-testid="button-stop-scanner"
                 >
