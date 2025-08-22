@@ -68,7 +68,7 @@ const getLicenseKey = (): string => {
   return LICENSE_KEYS.development;
 };
 
-// Queue types (same as scanner-modal)
+// Queue types for scan page
 interface QueueItem {
   id: string;
   isbn: string;
@@ -87,7 +87,7 @@ declare global {
   }
 }
 
-// QueueItemCard component (same as scanner-modal)
+// QueueItemCard component for scan page
 const QueueItemCard = ({ item, onRetry, onRemove }: {
   item: QueueItem;
   onRetry: () => void;
