@@ -549,8 +549,8 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   }, [isOpen]);
 
   return (
-    <Dialog open={isOpen && !isScanning} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md" data-testid="modal-scanner">
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className={`max-w-md ${isScanning ? 'opacity-0 pointer-events-none' : ''}`} data-testid="modal-scanner">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <div>
