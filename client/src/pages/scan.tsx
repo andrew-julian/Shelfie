@@ -408,14 +408,36 @@ export default function ScanPage() {
           try {
             console.log('Scanbot SDK script loaded, initializing...');
             const licenseKey = getLicenseKey();
-            await window.ScanbotSDK.initialize({
+            console.log('License key length:', licenseKey.length);
+            console.log('License key preview:', licenseKey.substring(0, 50) + '...');
+            
+            // Try different initialization approaches
+            console.log('Attempting SDK initialization...');
+            console.log('ScanbotSDK available:', !!window.ScanbotSDK);
+            console.log('ScanbotSDK.initialize available:', !!window.ScanbotSDK.initialize);
+            
+            const initResult = await window.ScanbotSDK.initialize({
               licenseKey: licenseKey,
-              engine: "/"
+              engine: "/",
+              verbose: true
             });
+            
+            console.log('SDK Init result:', initResult);
             console.log('Scanbot SDK initialized successfully');
             setIsSDKLoaded(true);
           } catch (error) {
             console.error('Failed to initialize Scanbot SDK:', error);
+            console.error('Error details:', JSON.stringify(error));
+            console.error('Error message:', (error as any)?.message);
+            console.error('Error stack:', (error as any)?.stack);
+            
+            // Show user-friendly error
+            toast({
+              title: "Scanner Initialization Failed",
+              description: "Camera scanner could not start. You can still add books manually using ISBN.",
+              variant: "destructive",
+              duration: 5000,
+            });
           }
         };
         script.onerror = () => {
