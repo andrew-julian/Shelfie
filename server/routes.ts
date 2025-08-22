@@ -124,8 +124,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     let filePath = req.path.replace('/scanbot-sdk/', '');
     
     // Handle specific Core files that need to be in bin/barcode-scanner/
-    // Only redirect ScanbotSDK.Core-*.js files, not UI or other files
-    if (!filePath.includes('/') && filePath.startsWith('ScanbotSDK.Core') && filePath.endsWith('.js')) {
+    // Redirect both Core JS files and WASM files to the appropriate subdirectory
+    if (!filePath.includes('/') && (
+      (filePath.startsWith('ScanbotSDK.Core') && filePath.endsWith('.js')) ||
+      (filePath.endsWith('.wasm'))
+    )) {
       filePath = `bin/barcode-scanner/${filePath}`;
     }
     
