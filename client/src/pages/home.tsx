@@ -379,19 +379,25 @@ export default function Home() {
 
   // Memoized layout calculation using new engine with performance measurement
   const newLayoutItems = useMemo(() => {
-    if (finalBooks.length === 0 || !isContainerMeasured || containerDimensions.width === 0) {
+    // Use fallback width if container hasn't been measured yet but we have books
+    const effectiveWidth = containerDimensions.width > 0 ? containerDimensions.width : 1200;
+    const canCalculateLayout = finalBooks.length > 0 && (isContainerMeasured || effectiveWidth > 0);
+    
+    if (!canCalculateLayout) {
       console.log('Layout calculation skipped:', { 
         booksCount: finalBooks.length, 
         containerMeasured: isContainerMeasured, 
-        containerWidth: containerDimensions.width 
+        containerWidth: containerDimensions.width,
+        effectiveWidth,
+        canCalculateLayout
       });
       return [];
     }
     
     const layoutBooks = convertToLayoutBooks(finalBooks);
-    console.log('Calculating layout with container width:', containerDimensions.width);
+    console.log('Calculating layout with container width:', effectiveWidth, 'measured:', isContainerMeasured);
     return measureLayout(
-      () => calculateLayout(layoutBooks, normalizedDimensions, containerDimensions.width, responsiveConfig),
+      () => calculateLayout(layoutBooks, normalizedDimensions, effectiveWidth, responsiveConfig),
       finalBooks.length,
       'BookScan Layout Engine'
     );
@@ -402,36 +408,73 @@ export default function Home() {
 
   // Container resize observer with ResizeObserver
   useEffect(() => {
+    console.log('Setting up container measurement effect');
+    
     const updateContainerSize = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        const newWidth = rect.width || 1200;
+        const parentElement = containerRef.current.parentElement;
+        const parentRect = parentElement?.getBoundingClientRect();
+        
+        // Try multiple fallback measurements
+        let newWidth = rect.width;
+        if (!newWidth && parentRect) {
+          newWidth = parentRect.width - 48; // Account for padding
+        }
+        if (!newWidth) {
+          newWidth = window.innerWidth - 100; // Fallback to window width with margin
+        }
+        if (!newWidth) {
+          newWidth = 1200; // Last resort fallback
+        }
+        
         const newHeight = Math.max(rect.height, 600);
         
-        console.log('Container size updated:', { width: newWidth, height: newHeight });
+        console.log('Container size updated:', { 
+          width: newWidth, 
+          height: newHeight, 
+          rectWidth: rect.width,
+          parentWidth: parentRect?.width,
+          windowWidth: window.innerWidth
+        });
         setContainerDimensions({ width: newWidth, height: newHeight });
+        setIsContainerMeasured(true);
+      } else {
+        console.log('Container ref not available, using fallback dimensions');
+        // If container ref isn't available, use window-based fallback
+        const fallbackWidth = window.innerWidth - 100;
+        setContainerDimensions({ width: fallbackWidth, height: 600 });
         setIsContainerMeasured(true);
       }
     };
 
-    // Initial measurement with a slight delay to ensure container is rendered
-    const initialMeasurement = () => {
+    // Multiple attempts to measure container with increasing delays
+    const attemptMeasurement = (attempt = 0) => {
+      if (attempt > 5) return; // Give up after 5 attempts
+      
       updateContainerSize();
-      // If container still has no width, try again after a short delay
+      
+      // If container still has no width, try again with exponential backoff
       if (containerRef.current && containerRef.current.getBoundingClientRect().width === 0) {
+        const delay = Math.min(50 * Math.pow(2, attempt), 1000); // 50ms, 100ms, 200ms, 400ms, 800ms, 1000ms
         setTimeout(() => {
-          updateContainerSize();
-        }, 100);
+          attemptMeasurement(attempt + 1);
+        }, delay);
       }
     };
 
-    initialMeasurement();
+    // Start measurement attempts immediately and with delays
+    attemptMeasurement();
+    
+    // Also try after guaranteed delays for React rendering
+    setTimeout(attemptMeasurement, 100);
+    setTimeout(attemptMeasurement, 300);
     
     // Use ResizeObserver for better performance
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
-        const newWidth = width || 1200;
+        const newWidth = Math.max(width || 1200, 300); // Ensure minimum width
         const newHeight = Math.max(height, 600);
         
         console.log('ResizeObserver update:', { width: newWidth, height: newHeight });
@@ -440,9 +483,15 @@ export default function Home() {
       }
     });
 
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
+    // Set up observer with a slight delay to ensure DOM is ready
+    const setupObserver = () => {
+      if (containerRef.current) {
+        resizeObserver.observe(containerRef.current);
+      }
+    };
+    
+    setupObserver();
+    setTimeout(setupObserver, 50); // Retry observer setup
 
     // Fallback for window resize
     window.addEventListener('resize', updateContainerSize);
@@ -451,7 +500,7 @@ export default function Home() {
       resizeObserver.disconnect();
       window.removeEventListener('resize', updateContainerSize);
     };
-  }, []);
+  }, []); // Only run once on mount
 
   // Update layout items state when new layout is calculated
   useEffect(() => {
@@ -573,7 +622,7 @@ export default function Home() {
         </div>
 
         {/* Dynamic Books Layout */}
-        {booksLoading || !isContainerMeasured || ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && isColorSorting) ? (
+        {booksLoading || ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && isColorSorting) || newLayoutItems.length === 0 ? (
           <div className="relative min-h-96" style={{ minHeight: '400px' }}>
             {[...Array(6)].map((_, i) => (
               <div 
