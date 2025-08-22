@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/header";
 import BookCard from "@/components/book-card";
 import ScannerModal from "@/components/scanner-modal";
-import BookDetailsModal from "@/components/book-details-modal";
+import EnhancedBookDetailsModal from "@/components/enhanced-book-details-modal";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -737,7 +737,7 @@ export default function Home() {
         onClose={handleScannerClose}
       />
       
-      <BookDetailsModal
+      <EnhancedBookDetailsModal
         book={selectedBook}
         isOpen={!!selectedBook}
         onClose={() => setSelectedBook(null)}
