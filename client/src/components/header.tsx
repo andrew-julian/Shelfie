@@ -400,32 +400,29 @@ function UserMenu() {
             </button>
 
             {showUserSwitcher && (
-              <div className="bg-gray-50 border-t border-gray-100">
-                {availableUsers.map((availableUser) => {
-                  console.log('Rendering user:', { id: availableUser.id, email: availableUser.email, firstName: availableUser.firstName });
-                  return (
-                    <button
-                      key={availableUser.id}
-                      onClick={() => {
-                        switchUser(availableUser.id);
-                        setShowDropdown(false);
-                      }}
-                      className={`flex items-center w-full px-6 py-2 text-sm hover:bg-gray-100 ${
-                        availableUser.id === currentUser?.id ? 'text-coral-red font-medium bg-coral-red/5' : 'text-gray-600'
-                      }`}
-                      data-testid={`button-switch-user-${availableUser.id}`}
-                    >
-                      <User className="h-4 w-4 mr-2" />
-                      <div className="text-left">
-                        <div className="font-medium">{availableUser.firstName || availableUser.email?.split('@')[0] || 'User'}</div>
-                        <div className="text-xs text-gray-500">{availableUser.email}</div>
-                      </div>
-                      {availableUser.id === currentUser?.id && (
-                        <div className="ml-auto w-2 h-2 bg-coral-red rounded-full"></div>
-                      )}
-                    </button>
-                  );
-                })}
+              <div className="bg-gray-50 border-t border-gray-100 max-h-48 overflow-y-auto">
+                {availableUsers.map((availableUser) => (
+                  <button
+                    key={availableUser.id}
+                    onClick={() => {
+                      switchUser(availableUser.id);
+                      setShowDropdown(false);
+                    }}
+                    className={`flex items-center w-full px-6 py-2 text-sm hover:bg-gray-100 ${
+                      availableUser.id === currentUser?.id ? 'text-coral-red font-medium bg-coral-red/5' : 'text-gray-600'
+                    }`}
+                    data-testid={`button-switch-user-${availableUser.id}`}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    <div className="text-left">
+                      <div className="font-medium">{availableUser.firstName || availableUser.email?.split('@')[0] || 'User'}</div>
+                      <div className="text-xs text-gray-500">{availableUser.email}</div>
+                    </div>
+                    {availableUser.id === currentUser?.id && (
+                      <div className="ml-auto w-2 h-2 bg-coral-red rounded-full"></div>
+                    )}
+                  </button>
+                ))}
               </div>
             )}
 
