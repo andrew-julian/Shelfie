@@ -54,6 +54,29 @@ const statusConfig = {
 // Mock data for demonstration - in real implementation this would come from API
 const getExtendedBookData = (book: Book) => {
   return {
+    feature_bullets: [
+      "Comprehensive coverage of industry fundamentals",
+      "Real-world examples and case studies", 
+      "Updated for 2024 market conditions",
+      "Includes digital transformation insights"
+    ],
+    about_this_item: [
+      "Essential reading for business professionals",
+      "Perfect for students and practitioners",
+      "Includes access to online resources",
+      "Written by industry experts"
+    ],
+    editorial_reviews: [
+      {
+        source: "Publishers Weekly",
+        body: "A masterful examination of contemporary business practices with actionable insights for modern professionals."
+      },
+      {
+        source: "Business Week",
+        body: "Essential reading that bridges theory and practice in today's rapidly evolving marketplace."
+      }
+    ],
+    book_description: "This comprehensive guide provides deep insights into the modern business landscape, offering practical strategies and theoretical frameworks for success in today's competitive environment.",
     variants: [
       { title: "Hardcover", price: "$24.99", asin: "1234567890", is_current_product: book.isbn === "1234567890" },
       { title: "Paperback", price: "$16.99", asin: "1234567891", is_current_product: book.isbn === "1234567891" },
@@ -93,9 +116,9 @@ const getExtendedBookData = (book: Book) => {
       { rank: 127, category: "All Books" }
     ],
     also_bought: [
-      { title: "Deep Work", author: "Cal Newport", price: "$15.99", image: "/api/placeholder/80/120" },
-      { title: "Atomic Habits", author: "James Clear", price: "$18.99", image: "/api/placeholder/80/120" },
-      { title: "The Power of Now", author: "Eckhart Tolle", price: "$16.99", image: "/api/placeholder/80/120" }
+      { title: "Deep Work", author: "Cal Newport", price: "$15.99", image: null },
+      { title: "Atomic Habits", author: "James Clear", price: "$18.99", image: null },
+      { title: "The Power of Now", author: "Eckhart Tolle", price: "$16.99", image: null }
     ]
   };
 };
@@ -627,15 +650,9 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {extendedData.also_bought.map((item, index) => (
                               <div key={index} className="flex gap-3 p-3 border rounded-lg hover:shadow-md transition-shadow">
-                                <img
-                                  src={item.image || "/api/placeholder/80/120"}
-                                  alt={item.title}
-                                  className="w-16 h-20 object-cover rounded"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = "/api/placeholder/80/120";
-                                  }}
-                                />
+                                <div className="w-16 h-20 bg-gray-200 rounded flex items-center justify-center">
+                                  <BookOpen className="w-6 h-6 text-gray-400" />
+                                </div>
                                 <div className="flex-1 min-w-0">
                                   <h4 className="font-medium text-sm line-clamp-2">{item.title}</h4>
                                   <p className="text-xs text-gray-500 mt-1">{item.author}</p>
@@ -820,7 +837,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
         isOpen={showCropper}
         onClose={() => setShowCropper(false)}
         imageUrl={currentCoverImage}
-        onCroppedImageSave={handleCroppedImageSave}
+        onSave={handleCroppedImageSave}
         isLoading={uploadCroppedImageMutation.isPending}
       />
     </>
