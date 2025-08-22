@@ -731,7 +731,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                         <Bookmark className="w-5 h-5" />
                         Available Formats
                       </h3>
-                      <div className="space-y-3">
+                      <div className="space-y-0">
                         {Object.entries(extendedData.variants).map(([format, details]: [string, any]) => {
                           // Determine if this is the user's copy based on stored format or best guess
                           const normalizedFormat = format.toLowerCase().replace(/[^a-z]/g, '');
@@ -742,19 +742,19 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                           return (
                             <div 
                               key={format} 
-                              className={`p-4 rounded-lg border transition-all ${
+                              className={`py-4 px-0 border-b border-gray-200 last:border-b-0 ${
                                 isUserCopy 
-                                  ? 'bg-coral-red/5 border-coral-red/20 shadow-sm ring-2 ring-coral-red/10' 
-                                  : 'bg-gray-50 border-gray-200'
+                                  ? 'bg-coral-red/5 -mx-6 px-6 border-coral-red/20 rounded-lg border-2 my-2' 
+                                  : ''
                               }`}
                             >
                               <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-3">
-                                  <span className="font-medium text-gray-900 capitalize">
+                                  <span className="font-medium text-gray-900 text-base capitalize">
                                     {format}
                                   </span>
                                   {isUserCopy && (
-                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-coral-red text-white">
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-coral-red text-white">
                                       Your Copy
                                     </span>
                                   )}
@@ -766,7 +766,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                                     </span>
                                   )}
                                   {!details.price && details.available && (
-                                    <span className="text-green-600 font-medium">
+                                    <span className="text-coral-red font-semibold text-lg">
                                       $0.00
                                     </span>
                                   )}
