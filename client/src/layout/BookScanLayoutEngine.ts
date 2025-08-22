@@ -123,8 +123,9 @@ export function calculateLayout(
       // Process current row
       processRow(currentRow, dims, containerWidth, cfg, yCursor, rowIndex, layoutItems);
       
-      // Start new row
-      yCursor += cfg.targetRowHeight + cfg.gutterY;
+      // Start new row using actual tallest book height in the row
+      const actualRowHeight = Math.max(...currentRow.map(book => book.phys.height_mm * 0.6));
+      yCursor += actualRowHeight + cfg.gutterY;
       rowIndex++;
       currentRow = [book];
       currentRowNaturalWidth = naturalWidth;
@@ -158,14 +159,17 @@ function processRow(
 ): void {
   if (rowBooks.length === 0) return;
   
-  // Calculate natural widths using physical proportions
-  const H = cfg.targetRowHeight;
+  // Calculate natural dimensions preserving true physical proportions
+  // Use a scale factor instead of forcing uniform height
+  const basePixelScale = 0.6; // Convert mm to pixels with realistic scaling
   let wsum = 0;
-  const physicalWidths = rowBooks.map(book => {
-    // Natural width at height H using physical aspect ratio
-    const Wi = (book.phys.width_mm / book.phys.height_mm) * H;
+  const physicalDimensions = rowBooks.map(book => {
+    // Preserve true proportions by scaling mm directly to pixels
+    const Wi = book.phys.width_mm * basePixelScale;
+    const Hi = book.phys.height_mm * basePixelScale;
+    const Di = book.phys.spine_mm * basePixelScale;
     wsum += Wi;
-    return Wi;
+    return { Wi, Hi, Di };
   });
   
   // Calculate scale factor for justification
@@ -190,12 +194,12 @@ function processRow(
   
   for (let i = 0; i < rowBooks.length; i++) {
     const book = rowBooks[i];
-    const Wi = physicalWidths[i];
-    const Di = book.phys.spine_mm * (H / book.phys.height_mm);
+    const { Wi, Hi, Di } = physicalDimensions[i];
     
+    // Apply justification scale but preserve individual heights
     const w = Wi * scale;
-    const h = H * scale;
-    const d = Math.max(2, Di * scale);
+    const h = Hi; // Keep natural height - no uniform scaling!
+    const d = Math.max(2, Di);
     
     nominalItems.push({ id: book.id, w, h, d, x });
     x += w + cfg.gutterX;
