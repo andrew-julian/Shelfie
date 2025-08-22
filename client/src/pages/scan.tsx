@@ -116,35 +116,35 @@ const QueueItemCard = ({ item, onRetry, onRemove }: {
   };
 
   return (
-    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center space-x-2">
-          <span className="font-mono text-sm text-gray-600">{item.isbn}</span>
-          <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(item.status)}`}>
+    <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+      <div className="flex-1 min-w-0 space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-mono text-sm text-gray-600 break-all">{item.isbn}</span>
+          <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${getStatusColor(item.status)}`}>
             {getStatusText(item.status)}
           </span>
           {['looking-up', 'adding'].includes(item.status) && (
-            <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
+            <Loader2 className="w-3 h-3 animate-spin text-blue-500 flex-shrink-0" />
           )}
         </div>
         {item.title && (
-          <p className="text-sm text-gray-800 truncate mt-1">{item.title}</p>
+          <p className="text-sm text-gray-800 break-words leading-snug">{item.title}</p>
         )}
         {item.author && (
-          <p className="text-xs text-gray-600 truncate">{item.author}</p>
+          <p className="text-xs text-gray-600 break-words">{item.author}</p>
         )}
         {item.error && (
-          <p className="text-xs text-red-600 mt-1">{item.error}</p>
+          <p className="text-xs text-red-600 break-words">{item.error}</p>
         )}
       </div>
       
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-col items-center space-y-1 flex-shrink-0">
         {item.status === 'error' && item.retryCount < 3 && (
           <Button
             variant="ghost"
             size="sm"
             onClick={onRetry}
-            className="text-xs text-blue-600 hover:text-blue-700"
+            className="text-xs text-blue-600 hover:text-blue-700 px-2 h-6"
             data-testid={`button-retry-${item.id}`}
           >
             Retry
@@ -154,7 +154,7 @@ const QueueItemCard = ({ item, onRetry, onRemove }: {
           variant="ghost"
           size="sm"
           onClick={onRemove}
-          className="text-xs text-gray-500 hover:text-gray-700"
+          className="text-xs text-gray-500 hover:text-gray-700 px-2 h-6"
           data-testid={`button-remove-${item.id}`}
         >
           ✕
@@ -487,14 +487,14 @@ export default function ScanPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="grid gap-8 md:grid-cols-2">
-          {/* Left Column - Scanner */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg p-6 shadow-sm">
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Scanner Section */}
+          <div className="space-y-4">
+            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm">
               
               {/* Camera Preview Area */}
-              <div className="relative bg-gray-900 rounded-lg overflow-hidden mb-6" style={{ aspectRatio: '4/3' }}>
+              <div className="relative bg-gray-900 rounded-lg overflow-hidden mb-4 sm:mb-6" style={{ aspectRatio: '4/3' }}>
                 <div 
                   ref={scannerRef} 
                   className="w-full h-full" 
@@ -556,17 +556,17 @@ export default function ScanPage() {
             </div>
           </div>
 
-          {/* Right Column - Queue */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
+          {/* Queue Section */}
+          <div className="space-y-4">
+            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
                 <h2 className="text-lg font-medium">
                   Scanning Queue ({queue.length})
                 </h2>
                 {queue.some(item => ['scanning', 'looking-up', 'adding'].includes(item.status)) && (
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center space-x-1 self-start">
                     <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                    <span className="text-sm text-blue-600">Processing...</span>
+                    <span className="text-sm text-blue-600 whitespace-nowrap">Processing...</span>
                   </div>
                 )}
               </div>
