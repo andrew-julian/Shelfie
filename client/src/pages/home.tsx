@@ -475,6 +475,7 @@ export default function Home() {
     
     // Use ResizeObserver for better performance
     const resizeObserver = new ResizeObserver((entries) => {
+      console.log('ResizeObserver update:', { width: entries[0].contentRect.width, height: entries[0].contentRect.height });
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
         const newWidth = Math.max(width || 1200, 300); // Ensure minimum width
@@ -504,6 +505,39 @@ export default function Home() {
       window.removeEventListener('resize', updateContainerSize);
     };
   }, []); // Only run once on mount
+
+  // Force layout refresh when books are loaded and container is measured (simulating scroll trigger)
+  useEffect(() => {
+    if (finalBooks.length > 0 && isContainerMeasured && containerDimensions.width > 0) {
+      // Trigger the same measurement update that happens during scroll
+      const forceLayoutRefresh = () => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const parentElement = containerRef.current.parentElement;
+          const parentRect = parentElement?.getBoundingClientRect();
+          
+          let newWidth = rect.width;
+          if (!newWidth && parentRect) {
+            newWidth = parentRect.width - 48;
+          }
+          if (!newWidth) {
+            newWidth = window.innerWidth - 100;
+          }
+          
+          const newHeight = Math.max(rect.height, 600);
+          
+          // Force a layout update by re-setting container dimensions
+          setContainerDimensions({ width: newWidth, height: newHeight });
+        }
+      };
+
+      // Trigger layout refresh with small delays to ensure DOM is ready
+      const refreshTimeouts = [100, 300, 500]; // Multiple attempts like on mobile scroll
+      refreshTimeouts.forEach(delay => {
+        setTimeout(forceLayoutRefresh, delay);
+      });
+    }
+  }, [finalBooks.length, isContainerMeasured, containerDimensions.width]);
 
   // Update layout items state when new layout is calculated
   useEffect(() => {
