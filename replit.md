@@ -14,6 +14,8 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 ### Physical Proportions Layout System (August 2025)
 - **True Physical Scaling**: Books now display with accurate real-world proportions using Amazon dimension data (8.27"×10.27" vs 5.16"×7.68")
 - **Dimension Parsing**: Intelligent parsing of both inches and centimeters from Amazon data with proper conversion logic
+- **Amazon Dimension Order Preservation**: Fixed dimension parsing to preserve Amazon's original width × height × depth order instead of forcing portrait orientation
+- **Accurate Book Proportions**: Resolved issues where books like "Understanding Company Law" appeared incorrectly wide due to swapped dimensions
 - **Proportion Preservation**: Layout engine modified to maintain individual book heights instead of forcing uniform row heights
 - **Centered Row Layout**: All rows are centered within the container to eliminate awkward whitespace
 - **Minimal Stretch Limits**: Maximum 1.05x scaling to prevent aspect ratio distortion while allowing slight justification
@@ -69,6 +71,8 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
   - Compact button layouts with abbreviated text on smaller screens
   - Compressed book count display format (55/60 vs 55 of 60 books)
   - Shortened color sort option labels for better fit
+- **Automatic Book Refresh**: Books automatically reload when navigating back from scan page to show newly scanned items
+- **Mobile Layout Auto-trigger**: Added automatic layout refresh that simulates scroll behavior to fix mobile display issues on initial page load
 
 ### Scanbot SDK Integration (August 2025)
 - **Fully Functional Barcode Scanner**: Complete implementation of Scanbot SDK v7.2.0 with working camera access and barcode detection
