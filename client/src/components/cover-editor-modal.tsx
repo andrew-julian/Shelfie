@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Crop, Check, X } from "lucide-react";
-import { ImageCropper } from "./image-cropper";
+import { Upload, Crop, Check, X, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 
 interface CoverEditorModalProps {
   isOpen: boolean;
@@ -30,9 +30,19 @@ export function CoverEditorModal({
   isUpdating
 }: CoverEditorModalProps) {
   const [activeTab, setActiveTab] = useState("gallery");
-  const [showCropper, setShowCropper] = useState(false);
+  const [cropMode, setCropMode] = useState(false);
   const [selectedCoverIndex, setSelectedCoverIndex] = useState(currentCoverIndex);
   const [cropImageUrl, setCropImageUrl] = useState("");
+  const [cropSettings, setCropSettings] = useState({
+    zoom: 1,
+    rotation: 0,
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 133 // Aspect ratio for book covers (3:4)
+  });
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const handleCoverSelection = (index: number) => {
     setSelectedCoverIndex(index);
@@ -58,7 +68,8 @@ export function CoverEditorModal({
         reader.onload = (e) => {
           const imageUrl = e.target?.result as string;
           setCropImageUrl(imageUrl);
-          setShowCropper(true);
+          setCropMode(true);
+          setActiveTab("crop");
         };
         reader.readAsDataURL(file);
       }
@@ -66,16 +77,63 @@ export function CoverEditorModal({
     input.click();
   };
 
-  const handleCropComplete = (croppedImageData: string) => {
-    onCustomCover(croppedImageData);
-    setShowCropper(false);
-    onClose();
-  };
+
 
   const handleCropFromExisting = (imageUrl: string) => {
     setCropImageUrl(imageUrl);
-    setShowCropper(true);
-    setActiveTab("custom");
+    setCropMode(true);
+    setActiveTab("crop");
+  };
+
+  const handleCropApply = () => {
+    const canvas = canvasRef.current;
+    const img = imageRef.current;
+    if (!canvas || !img) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas size to desired output size
+    canvas.width = 300;
+    canvas.height = 400;
+
+    // Calculate crop area based on settings
+    const { zoom, rotation, x, y, width, height } = cropSettings;
+    
+    // Draw cropped image
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((rotation * Math.PI) / 180);
+    ctx.scale(zoom, zoom);
+    
+    const cropX = (x * img.naturalWidth) / 100;
+    const cropY = (y * img.naturalHeight) / 100;
+    const cropWidth = (width * img.naturalWidth) / 100;
+    const cropHeight = (height * img.naturalHeight) / 100;
+    
+    ctx.drawImage(
+      img,
+      cropX, cropY, cropWidth, cropHeight,
+      -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height
+    );
+    ctx.restore();
+
+    // Convert to base64
+    const croppedImageData = canvas.toDataURL('image/jpeg', 0.9);
+    onCustomCover(croppedImageData);
+    setCropMode(false);
+    onClose();
+  };
+
+  const resetCropSettings = () => {
+    setCropSettings({
+      zoom: 1,
+      rotation: 0,
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 133
+    });
   };
 
   if (!book.coverImages) return null;
@@ -92,7 +150,7 @@ export function CoverEditorModal({
           </DialogHeader>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className={`grid w-full ${cropMode ? 'grid-cols-3' : 'grid-cols-2'}`}>
               <TabsTrigger value="gallery" className="flex items-center gap-2">
                 <Check className="w-4 h-4" />
                 Select Cover
@@ -101,6 +159,12 @@ export function CoverEditorModal({
                 <Upload className="w-4 h-4" />
                 Custom Upload
               </TabsTrigger>
+              {cropMode && (
+                <TabsTrigger value="crop" className="flex items-center gap-2">
+                  <Crop className="w-4 h-4" />
+                  Crop Image
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="gallery" className="space-y-4 flex-1">
@@ -170,6 +234,118 @@ export function CoverEditorModal({
                 </p>
               </div>
             </TabsContent>
+
+            {cropMode && (
+              <TabsContent value="crop" className="space-y-4 flex-1">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Image Preview */}
+                  <div className="relative">
+                    <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden relative">
+                      <img
+                        ref={imageRef}
+                        src={cropImageUrl}
+                        alt="Crop preview"
+                        className="w-full h-full object-contain"
+                        style={{
+                          transform: `scale(${cropSettings.zoom}) rotate(${cropSettings.rotation}deg)`,
+                          transformOrigin: 'center',
+                        }}
+                      />
+                      {/* Crop Overlay */}
+                      <div
+                        className="absolute border-2 border-coral-red bg-coral-red/10"
+                        style={{
+                          left: `${cropSettings.x}%`,
+                          top: `${cropSettings.y}%`,
+                          width: `${cropSettings.width}%`,
+                          height: `${cropSettings.height}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Crop Controls */}
+                  <div className="space-y-6">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Zoom</label>
+                      <div className="flex items-center gap-2">
+                        <ZoomOut className="w-4 h-4" />
+                        <Slider
+                          value={[cropSettings.zoom]}
+                          onValueChange={([zoom]) =>
+                            setCropSettings(prev => ({ ...prev, zoom }))
+                          }
+                          min={0.5}
+                          max={3}
+                          step={0.1}
+                          className="flex-1"
+                        />
+                        <ZoomIn className="w-4 h-4" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Rotation</label>
+                      <div className="flex items-center gap-2">
+                        <RotateCcw className="w-4 h-4" />
+                        <Slider
+                          value={[cropSettings.rotation]}
+                          onValueChange={([rotation]) =>
+                            setCropSettings(prev => ({ ...prev, rotation }))
+                          }
+                          min={-45}
+                          max={45}
+                          step={1}
+                          className="flex-1"
+                        />
+                        <span className="text-sm w-8">{cropSettings.rotation}°</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Position X</label>
+                      <Slider
+                        value={[cropSettings.x]}
+                        onValueChange={([x]) =>
+                          setCropSettings(prev => ({ ...prev, x }))
+                        }
+                        min={0}
+                        max={100 - cropSettings.width}
+                        step={1}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Position Y</label>
+                      <Slider
+                        value={[cropSettings.y]}
+                        onValueChange={([y]) =>
+                          setCropSettings(prev => ({ ...prev, y }))
+                        }
+                        min={0}
+                        max={100 - cropSettings.height}
+                        step={1}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div className="flex gap-2 pt-4">
+                      <Button variant="outline" onClick={resetCropSettings} className="flex-1">
+                        <RotateCcw className="w-4 h-4 mr-2" />
+                        Reset
+                      </Button>
+                      <Button onClick={handleCropApply} className="flex-1">
+                        Apply Crop
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hidden canvas for crop processing */}
+                <canvas ref={canvasRef} className="hidden" />
+              </TabsContent>
+            )}
           </Tabs>
 
           {/* Action Buttons */}
@@ -189,17 +365,24 @@ export function CoverEditorModal({
                 </Button>
               </div>
             )}
+
+            {activeTab === "crop" && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setCropMode(false);
+                    setActiveTab("gallery");
+                  }}
+                >
+                  Back to Gallery
+                </Button>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Image Cropper Modal */}
-      <ImageCropper
-        isOpen={showCropper}
-        onClose={() => setShowCropper(false)}
-        imageUrl={cropImageUrl}
-        onCropComplete={handleCropComplete}
-      />
     </>
   );
 }
