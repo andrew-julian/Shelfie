@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import Home from "@/pages/home";
+import ScanPage from "@/pages/scan";
 import Landing from "@/pages/Landing";
 import Settings from "@/pages/Settings";
 import RefreshProgress from "@/pages/refresh-progress";
@@ -20,6 +21,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
+          <Route path="/scan" component={ScanPage} />
           <Route path="/settings" component={Settings} />
           <Route path="/refresh-progress" component={RefreshProgress} />
         </>

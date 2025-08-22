@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/header";
 import BookCard from "@/components/book-card";
-import ScannerModal from "@/components/scanner-modal";
 import EnhancedBookDetailsModal from "@/components/enhanced-book-details-modal";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,7 +20,7 @@ import {
 } from '@/layout/BookScanLayoutEngine';
 import VirtualizedBookGrid from '@/components/virtualized-book-grid';
 import { usePerformanceTelemetry } from '@/hooks/usePerformanceTelemetry';
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 
 type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
@@ -55,7 +54,6 @@ async function sortBooksByColor(books: Book[], reverse: boolean = false): Promis
 }
 
 export default function Home() {
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('date-added');
@@ -566,10 +564,7 @@ export default function Home() {
     setSelectedBook(book);
   };
 
-  const handleScannerClose = () => {
-    setIsScannerOpen(false);
-    refetch(); // Refresh books list after scanning
-  };
+
 
   const handleBookUpdate = () => {
     refetch(); // Refresh books list after update
@@ -708,35 +703,30 @@ export default function Home() {
                 Start your reading journey by scanning book barcodes. Watch your personal library come to life.
               </p>
             </div>
-            <button
-              onClick={() => setIsScannerOpen(true)}
-              className="inline-flex items-center px-8 py-4 bg-coral-red hover:bg-red-600 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-              data-testid="button-scan-first-book"
-            >
-              <Camera className="w-6 h-6 mr-3" />
-              Scan Your First Book
-            </button>
+            <Link href="/scan">
+              <button className="inline-flex items-center px-8 py-4 bg-coral-red hover:bg-red-600 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                data-testid="button-scan-first-book"
+              >
+                <Camera className="w-6 h-6 mr-3" />
+                Scan Your First Book
+              </button>
+            </Link>
           </div>
         )}
         </main>
 
       {/* Floating Action Button */}
       {finalBooks.length > 0 && (
-        <button
-          onClick={() => setIsScannerOpen(true)}
-          className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 bg-coral-red hover:bg-red-600 text-white p-3 sm:p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 z-[9997]"
-          data-testid="button-floating-scan"
-        >
-          <Camera className="w-6 h-6 sm:w-7 sm:h-7" />
-        </button>
+        <Link href="/scan">
+          <button className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 bg-coral-red hover:bg-red-600 text-white p-3 sm:p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 z-[9997]"
+            data-testid="button-floating-scan"
+          >
+            <Camera className="w-6 h-6 sm:w-7 sm:h-7" />
+          </button>
+        </Link>
       )}
 
-      {/* Modals */}
-      <ScannerModal 
-        isOpen={isScannerOpen} 
-        onClose={handleScannerClose}
-      />
-      
+      {/* Book Details Modal */}
       <EnhancedBookDetailsModal
         book={selectedBook}
         isOpen={!!selectedBook}

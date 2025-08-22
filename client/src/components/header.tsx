@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut, Menu, Users, ChevronDown } from "lucide-react";
+import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut, Menu, Users, ChevronDown, Camera } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
@@ -51,6 +51,13 @@ export default function Header({
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-2 lg:space-x-4 xl:space-x-6">
+            <Link href="/scan">
+              <button className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-2 text-xs lg:text-sm font-medium text-white bg-coral-red hover:bg-red-600 rounded-lg transition-all" data-testid="button-scan">
+                <Camera className="w-3 lg:w-4 h-3 lg:h-4" />
+                <span className="hidden lg:inline">Scan Books</span>
+                <span className="lg:hidden">Scan</span>
+              </button>
+            </Link>
             <span className="text-xs lg:text-sm text-gray-600 font-medium whitespace-nowrap" data-testid="text-books-count">
               {filteredCount !== booksCount ? `${filteredCount}/${booksCount}` : booksCount} books
             </span>
@@ -191,6 +198,17 @@ export default function Header({
                 <Filter className="w-4 h-4" />
                 Filters
               </button>
+
+              <Link href="/scan">
+                <button 
+                  onClick={() => setShowMobileMenu(false)}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-coral-red hover:bg-red-600 rounded-lg transition-all"
+                  data-testid="button-scan-mobile"
+                >
+                  <Camera className="w-4 h-4" />
+                  Scan Books
+                </button>
+              </Link>
 
 
             </div>
