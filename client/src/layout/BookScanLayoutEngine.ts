@@ -177,10 +177,10 @@ function processRow(
   const usable = containerWidth - totalGutterWidth;
   let scale = usable / wsum;
   
-  // Handle last row according to config
-  if (isLastRow && cfg.raggedLastRow) {
-    scale = Math.min(1, scale);
-  }
+  // Preserve natural proportions for all rows, not just the last one
+  // Limit scaling to prevent excessive stretching that destroys proportions
+  const maxStretch = 1.3; // Allow some stretching but preserve dramatic size differences
+  scale = Math.min(scale, maxStretch);
   
   // Row waviness
   const jy = Math.sin(rowIndex * 1.3) * 4;

@@ -186,7 +186,7 @@ export default function Home() {
     
     setResponsiveConfig({
       ...baseConfig,
-      raggedLastRow: !tidyMode
+      raggedLastRow: true // Always use ragged rows to preserve proportions
     });
   }, [containerDimensions.width, tidyMode]);
 
