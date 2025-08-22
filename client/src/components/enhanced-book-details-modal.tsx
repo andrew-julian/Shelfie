@@ -33,7 +33,8 @@ import {
   FileText,
   MessageSquare,
   BarChart3,
-  Quote
+  Quote,
+  CheckCircle
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -319,11 +320,11 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                 <p className="text-gray-600 mb-2">{book.author}</p>
                 
                 {/* Star Rating */}
-                {extendedData?.rating && (
+                {book.rating && (
                   <div className="flex items-center gap-2 mb-2">
-                    {renderStarRating(extendedData.rating, 16)}
+                    {renderStarRating(parseFloat(book.rating), "sm")}
                     <span className="text-sm text-gray-600">
-                      ({extendedData.rating_count || 'No reviews'})
+                      ({book.ratingsTotal || 'No reviews'})
                     </span>
                   </div>
                 )}
@@ -341,9 +342,9 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                     </SelectContent>
                   </Select>
                   
-                  {extendedData?.price && (
+                  {book.price && (
                     <Badge variant="secondary" className="text-sm">
-                      {extendedData.price}
+                      ${book.price}
                     </Badge>
                   )}
                 </div>
@@ -377,494 +378,52 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
               )}
             </div>
 
-            {/* Format Variants - Compact Row */}
-            {extendedData?.variants && (
-              <div className="flex gap-2 flex-wrap pb-4">
-                {extendedData.variants.map((variant, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm transition-all ${
-                      variant.is_current_product
-                        ? 'border-coral-red bg-coral-red/5 text-coral-red font-medium'
-                        : 'border-gray-200 text-gray-600'
-                    }`}
-                  >
-                    <span>{variant.title}</span>
-                    <span className="font-semibold">
-                      {variant.price?.raw || variant.price?.value || variant.price || "N/A"}
-                    </span>
-                    {variant.is_current_product && (
-                      <CheckCircle className="w-3 h-3" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Main Content - Tabbed Interface */}
-            <div className="border-b border-gray-200">
-              <div className="flex space-x-6">
-                {['overview', 'reviews', 'details'].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab as typeof activeTab)}
-                    className={`pb-2 px-1 border-b-2 font-medium text-sm capitalize transition-all ${
-                      activeTab === tab
-                        ? 'border-coral-red text-coral-red'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
+            {/* Navigation Tabs */}
+            <div className="flex gap-4 mb-6 border-b">
+              {[
+                { id: 'overview', label: 'Overview', icon: Eye },
+                { id: 'reviews', label: 'Reviews', icon: Star },
+                { id: 'details', label: 'Details', icon: BookOpen }
+              ].map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(id as any)}
+                  className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+                    activeTab === id
+                      ? 'border-coral-red text-coral-red'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {label}
+                </button>
+              ))}
             </div>
 
             {/* Tab Content */}
             <div className="space-y-6">
               {activeTab === 'overview' && (
                 <div className="space-y-6">
-                  {/* Description */}
                   {extendedData?.book_description && (
                     <div>
                       <h3 className="text-lg font-semibold mb-3">Description</h3>
                       <p className="text-gray-700 leading-relaxed">{extendedData.book_description}</p>
                     </div>
                   )}
+                </div>
+              )}
 
-                  {/* Quick Info Grid */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {book.publishYear && (
-                      <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                        <Calendar className="w-4 h-4 text-gray-500" />
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Published</p>
-                            <p className="font-semibold text-sm">{book.publishYear}</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {book.pages && (
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                          <BookOpen className="w-4 h-4 text-gray-500" />
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Pages</p>
-                            <p className="font-semibold text-sm">{book.pages}</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {book.language && (
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                          <Languages className="w-4 h-4 text-gray-500" />
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Language</p>
-                            <p className="font-semibold text-sm">{book.language}</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {book.publisher && (
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                          <Building className="w-4 h-4 text-gray-500" />
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Publisher</p>
-                            <p className="font-semibold text-sm">{book.publisher}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+              {activeTab === 'reviews' && (
+                <div className="space-y-6">
+                  <p className="text-gray-500">Reviews tab content...</p>
+                </div>
+              )}
 
-                    {/* Bestseller Ranks */}
-                    {extendedData?.bestsellers_rank && (
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                          <Award className="w-4 h-4" />
-                          Bestseller Ranks
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {extendedData.bestsellers_rank.map((rank: any, index: number) => (
-                            <Badge key={index} variant="secondary" className="bg-yellow-100 text-yellow-800">
-                              #{rank.rank} in {rank.category}
-                            </Badge>
-                              #{rank.rank} in {rank.category}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-            </div>
-
-            <Separator className="my-8" />
-
-            {/* Navigation Tabs */}
-            <div className="flex gap-4 mb-6 border-b">
-                  {[
-                    { id: 'overview', label: 'Overview', icon: Eye },
-                    { id: 'reviews', label: 'Reviews', icon: Star },
-                    { id: 'details', label: 'Details', icon: BookOpen }
-                  ].map(({ id, label, icon: Icon }) => (
-                    <button
-                      key={id}
-                      onClick={() => setActiveTab(id as any)}
-                      className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
-                        activeTab === id
-                          ? 'border-coral-red text-coral-red'
-                          : 'border-transparent text-gray-500 hover:text-gray-700'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      {label}
-                    </button>
-                  ))}
-            </div>
-
-            {/* Tab Content */}
-            <div className="space-y-6">
-                  {activeTab === 'overview' && (
-                    <>
-                      {/* Description & Overview */}
-                      <div>
-                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                          <FileText className="w-5 h-5" />
-                          Overview
-                        </h3>
-                        <div className="space-y-4">
-                          {extendedData?.feature_bullets && extendedData.feature_bullets.length > 0 && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Key Features</h4>
-                              <ul className="list-disc list-inside space-y-1">
-                                {extendedData.feature_bullets.map((bullet, index) => (
-                                  <li key={index} className="text-gray-700">{bullet}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                          
-                          {extendedData?.about_this_item && extendedData.about_this_item.length > 0 && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">About This Item</h4>
-                              <ul className="list-disc list-inside space-y-1">
-                                {extendedData.about_this_item.map((item, index) => (
-                                  <li key={index} className="text-gray-700">{item}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {book.description && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                              <p className="text-gray-700 leading-relaxed">
-                                {book.description}
-                              </p>
-                            </div>
-                          )}
-
-                          {extendedData?.editorial_reviews && extendedData.editorial_reviews.length > 0 && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <Quote className="w-4 h-4" />
-                                Editorial Reviews
-                              </h4>
-                              <div className="space-y-4">
-                                {extendedData.editorial_reviews.map((review, index) => {
-                                  // Parse and format the review body to extract individual quotes with sources
-                                  const parseEditorialReview = (text: string) => {
-                                    // Split on common patterns that indicate new quotes
-                                    const quoteParts = text.split(/--/);
-                                    const quotes = [];
-                                    
-                                    for (let i = 0; i < quoteParts.length; i++) {
-                                      const part = quoteParts[i].trim();
-                                      if (part) {
-                                        // Check if this looks like a quote (starts with opening quote or contains quoted content)
-                                        const hasQuotes = part.includes('"') && part.includes('"');
-                                        const startsWithQuote = part.startsWith('"');
-                                        
-                                        if (hasQuotes || startsWithQuote) {
-                                          // Try to extract quote and attribution
-                                          const quoteMatch = part.match(/^[""]([^""]+)[""]?(.*)$/);
-                                          if (quoteMatch) {
-                                            const quoteText = quoteMatch[1];
-                                            let attribution = quoteMatch[2] ? quoteMatch[2].trim() : '';
-                                            
-                                            // Look for attribution in the next part if not found
-                                            if (!attribution && i + 1 < quoteParts.length) {
-                                              attribution = quoteParts[i + 1].trim();
-                                              i++; // Skip the next part since we used it as attribution
-                                            }
-                                            
-                                            // Clean up attribution - remove leading dashes or common prefixes
-                                            attribution = attribution.replace(/^-+/, '').trim();
-                                            
-                                            quotes.push({ text: quoteText, attribution });
-                                          } else {
-                                            // Fallback: treat as quote without clear structure
-                                            quotes.push({ text: part, attribution: '' });
-                                          }
-                                        } else if (part.length > 20) {
-                                          // Long text without quotes - treat as regular text
-                                          quotes.push({ text: part, attribution: '' });
-                                        }
-                                      }
-                                    }
-                                    
-                                    return quotes.length > 0 ? quotes : [{ text: text, attribution: '' }];
-                                  };
-                                  
-                                  const parsedQuotes = parseEditorialReview(review.body || '');
-                                  
-                                  return (
-                                    <div key={index} className="space-y-3">
-                                      {parsedQuotes.map((quote, qIndex) => (
-                                        <div 
-                                          key={qIndex} 
-                                          className="relative p-4 bg-gradient-to-r from-blue-50 to-gray-50 rounded-lg border-l-4 border-blue-400"
-                                        >
-                                          <Quote className="absolute top-2 left-2 w-4 h-4 text-blue-400 opacity-60" />
-                                          <blockquote className="pl-6 text-gray-800 leading-relaxed italic">
-                                            "{quote.text.replace(/^[""]|[""]$/g, '')}"
-                                          </blockquote>
-                                          {quote.attribution && (
-                                            <cite className="block mt-2 text-sm font-medium text-gray-600 not-italic pl-6">
-                                              — {quote.attribution}
-                                            </cite>
-                                          )}
-                                          {review.source && qIndex === 0 && (
-                                            <div className="absolute top-2 right-3 text-xs text-gray-500 bg-white px-2 py-1 rounded">
-                                              {review.source}
-                                            </div>
-                                          )}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          )}
-
-                          {extendedData?.book_description && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Product Description</h4>
-                              <p className="text-gray-700 leading-relaxed">
-                                {extendedData.book_description}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Categories */}
-                      {book.categories && book.categories.length > 0 && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                            <Tag className="w-5 h-5" />
-                            Categories
-                          </h3>
-                          <div className="flex flex-wrap gap-2">
-                            {book.categories.map((category, index) => (
-                              <Badge key={index} variant="outline">
-                                {category}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Also Bought */}
-                      {extendedData?.also_bought && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                            <Users className="w-5 h-5" />
-                            Customers also bought
-                          </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {extendedData.also_bought.map((item, index) => (
-                              <div key={index} className="flex gap-3 p-3 border rounded-lg hover:shadow-md transition-shadow">
-                                <div className="w-16 h-20 bg-gray-200 rounded flex items-center justify-center">
-                                  <BookOpen className="w-6 h-6 text-gray-400" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="font-medium text-sm line-clamp-2">{item.title}</h4>
-                                  <p className="text-xs text-gray-500 mt-1">{item.author}</p>
-                                  <p className="text-sm font-semibold text-coral-red mt-1">
-                                    {item.price?.raw || item.price?.value || item.price || "N/A"}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {activeTab === 'reviews' && (
-                    <>
-                      {/* Rating Breakdown */}
-                      {extendedData?.rating_breakdown && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-4">Rating Breakdown</h3>
-                          <div className="space-y-2">
-                            {Object.entries(extendedData.rating_breakdown).reverse().map(([key, value], index) => {
-                              const starNum = 5 - index;
-                              return (
-                                <div key={key} className="flex items-center gap-3">
-                                  <span className="text-sm w-8">{starNum} ★</span>
-                                  <div className="flex-1 bg-gray-200 rounded-full h-2">
-                                    <div
-                                      className="bg-yellow-400 h-2 rounded-full"
-                                      style={{ width: `${value.percentage}%` }}
-                                    />
-                                  </div>
-                                  <span className="text-sm text-gray-500 w-12">
-                                    {value.percentage}%
-                                  </span>
-                                  <span className="text-sm text-gray-500 w-16">
-                                    ({value.count.toLocaleString()})
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Top Reviews */}
-                      {extendedData?.top_reviews && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-4">Top Reviews</h3>
-                          <div className="space-y-4">
-                            {extendedData.top_reviews.map((review) => (
-                              <div key={review.id} className="border rounded-lg p-4">
-                                <div className="flex items-start justify-between mb-2">
-                                  <div className="flex items-center gap-2">
-                                    {renderStarRating(review.rating)}
-                                    <span className="font-semibold text-sm">{review.title}</span>
-                                  </div>
-                                  {review.verified_purchase && (
-                                    <Badge variant="outline" className="text-xs">
-                                      Verified Purchase
-                                    </Badge>
-                                  )}
-                                </div>
-                                <p className="text-gray-700 text-sm mb-2 line-clamp-3">{review.body}</p>
-                                <div className="flex items-center gap-4 text-xs text-gray-500">
-                                  <span>
-                                    {review.date?.raw || review.date?.utc || review.date || "N/A"}
-                                  </span>
-                                  <span>{review.helpful_votes} people found this helpful</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {activeTab === 'details' && (
-                    <>
-                      {/* Physical Specifications */}
-                      <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <Ruler className="w-5 h-5" />
-                          Physical Specifications
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {book.dimensions && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Dimensions</span>
-                              <span className="font-medium">{book.dimensions}</span>
-                            </div>
-                          )}
-                          {book.weight && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Weight</span>
-                              <span className="font-medium">{book.weight}</span>
-                            </div>
-                          )}
-                          {book.width && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Width</span>
-                              <span className="font-medium">{book.width}"</span>
-                            </div>
-                          )}
-                          {book.height && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Height</span>
-                              <span className="font-medium">{book.height}"</span>
-                            </div>
-                          )}
-                          {book.depth && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Depth</span>
-                              <span className="font-medium">{book.depth}"</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Publishing Information */}
-                      <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <Building className="w-5 h-5" />
-                          Publishing Information
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {book.isbn && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">ISBN</span>
-                              <span className="font-medium font-mono">{book.isbn}</span>
-                            </div>
-                          )}
-                          {book.asin && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">ASIN</span>
-                              <span className="font-medium font-mono">{book.asin}</span>
-                            </div>
-                          )}
-                          {book.publishDate && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Publication Date</span>
-                              <span className="font-medium">{book.publishDate}</span>
-                            </div>
-                          )}
-                          {book.amazonDomain && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Amazon Region</span>
-                              <span className="font-medium">{book.amazonDomain}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Personal Library Info */}
-                      <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <Bookmark className="w-5 h-5" />
-                          Library Information
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="flex justify-between p-3 bg-gray-50 rounded">
-                            <span className="text-gray-600">Added to Library</span>
-                            <span className="font-medium">
-                              {new Date(book.addedAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <div className="flex justify-between p-3 bg-gray-50 rounded">
-                            <span className="text-gray-600">Reading Status</span>
-                            <Badge className={statusConfig[book.status as keyof typeof statusConfig]?.color || 'bg-gray-100 text-gray-800'}>
-                              {statusConfig[book.status as keyof typeof statusConfig]?.label || book.status}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
+              {activeTab === 'details' && (
+                <div className="space-y-6">
+                  <p className="text-gray-500">Details tab content...</p>
+                </div>
+              )}
             </div>
           </div>
         </DialogContent>
@@ -875,8 +434,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
         isOpen={showCropper}
         onClose={() => setShowCropper(false)}
         imageUrl={currentCoverImage}
-        onSave={handleCroppedImageSave}
-        isLoading={uploadCroppedImageMutation.isPending}
+        onCropComplete={handleCroppedImageSave}
       />
     </>
   );
