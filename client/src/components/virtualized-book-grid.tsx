@@ -210,7 +210,7 @@ export default function VirtualizedBookGrid({
             return (
               <div
                 key={item.id}
-                className="absolute transition-all duration-700 ease-out"
+                className="absolute"
                 style={{
                   '--x': `${item.x}px`,
                   '--y': `${item.y}px`,
@@ -222,7 +222,8 @@ export default function VirtualizedBookGrid({
                   left: `var(--x)`,
                   top: `var(--y)`,
                   zIndex: Math.round(item.z * 100),
-                  transform: `rotateY(var(--ry))`,
+                  transform: `rotateY(${tidyMode ? 0 : item.ry}deg)`,
+                  transition: 'transform 220ms cubic-bezier(.2,.8,.2,1)',
                   width: `var(--w)`,
                   height: `var(--h)`
                 } as React.CSSProperties}

@@ -183,7 +183,12 @@ body {
     transform: 
       rotateY(-25deg) 
       translateZ(1px);
-    transition: transform 0.8s ease;
+    transition: transform 220ms cubic-bezier(.2,.8,.2,1);
+  }
+  
+  /* Mode-specific transitions for tidy toggle */
+  .book-3d.mode-transition .book-3d__inner {
+    transition: transform 600ms cubic-bezier(.2,.8,.2,1);
     /* Layered realistic shadows with softer integration */
     box-shadow:
       0 6px 10px rgba(0,0,0,.18),   /* ambient occlusion */
@@ -223,7 +228,7 @@ body {
     transform: translateZ(-1px);
     pointer-events: none;
     z-index: -1;
-    transition: opacity 0.3s ease;
+    transition: opacity 220ms cubic-bezier(.2,.8,.2,1);
   }
 
   /* Book Pages - using ::before on inner element */

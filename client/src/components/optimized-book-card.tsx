@@ -118,7 +118,7 @@ export default function OptimizedBookCard({
   return (
     <div
       ref={cardRef}
-      className="absolute cursor-pointer transition-all duration-300 ease-out will-change-transform"
+      className="absolute cursor-pointer will-change-transform"
       style={{
         width: `${dimensions.width}px`,
         height: `${dimensions.height}px`,
@@ -137,15 +137,15 @@ export default function OptimizedBookCard({
       <div
         className="relative w-full h-full rounded-lg shadow-lg overflow-hidden"
         style={{
-          background: book.coverUrl ? 'transparent' : '#f3f4f6',
+          background: book.coverImage ? 'transparent' : '#f3f4f6',
           transform: isHovered && !tidyMode ? 'translateZ(10px) rotateX(-5deg)' : 'translateZ(0)',
-          transition: 'transform 0.3s ease-out',
+          transition: 'transform 220ms cubic-bezier(.2,.8,.2,1)',
           filter: isHovered ? 'brightness(1.1)' : 'brightness(1)',
         }}
       >
-        {book.coverUrl ? (
+        {book.coverImage ? (
           <img
-            src={book.coverUrl}
+            src={book.coverImage}
             alt={book.title}
             className="w-full h-full object-cover"
             style={{
@@ -179,7 +179,7 @@ export default function OptimizedBookCard({
           height: `${dimensions.height}px`,
           transform: `rotateY(90deg) translateZ(${dimensions.depth / 2}px)`,
           borderRadius: '0 4px 4px 0',
-          background: book.coverUrl 
+          background: book.coverImage 
             ? `linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%)`
             : '#374151'
         }}

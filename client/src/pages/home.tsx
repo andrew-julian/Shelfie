@@ -441,7 +441,7 @@ export default function Home() {
                       transform: `rotateY(${tidyMode ? 0 : item.ry}deg)`,
                       width: `${item.w}px`,
                       height: `${item.h}px`,
-                      transition: 'transform 0.7s ease-out',
+                      transition: tidyMode !== undefined ? 'transform 600ms cubic-bezier(.2,.8,.2,1)' : 'transform 220ms cubic-bezier(.2,.8,.2,1)',
                       willChange: 'transform'
                     }}
                   >
