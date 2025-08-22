@@ -204,13 +204,38 @@ export default function Home() {
   // Convert books to layout engine format
   const convertToLayoutBooks = (books: Book[]): LayoutBook[] => {
     return books.map(book => {
-      // Convert from inches to millimeters (Amazon data is typically in inches)
-      // Default book dimensions: ~5.5" x 8.5" x 0.75" typical paperback
-      const widthInches = book.width ? parseFloat(book.width) : 5.5;
-      const heightInches = book.height ? parseFloat(book.height) : 8.5;
-      const depthInches = book.depth ? parseFloat(book.depth) : 0.75;
+      // Debug logging for dimension analysis
+      if (book.title.toLowerCase().includes('rolex')) {
+        console.log('Rolex book dimensions:', { 
+          title: book.title, 
+          width: book.width, 
+          height: book.height, 
+          depth: book.depth, 
+          dimensions: book.dimensions 
+        });
+      }
       
-      return {
+      let widthInches, heightInches, depthInches;
+      
+      // Try to use parsed dimensions first (from backend intelligent parsing)
+      if (book.width && book.height && book.depth) {
+        widthInches = parseFloat(book.width);
+        heightInches = parseFloat(book.height);
+        depthInches = parseFloat(book.depth);
+      } else if (book.dimensions) {
+        // Parse dimensions string as fallback
+        const parsed = parseRawDimensions(book.dimensions);
+        widthInches = parsed.width;
+        heightInches = parsed.height;
+        depthInches = parsed.depth;
+      } else {
+        // Default dimensions for typical paperback
+        widthInches = 5.5;
+        heightInches = 8.5;
+        depthInches = 0.75;
+      }
+      
+      const result = {
         id: book.id,
         phys: {
           width_mm: widthInches * 25.4, // Convert inches to mm
@@ -218,7 +243,124 @@ export default function Home() {
           spine_mm: depthInches * 25.4
         }
       };
+      
+      // Debug large books
+      if (widthInches > 10 || heightInches > 12) {
+        console.log('Large book detected:', { 
+          title: book.title, 
+          dimensions_inches: { width: widthInches, height: heightInches, depth: depthInches },
+          dimensions_mm: result.phys
+        });
+      }
+      
+      return result;
     });
+  };
+  
+  // Parse raw dimensions string to inches
+  const parseRawDimensions = (dimensionsStr: string): { width: number; height: number; depth: number } => {
+    const defaultDims = { width: 5.5, height: 8.5, depth: 0.75 }; // inches
+    
+    if (!dimensionsStr) return defaultDims;
+    
+    try {
+      const matches = dimensionsStr.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
+      if (!matches) return defaultDims;
+      
+      let [, dim1Str, dim2Str, dim3Str] = matches;
+      let dim1 = parseFloat(dim1Str);
+      let dim2 = parseFloat(dim2Str);
+      let dim3 = parseFloat(dim3Str);
+      
+      // Check if dimensions are in centimeters (convert to inches)
+      if (dimensionsStr.toLowerCase().includes('cm')) {
+        dim1 = dim1 / 2.54; // Convert cm to inches
+        dim2 = dim2 / 2.54;
+        dim3 = dim3 / 2.54;
+      }
+      
+      // Heuristic to determine width, height, depth from the three dimensions
+      const dims = [dim1, dim2, dim3];
+      dims.sort((a, b) => a - b);
+      const [smallest, middle, largest] = dims;
+      
+      // Smallest is typically depth/thickness
+      let width, height, depth = smallest;
+      const remaining = dims.filter(d => d !== smallest);
+      
+      if (remaining.length === 2) {
+        const [smaller, larger] = remaining.sort((a, b) => a - b);
+        const aspectRatio = larger / smaller;
+        
+        if (aspectRatio > 1.4) {
+          // Clear portrait orientation
+          width = smaller;
+          height = larger;
+        } else {
+          // Landscape or square - for coffee table books, width is often larger
+          width = larger;
+          height = smaller;
+        }
+      } else {
+        width = middle;
+        height = largest;
+      }
+      
+      return { width, height, depth };
+    } catch (error) {
+      console.warn('Failed to parse dimensions:', dimensionsStr, error);
+      return defaultDims;
+    }
+  };
+
+  // Legacy parseBookDimensions function for display scaling (no longer used)
+  const parseBookDimensions = (book: Book): { width: number; height: number; depth: number } => {
+    const defaultDimensions = { width: 140, height: 200, depth: 15 };
+    
+    if (!book.dimensions) return defaultDimensions;
+    
+    try {
+      const matches = book.dimensions.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
+      if (!matches) return defaultDimensions;
+      
+      let [, dim1Str, dim2Str, dim3Str] = matches;
+      let dim1 = parseFloat(dim1Str);
+      let dim2 = parseFloat(dim2Str);
+      let dim3 = parseFloat(dim3Str);
+      
+      const dims = [dim1, dim2, dim3];
+      dims.sort((a, b) => a - b);
+      const [smallest, middle, largest] = dims;
+      
+      let width, height, depth = smallest;
+      const remaining = dims.filter(d => d !== smallest);
+      if (remaining.length === 2) {
+        const [smaller, larger] = remaining.sort((a, b) => a - b);
+        const aspectRatio = larger / smaller;
+        
+        if (aspectRatio > 1.4) {
+          width = smaller;
+          height = larger;
+        } else {
+          width = middle;
+          height = largest;
+        }
+      } else {
+        width = middle;
+        height = largest;
+      }
+      
+      // Scale dimensions for visual display
+      const baseScale = 22;
+      return {
+        width: Math.round(width * baseScale),
+        height: Math.round(height * baseScale),
+        depth: Math.max(Math.round(depth * baseScale * 1.2), 10)
+      };
+    } catch (error) {
+      console.warn('Failed to parse book dimensions:', book.dimensions, error);
+      return defaultDimensions;
+    }
   };
 
   // Memoized book normalization
