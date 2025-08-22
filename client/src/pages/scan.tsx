@@ -472,17 +472,15 @@ export default function ScanPage() {
       <div className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
-              <Link href="/">
-                <Button variant="ghost" size="sm" data-testid="button-back-to-library" className="flex-shrink-0">
-                  <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" />
-                  <span className="hidden xs:inline">Back to Library</span>
-                  <span className="xs:hidden">Back</span>
-                </Button>
-              </Link>
-              <h1 className="text-lg sm:text-xl font-semibold truncate">Scan</h1>
-            </div>
-            <div className="text-xs sm:text-sm text-gray-600 flex-shrink-0 ml-2">
+            <Link href="/">
+              <Button variant="ghost" size="sm" data-testid="button-back-to-library" className="flex-shrink-0">
+                <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden xs:inline">Back to Library</span>
+                <span className="xs:hidden">Back</span>
+              </Button>
+            </Link>
+            <h1 className="text-lg sm:text-xl font-semibold absolute left-1/2 transform -translate-x-1/2">Scan</h1>
+            <div className="text-xs sm:text-sm text-gray-600 flex-shrink-0">
               {queue.filter(item => item.status === 'success').length} books added
             </div>
           </div>
@@ -494,7 +492,6 @@ export default function ScanPage() {
           {/* Left Column - Scanner */}
           <div className="space-y-6">
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-medium mb-4">Camera Scanner</h2>
               
               {/* Camera Preview Area */}
               <div className="relative bg-gray-900 rounded-lg overflow-hidden mb-6" style={{ aspectRatio: '4/3' }}>
