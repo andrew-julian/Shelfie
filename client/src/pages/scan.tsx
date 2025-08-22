@@ -418,8 +418,7 @@ export default function ScanPage() {
             
             const initResult = await window.ScanbotSDK.initialize({
               licenseKey: licenseKey,
-              engine: "/",
-              verbose: true
+              enginePath: "https://cdn.jsdelivr.net/npm/scanbot-web-sdk@7.2.0/bundle"
             });
             
             console.log('SDK Init result:', initResult);
