@@ -403,7 +403,7 @@ export default function ScanPage() {
     const loadScanbotSDK = async () => {
       try {
         const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/scanbot-web-sdk@7.2.0/bundle/ScanbotSDK.ui2.min.js';
+        script.src = '/scanbot-sdk/ScanbotSDK.ui2.min.js';
         script.onload = async () => {
           try {
             console.log('Scanbot SDK script loaded, initializing...');
@@ -416,35 +416,14 @@ export default function ScanPage() {
             console.log('ScanbotSDK available:', !!window.ScanbotSDK);
             console.log('ScanbotSDK.initialize available:', !!window.ScanbotSDK.initialize);
             
-            // Try different engine paths to resolve WASM loading issues
-            const possiblePaths = [
-              "/scanbot-sdk",
-              "/scanbot-sdk/",
-              "https://unpkg.com/scanbot-web-sdk@7.2.0/bundle"
-            ];
+            // Use local files for better reliability
+            const enginePath = "/scanbot-sdk/";
             
-            let initResult;
-            let lastError;
-            
-            for (const enginePath of possiblePaths) {
-              try {
-                console.log('Trying enginePath:', enginePath);
-                initResult = await window.ScanbotSDK.initialize({
-                  licenseKey: licenseKey,
-                  enginePath: enginePath
-                });
-                console.log('Success with enginePath:', enginePath);
-                break;
-              } catch (error) {
-                console.log('Failed with enginePath:', enginePath, 'Error:', (error as any)?.message);
-                lastError = error;
-                continue;
-              }
-            }
-            
-            if (!initResult) {
-              throw lastError || new Error('All enginePath options failed');
-            }
+            console.log('Using enginePath:', enginePath);
+            const initResult = await window.ScanbotSDK.initialize({
+              licenseKey: licenseKey,
+              enginePath: enginePath
+            });
             
             console.log('SDK Init result:', initResult);
             console.log('Scanbot SDK initialized successfully');
