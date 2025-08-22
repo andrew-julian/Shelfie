@@ -1,10 +1,9 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Crop, Check, X, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import { Upload, Crop, Check, X, Move } from "lucide-react";
 
 interface CoverEditorModalProps {
   isOpen: boolean;
@@ -34,15 +33,17 @@ export function CoverEditorModal({
   const [selectedCoverIndex, setSelectedCoverIndex] = useState(currentCoverIndex);
   const [cropImageUrl, setCropImageUrl] = useState("");
   const [cropSettings, setCropSettings] = useState({
-    zoom: 1,
-    rotation: 0,
-    x: 0,
+    x: 12.5, // Start at 12.5% to center a 75% width crop
     y: 0,
     width: 75, // Start with 75% width
     height: 100 // Full height
   });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragHandle, setDragHandle] = useState<string | null>(null);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const cropContainerRef = useRef<HTMLDivElement>(null);
 
   const handleCoverSelection = (index: number) => {
     setSelectedCoverIndex(index);
@@ -98,13 +99,7 @@ export function CoverEditorModal({
     canvas.height = 400;
 
     // Calculate crop area based on settings
-    const { zoom, rotation, x, y, width, height } = cropSettings;
-    
-    // Draw cropped image
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((rotation * Math.PI) / 180);
-    ctx.scale(zoom, zoom);
+    const { x, y, width, height } = cropSettings;
     
     const cropX = (x * img.naturalWidth) / 100;
     const cropY = (y * img.naturalHeight) / 100;
@@ -114,9 +109,8 @@ export function CoverEditorModal({
     ctx.drawImage(
       img,
       cropX, cropY, cropWidth, cropHeight,
-      -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height
+      0, 0, canvas.width, canvas.height
     );
-    ctx.restore();
 
     // Convert to base64
     const croppedImageData = canvas.toDataURL('image/jpeg', 0.9);
@@ -127,11 +121,9 @@ export function CoverEditorModal({
 
   const resetCropSettings = () => {
     setCropSettings({
-      zoom: 1,
-      rotation: 0,
-      x: 0,
+      x: 12.5, // Center the 75% width crop
       y: 0,
-      width: 75, // Start with 75% width
+      width: 75, // Start with 75% width  
       height: 100 // Full height
     });
   };
@@ -236,153 +228,88 @@ export function CoverEditorModal({
             </TabsContent>
 
             {cropMode && (
-              <TabsContent value="crop" className="space-y-4 flex-1 max-h-96 overflow-y-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Image Preview */}
+              <TabsContent value="crop" className="space-y-4 flex-1">
+                <div className="flex flex-col gap-4">
+                  <h3 className="text-lg font-semibold">Crop Image</h3>
+                  
+                  {/* Interactive Crop Area */}
                   <div className="relative">
-                    <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden relative max-h-80">
+                    <div 
+                      ref={cropContainerRef}
+                      className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden relative max-w-md mx-auto"
+                      style={{ userSelect: 'none' }}
+                    >
                       <img
                         ref={imageRef}
                         src={cropImageUrl}
                         alt="Crop preview"
                         className="w-full h-full object-contain"
-                        style={{
-                          transform: `scale(${cropSettings.zoom}) rotate(${cropSettings.rotation}deg)`,
-                          transformOrigin: 'center',
-                        }}
+                        draggable={false}
                       />
-                      {/* Crop Overlay */}
+                      
+                      {/* Draggable Crop Box */}
                       <div
-                        className="absolute border-2 border-coral-red bg-coral-red/10 pointer-events-none"
+                        className="absolute border-2 border-coral-red bg-coral-red/10"
                         style={{
                           left: `${cropSettings.x}%`,
                           top: `${cropSettings.y}%`,
                           width: `${cropSettings.width}%`,
                           height: `${cropSettings.height}%`,
+                          cursor: isDragging && dragHandle === 'move' ? 'grabbing' : 'grab'
                         }}
-                      />
+                        onMouseDown={(e) => handleMouseDown(e, 'move')}
+                      >
+                        {/* Corner handles */}
+                        <div 
+                          className="absolute -top-1 -left-1 w-3 h-3 bg-coral-red border border-white cursor-nw-resize"
+                          onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'nw'); }}
+                        />
+                        <div 
+                          className="absolute -top-1 -right-1 w-3 h-3 bg-coral-red border border-white cursor-ne-resize"
+                          onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'ne'); }}
+                        />
+                        <div 
+                          className="absolute -bottom-1 -left-1 w-3 h-3 bg-coral-red border border-white cursor-sw-resize"
+                          onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'sw'); }}
+                        />
+                        <div 
+                          className="absolute -bottom-1 -right-1 w-3 h-3 bg-coral-red border border-white cursor-se-resize"
+                          onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'se'); }}
+                        />
+                        
+                        {/* Edge handles */}
+                        <div 
+                          className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-coral-red border border-white cursor-n-resize"
+                          onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'n'); }}
+                        />
+                        <div 
+                          className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-coral-red border border-white cursor-s-resize"
+                          onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 's'); }}
+                        />
+                        <div 
+                          className="absolute -left-1 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-coral-red border border-white cursor-w-resize"
+                          onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'w'); }}
+                        />
+                        <div 
+                          className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-coral-red border border-white cursor-e-resize"
+                          onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'e'); }}
+                        />
+                        
+                        {/* Move handle in center */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Move className="w-4 h-4 text-coral-red opacity-70" />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Crop Controls */}
-                  <div className="space-y-4 min-h-80">
-                    <h3 className="text-lg font-semibold">Crop Controls</h3>
-                    
-                    <div>
-                      <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                        <ZoomIn className="w-4 h-4" />
-                        Zoom: {cropSettings.zoom.toFixed(1)}x
-                      </label>
-                      <Slider
-                        value={[cropSettings.zoom]}
-                        onValueChange={([zoom]) =>
-                          setCropSettings(prev => ({ ...prev, zoom }))
-                        }
-                        min={0.5}
-                        max={3}
-                        step={0.1}
-                        className="w-full"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                        <RotateCcw className="w-4 h-4" />
-                        Rotation: {cropSettings.rotation}°
-                      </label>
-                      <Slider
-                        value={[cropSettings.rotation]}
-                        onValueChange={([rotation]) =>
-                          setCropSettings(prev => ({ ...prev, rotation }))
-                        }
-                        min={-45}
-                        max={45}
-                        step={1}
-                        className="w-full"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Horizontal Position: {cropSettings.x}%
-                      </label>
-                      <Slider
-                        value={[cropSettings.x]}
-                        onValueChange={([x]) =>
-                          setCropSettings(prev => ({ ...prev, x }))
-                        }
-                        min={0}
-                        max={Math.max(0, 100 - cropSettings.width)}
-                        step={1}
-                        className="w-full"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Vertical Position: {cropSettings.y}%
-                      </label>
-                      <Slider
-                        value={[cropSettings.y]}
-                        onValueChange={([y]) =>
-                          setCropSettings(prev => ({ ...prev, y }))
-                        }
-                        min={0}
-                        max={Math.max(0, 100 - cropSettings.height)}
-                        step={1}
-                        className="w-full"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Crop Width: {cropSettings.width}%
-                      </label>
-                      <Slider
-                        value={[cropSettings.width]}
-                        onValueChange={([width]) =>
-                          setCropSettings(prev => ({ 
-                            ...prev, 
-                            width,
-                            x: Math.min(prev.x, 100 - width)
-                          }))
-                        }
-                        min={20}
-                        max={100}
-                        step={1}
-                        className="w-full"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Crop Height: {cropSettings.height}%
-                      </label>
-                      <Slider
-                        value={[cropSettings.height]}
-                        onValueChange={([height]) =>
-                          setCropSettings(prev => ({ 
-                            ...prev, 
-                            height,
-                            y: Math.min(prev.y, 100 - height)
-                          }))
-                        }
-                        min={20}
-                        max={100}
-                        step={1}
-                        className="w-full"
-                      />
-                    </div>
-
-                    <div className="flex gap-2 pt-4">
-                      <Button variant="outline" onClick={resetCropSettings} className="flex-1">
-                        <RotateCcw className="w-4 h-4 mr-2" />
-                        Reset
-                      </Button>
-                      <Button onClick={handleCropApply} className="flex-1">
-                        Apply Crop
-                      </Button>
-                    </div>
+                  <div className="flex gap-2 justify-center">
+                    <Button variant="outline" onClick={resetCropSettings}>
+                      Reset
+                    </Button>
+                    <Button onClick={handleCropApply}>
+                      Apply Crop
+                    </Button>
                   </div>
                 </div>
 
