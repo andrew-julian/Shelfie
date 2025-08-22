@@ -664,7 +664,9 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                                 </div>
                                 <p className="text-gray-700 text-sm mb-2 line-clamp-3">{review.body}</p>
                                 <div className="flex items-center gap-4 text-xs text-gray-500">
-                                  <span>{review.date}</span>
+                                  <span>
+                                    {review.date?.raw || review.date?.utc || review.date || "N/A"}
+                                  </span>
                                   <span>{review.helpful_votes} people found this helpful</span>
                                 </div>
                               </div>
