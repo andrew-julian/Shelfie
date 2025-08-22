@@ -178,8 +178,8 @@ export default function Home() {
       baseConfig = {
         ...baseConfig,
         targetRowHeight: 280, // Dramatically increased from 200 to allow coffee table books
-        gutterX: 16, // More spacing for larger books
-        gutterY: 18,
+        gutterX: 12, // Reduced spacing to fit more books per row
+        gutterY: 16, // Reduced vertical spacing
         BASE_HEIGHT: 195 // Optimized for better aspect ratio scaling
       };
     }

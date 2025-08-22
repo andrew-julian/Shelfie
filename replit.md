@@ -11,15 +11,16 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 
 ## Recent Enhancements
 
-### Dynamic Layout System (August 2025)
-- **Smart Packing Algorithm**: Replaced rigid CSS grid with dynamic positioning that prevents book overlaps while maintaining color-sorted order
-- **Collision-Free Layout**: Books are positioned using bin-packing logic with intelligent shelf management for optimal space utilization
-- **Touch Scroll Detection**: Implemented comprehensive touch event handling to prevent accidental book hover animations during mobile scrolling
-- **Animated Transitions**: Added smooth 700ms transitions when books are repositioned, creating natural movement effects
+### Physical Proportions Layout System (August 2025)
+- **True Physical Scaling**: Books now display with accurate real-world proportions using Amazon dimension data (8.27"×10.27" vs 5.16"×7.68")
+- **Dimension Parsing**: Intelligent parsing of both inches and centimeters from Amazon data with proper conversion logic
+- **Proportion Preservation**: Layout engine modified to maintain individual book heights instead of forcing uniform row heights
+- **Centered Row Layout**: All rows are centered within the container to eliminate awkward whitespace
+- **Minimal Stretch Limits**: Maximum 1.05x scaling to prevent aspect ratio distortion while allowing slight justification
+- **Optimized Space Usage**: Increased base scale factor (0.85) and aggressive row packing to maximize horizontal space utilization
+- **Coffee Table Books**: Large format books like "Elements of Pizza" appear dramatically larger than paperbacks like "Innovation"
+- **Touch Scroll Detection**: Comprehensive touch event handling to prevent accidental book hover animations during mobile scrolling
 - **Deterministic Positioning**: Uses book ID-based micro-rotations for consistent yet natural appearance without randomness
-- **Responsive Container**: Dynamic container sizing with automatic height adjustment based on book positions
-- **Centered Row Layout**: Two-pass algorithm that calculates row widths then centers each row as a cohesive unit
-- **Constrained Responsive Scaling**: Dynamic scaling with hard minimum of 2 books per row - automatically reduces book size if needed to maintain this constraint across all screen widths
 
 ### User Management System (August 2025)
 - **Database-Connected User Switcher**: Real-time user switching connected to actual database users, replacing hardcoded test data
