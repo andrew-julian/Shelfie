@@ -37,6 +37,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
+import { CoverEditorModal } from "./cover-editor-modal";
 import { useToast } from "@/hooks/use-toast";
 import { ImageCropper } from "@/components/image-cropper";
 
@@ -75,6 +76,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
   const [currentCoverIndex, setCurrentCoverIndex] = useState(book?.selectedCoverIndex || 0);
   const [currentCoverImage, setCurrentCoverImage] = useState(book?.coverImage || '');
   const [showCropper, setShowCropper] = useState(false);
+  const [showCoverEditor, setShowCoverEditor] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'details'>('overview');
   
   // Update local state when book prop changes (modal opens with new book)
@@ -275,9 +277,9 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowCropper(true)}
+                onClick={() => setShowCoverEditor(true)}
                 className="text-gray-500 hover:text-coral-red"
-                data-testid="button-crop-cover"
+                data-testid="button-edit-cover"
               >
                 <Crop className="w-4 h-4" />
                 Edit Cover
@@ -780,7 +782,28 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
         </DialogContent>
       </Dialog>
 
-      {/* Image Cropper Modal */}
+      {/* Cover Editor Modal */}
+      <CoverEditorModal
+        isOpen={showCoverEditor}
+        onClose={() => setShowCoverEditor(false)}
+        book={{
+          id: book?.id || '',
+          title: book?.title || '',
+          coverImages: book?.coverImages || []
+        }}
+        currentCoverIndex={currentCoverIndex}
+        onCoverSelect={(index) => {
+          updateCoverMutation.mutate(index);
+          setShowCoverEditor(false);
+        }}
+        onCustomCover={(croppedImageData) => {
+          uploadCroppedImageMutation.mutate(croppedImageData);
+          setShowCoverEditor(false);
+        }}
+        isUpdating={updateCoverMutation.isPending || uploadCroppedImageMutation.isPending}
+      />
+
+      {/* Legacy Image Cropper Modal */}
       <ImageCropper
         isOpen={showCropper}
         onClose={() => setShowCropper(false)}
