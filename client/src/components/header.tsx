@@ -113,7 +113,13 @@ export default function Header({
           </div>
 
           {/* Mobile Navigation */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-2">
+            <Link href="/scan">
+              <button className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-white bg-coral-red hover:bg-red-600 rounded-lg transition-all" data-testid="button-scan-mobile-header">
+                <Camera className="w-3 h-3" />
+                <span>Scan</span>
+              </button>
+            </Link>
             <div className="flex items-center gap-1 text-sm text-gray-600 font-medium" data-testid="text-books-count-mobile">
               <BookOpen className="w-4 h-4 text-coral-red" />
               <span>{filteredCount !== booksCount ? `${filteredCount}/${booksCount}` : booksCount}</span>
