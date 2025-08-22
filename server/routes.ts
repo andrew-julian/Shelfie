@@ -14,7 +14,7 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
 
   try {
     // Parse various dimension formats and detect units
-    console.log('Parsing dimensions:', dimensionText);
+    console.log('Parsing dimensions:', dimensionText, 'for book:', title);
     
     // First check if units are explicitly mentioned
     const isMetric = /cm|centimeter|millimeter/i.test(dimensionText);
@@ -41,12 +41,31 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
       console.log('Using as inches (imperial or small values):', { dim1, dim2, dim3 });
     }
     
-    // Amazon dimensions for books are typically in Height x Depth x Width format
-    // For example: "23.5 x 3 x 15.2 cm" = Height x Depth x Width
-    // dim1 = height (tallest), dim2 = depth (spine), dim3 = width  
-    let height = dim1;
-    let depth = dim2; 
-    let width = dim3;
+    // Amazon dimensions can vary in format. Use intelligent detection based on values.
+    // The smallest dimension is usually depth (spine thickness)
+    // For portrait books: height > width, for landscape books: width > height
+    const dims = [dim1, dim2, dim3];
+    dims.sort((a, b) => a - b);
+    const [smallest, middle, largest] = dims;
+    
+    // Smallest dimension is typically depth/spine thickness
+    let depth = smallest;
+    
+    // Determine width and height from the remaining two dimensions
+    let width, height;
+    const remaining = dims.filter(d => d !== smallest);
+    if (remaining.length === 2) {
+      const [smaller, larger] = remaining.sort((a, b) => a - b);
+      
+      // Default assumption: books are usually portrait (height > width)
+      // Unless it's clearly a landscape format like coffee table books
+      width = smaller;
+      height = larger;
+    } else {
+      // Fallback if logic fails
+      width = middle;
+      height = largest;
+    }
     
     // Detect coffee table books and handle their landscape orientation
     const isCoffeeTableBook = title && (
@@ -59,9 +78,9 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
       // Note: Using word boundaries (\b) to avoid false positives like "Illustrated" containing "art"
     );
     
-    // For coffee table books, swap width and height to achieve width > height
+    // For coffee table books, ensure width > height (landscape orientation)
     if (isCoffeeTableBook && height > width) {
-      console.log(`☕ Coffee table book detected: ${title}, swapping width/height from w:${width}, h:${height} to w:${height}, h:${width}`);
+      console.log(`☕ Coffee table book detected: ${title}, swapping to landscape: w:${height}, h:${width}`);
       [width, height] = [height, width]; // Swap to make width > height
     }
     
