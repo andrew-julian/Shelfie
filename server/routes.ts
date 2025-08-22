@@ -145,17 +145,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         first_name: targetUser.firstName,
         last_name: targetUser.lastName,
         profile_image_url: targetUser.profileImageUrl,
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
       };
 
-      // Update session with new user
+      // Update session with new user context
       req.user = {
         claims: userClaims,
-        access_token: req.user?.access_token || 'mock-token',
-        refresh_token: req.user?.refresh_token || 'mock-refresh',
-        expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
+        access_token: req.user?.access_token || 'dev-token-' + targetUser.id,
+        refresh_token: req.user?.refresh_token || 'dev-refresh-' + targetUser.id,
+        expires_at: userClaims.exp,
       };
 
-      res.json({ message: "User switched successfully", userId: targetUser.id });
+      // Force session save to persist the user switch
+      req.session.save((err: any) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ message: "Failed to save session" });
+        }
+        
+        console.log(`User switched from ${req.session.passport?.user?.claims?.sub || 'unknown'} to ${targetUser.id}`);
+        res.json({ 
+          message: "User switched successfully", 
+          userId: targetUser.id,
+          user: targetUser 
+        });
+      });
     } catch (error) {
       console.error("Error switching user:", error);
       res.status(500).json({ message: "Failed to switch user" });

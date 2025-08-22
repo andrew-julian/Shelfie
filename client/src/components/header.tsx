@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut, Menu, Users, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 
 type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
@@ -285,6 +286,7 @@ export default function Header({
 
 function UserMenu() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showUserSwitcher, setShowUserSwitcher] = useState(false);
   const [availableUsers, setAvailableUsers] = useState<any[]>([]);
@@ -312,17 +314,29 @@ function UserMenu() {
 
   const switchUser = async (targetUserId: string) => {
     try {
+      console.log(`Switching to user: ${targetUserId}`);
+      
       // Call server endpoint to switch user context
       const response = await fetch(`/api/auth/switch-user/${targetUserId}`, {
         method: 'POST',
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       
       if (response.ok) {
-        // Reload the page to refresh the user context
+        const data = await response.json();
+        console.log('User switch successful:', data);
+        
+        // Invalidate all queries to ensure fresh data
+        queryClient.clear();
+        
+        // Force a hard reload to completely refresh the user context
         window.location.reload();
       } else {
-        console.error('Failed to switch user');
+        const errorData = await response.json();
+        console.error('Failed to switch user:', errorData);
       }
     } catch (error) {
       console.error('Error switching user:', error);
