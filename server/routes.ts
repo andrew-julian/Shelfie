@@ -585,7 +585,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         availability: product.availability?.raw || product.availability || product.in_stock ? "In Stock" : null,
         amazonDomain: amazonDomain,
         userId: userId,
-        status: "want-to-read"
+        status: "want-to-read",
+        
+        // Add comprehensive metadata fields that refresh endpoint fetches
+        aboutThisItem: product.about_this_item || null,
+        bookDescription: product.book_description || product.description || null,
+        editorialReviews: product.editorial_reviews || null,
+        ratingBreakdown: product.rating_breakdown || null,
+        topReviews: product.top_reviews || null,
+        bestsellersRank: product.bestsellers_rank || null,
+        alsoBought: product.also_bought || null,
+        variants: product.variants || null,
+        amazonData: data // Store full API response for future reference
       };
       
       console.log("Processed book data:", JSON.stringify(bookData, null, 2));

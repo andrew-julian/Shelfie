@@ -247,7 +247,18 @@ export default function ScanPage() {
           featureBullets: bookData.featureBullets || [],
           amazonDomain: bookData.amazonDomain,
           userId: bookData.userId,
-          status: bookData.status
+          status: bookData.status,
+          
+          // Include comprehensive metadata from lookup
+          aboutThisItem: bookData.aboutThisItem,
+          bookDescription: bookData.bookDescription,
+          editorialReviews: bookData.editorialReviews,
+          ratingBreakdown: bookData.ratingBreakdown,
+          topReviews: bookData.topReviews,
+          bestsellersRank: bookData.bestsellersRank,
+          alsoBought: bookData.alsoBought,
+          variants: bookData.variants,
+          amazonData: bookData.amazonData
         })
       });
       
