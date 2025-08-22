@@ -157,27 +157,30 @@ export default function Home() {
     const width = containerDimensions.width;
     let baseConfig = { ...DEFAULT_CFG };
     
-    // Container-query equivalent logic
+    // Container-query equivalent logic with enhanced scaling for dramatic size differences
     if (width < 480) {
       baseConfig = {
         ...baseConfig,
-        targetRowHeight: 160,
+        targetRowHeight: 180, // Increased from 160
         gutterX: 8,
-        gutterY: 12
+        gutterY: 12,
+        BASE_HEIGHT: 195 // Adjusted for better proportional scaling
       };
     } else if (width < 900) {
       baseConfig = {
         ...baseConfig,
-        targetRowHeight: 184,
-        gutterX: 10,
-        gutterY: 12
+        targetRowHeight: 220, // Increased from 184
+        gutterX: 12, // Increased spacing
+        gutterY: 14,
+        BASE_HEIGHT: 195
       };
     } else {
       baseConfig = {
         ...baseConfig,
-        targetRowHeight: 200,
-        gutterX: 12,
-        gutterY: 14
+        targetRowHeight: 280, // Dramatically increased from 200 to allow coffee table books
+        gutterX: 16, // More spacing for larger books
+        gutterY: 18,
+        BASE_HEIGHT: 195 // Optimized for better aspect ratio scaling
       };
     }
     
@@ -205,8 +208,10 @@ export default function Home() {
   const convertToLayoutBooks = (books: Book[]): LayoutBook[] => {
     return books.map(book => {
       // Debug logging for dimension analysis
-      if (book.title.toLowerCase().includes('rolex')) {
-        console.log('Rolex book dimensions:', { 
+      if (book.title.toLowerCase().includes('rolex') || 
+          book.title.toLowerCase().includes('innovation') || 
+          book.title.toLowerCase().includes('pizza')) {
+        console.log(`${book.title} dimensions:`, { 
           title: book.title, 
           width: book.width, 
           height: book.height, 
