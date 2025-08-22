@@ -65,13 +65,15 @@ export function ImageCropper({ isOpen, onClose, imageUrl, onCropComplete }: Imag
             height: height - (margin * 2)
           });
           
+          console.log('Setting imageLoaded=true, isLoading=false');
           setImageLoaded(true);
           setIsLoading(false);
           
           // Use setTimeout to ensure the state update has happened
           setTimeout(() => {
+            console.log('setTimeout: Calling drawCanvas');
             drawCanvas();
-          }, 0);
+          }, 10);
         }
       };
       img.onerror = (e) => {
@@ -85,9 +87,10 @@ export function ImageCropper({ isOpen, onClose, imageUrl, onCropComplete }: Imag
 
   useEffect(() => {
     if (imageLoaded && imageElement && canvasRef.current) {
+      console.log('useEffect: Calling drawCanvas');
       drawCanvas();
     }
-  }, [cropArea, imageLoaded, imageElement]);
+  }, [cropArea, imageLoaded]);
 
   const drawCanvas = () => {
     console.log('drawCanvas called', { 
@@ -255,19 +258,26 @@ export function ImageCropper({ isOpen, onClose, imageUrl, onCropComplete }: Imag
         </DialogHeader>
         
         <div className="flex flex-col gap-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-96">
-              <div className="text-gray-500">Loading image...</div>
-            </div>
-          ) : hasError ? (
-            <div className="flex flex-col items-center justify-center h-96 gap-4">
-              <div className="text-red-500">Failed to load image</div>
-              <div className="text-sm text-gray-500">This image cannot be cropped due to security restrictions</div>
-              <Button onClick={onClose} variant="outline">Close</Button>
-            </div>
-          ) : (
-            <>
-              <div className="flex justify-center bg-gray-100 rounded-lg p-4">
+          {(() => {
+            console.log('Render state:', { isLoading, hasError, imageLoaded });
+            if (isLoading) {
+              return (
+                <div className="flex items-center justify-center h-96">
+                  <div className="text-gray-500">Loading image...</div>
+                </div>
+              );
+            } else if (hasError) {
+              return (
+                <div className="flex flex-col items-center justify-center h-96 gap-4">
+                  <div className="text-red-500">Failed to load image</div>
+                  <div className="text-sm text-gray-500">This image cannot be cropped due to security restrictions</div>
+                  <Button onClick={onClose} variant="outline">Close</Button>
+                </div>
+              );
+            } else {
+              return (
+                <>
+                  <div className="flex justify-center bg-gray-100 rounded-lg p-4">
                 <canvas
                   ref={canvasRef}
                   className="border rounded cursor-crosshair max-w-full max-h-96"
@@ -314,9 +324,11 @@ export function ImageCropper({ isOpen, onClose, imageUrl, onCropComplete }: Imag
                     Apply Crop
                   </Button>
                 </div>
-              </div>
-            </>
-          )}
+                  </div>
+                </>
+              );
+            }
+          })()}
         </div>
       </DialogContent>
     </Dialog>
