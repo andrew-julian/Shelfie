@@ -124,7 +124,7 @@ export function calculateLayout(
       processRow(currentRow, dims, containerWidth, cfg, yCursor, rowIndex, layoutItems);
       
       // Start new row using actual tallest book height in the row
-      const actualRowHeight = Math.max(...currentRow.map(book => book.phys.height_mm * 0.6));
+      const actualRowHeight = Math.max(...currentRow.map(book => book.phys.height_mm * 0.85));
       yCursor += actualRowHeight + cfg.gutterY;
       rowIndex++;
       currentRow = [book];
@@ -161,7 +161,7 @@ function processRow(
   
   // Calculate natural dimensions preserving true physical proportions
   // Use a scale factor instead of forcing uniform height
-  const basePixelScale = 0.6; // Convert mm to pixels with realistic scaling
+  const basePixelScale = 0.85; // Increased scale to better utilize horizontal space
   let wsum = 0;
   const physicalDimensions = rowBooks.map(book => {
     // Preserve true proportions by scaling mm directly to pixels
@@ -186,7 +186,7 @@ function processRow(
   // Debug scaling for problematic books
   if (rowBooks.some(book => book.id.includes('nexus') || book.id.includes('drama') || book.id.includes('reading'))) {
     console.log('Scaling debug:', {
-      rowBooks: rowBooks.map(b => ({ id: b.id.slice(0, 8), title: b.title.slice(0, 30) })),
+      rowBooks: rowBooks.map(b => ({ id: b.id.slice(0, 8) })),
       originalScale,
       finalScale: scale,
       wsum,
