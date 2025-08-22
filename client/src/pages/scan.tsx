@@ -416,10 +416,35 @@ export default function ScanPage() {
             console.log('ScanbotSDK available:', !!window.ScanbotSDK);
             console.log('ScanbotSDK.initialize available:', !!window.ScanbotSDK.initialize);
             
-            const initResult = await window.ScanbotSDK.initialize({
-              licenseKey: licenseKey,
-              enginePath: "https://cdn.jsdelivr.net/npm/scanbot-web-sdk@7.2.0/bundle"
-            });
+            // Try different engine paths to resolve WASM loading issues
+            const possiblePaths = [
+              "https://cdn.jsdelivr.net/npm/scanbot-web-sdk@7.2.0/bundle/",
+              "https://unpkg.com/scanbot-web-sdk@7.2.0/bundle/",
+              "/node_modules/scanbot-web-sdk/bundle/"
+            ];
+            
+            let initResult;
+            let lastError;
+            
+            for (const enginePath of possiblePaths) {
+              try {
+                console.log('Trying enginePath:', enginePath);
+                initResult = await window.ScanbotSDK.initialize({
+                  licenseKey: licenseKey,
+                  enginePath: enginePath
+                });
+                console.log('Success with enginePath:', enginePath);
+                break;
+              } catch (error) {
+                console.log('Failed with enginePath:', enginePath, 'Error:', (error as any)?.message);
+                lastError = error;
+                continue;
+              }
+            }
+            
+            if (!initResult) {
+              throw lastError || new Error('All enginePath options failed');
+            }
             
             console.log('SDK Init result:', initResult);
             console.log('Scanbot SDK initialized successfully');
