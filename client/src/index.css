@@ -184,6 +184,8 @@ body {
       rotateY(-25deg) 
       translateZ(1px);
     transition: transform 220ms cubic-bezier(.2,.8,.2,1);
+    margin: 0;
+    box-sizing: border-box;
   }
   
   /* Mode-specific transitions for tidy toggle */

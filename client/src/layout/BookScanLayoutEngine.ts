@@ -158,18 +158,20 @@ function processRow(
 ): void {
   if (rowBooks.length === 0) return;
   
-  // Calculate total natural width
-  let sumNaturalWidth = 0;
-  const naturalWidths = rowBooks.map(book => {
-    const bookDims = dims.get(book.id)!;
-    const naturalWidth = (bookDims.w_norm * cfg.targetRowHeight) / cfg.BASE_HEIGHT;
-    sumNaturalWidth += naturalWidth;
-    return naturalWidth;
+  // Calculate natural widths using physical proportions
+  const H = cfg.targetRowHeight;
+  let wsum = 0;
+  const physicalWidths = rowBooks.map(book => {
+    // Natural width at height H using physical aspect ratio
+    const Wi = (book.phys.width_mm / book.phys.height_mm) * H;
+    wsum += Wi;
+    return Wi;
   });
   
   // Calculate scale factor for justification
-  const availableWidth = containerWidth - (cfg.gutterX * (rowBooks.length - 1));
-  let scale = availableWidth / sumNaturalWidth;
+  const totalGutterWidth = Math.max(0, rowBooks.length - 1) * cfg.gutterX;
+  const usable = containerWidth - totalGutterWidth;
+  let scale = usable / wsum;
   
   // Handle last row according to config
   if (isLastRow && cfg.raggedLastRow) {
@@ -182,58 +184,51 @@ function processRow(
   // Position books in row
   let currentX = 0;
   
+  // Create nominal positions first (no jitter)
+  const nominalItems: Array<{id: string, w: number, h: number, d: number, x: number}> = [];
+  let x = 0;
+  
   for (let i = 0; i < rowBooks.length; i++) {
     const book = rowBooks[i];
-    const bookDims = dims.get(book.id)!;
-    const naturalWidth = naturalWidths[i];
+    const Wi = physicalWidths[i];
+    const Di = book.phys.spine_mm * (H / book.phys.height_mm);
     
-    // Apply scaling with size clamping for mobile/desktop optimization
-    let w = naturalWidth * scale;
-    let h = cfg.targetRowHeight * scale;
-    const d = Math.max(2, Math.round(bookDims.d_norm * scale));
+    const w = Wi * scale;
+    const h = H * scale;
+    const d = Math.max(2, Di * scale);
     
-    // Clamp book width to prevent pathological cases
-    const minW = 84; // Minimum readable width
-    const maxW = 360; // Maximum width to prevent oversized books
+    nominalItems.push({ id: book.id, w, h, d, x });
+    x += w + cfg.gutterX;
+  }
+  
+  // Apply safe jitter that prevents overlaps
+  for (let i = 0; i < nominalItems.length; i++) {
+    const item = nominalItems[i];
     
-    if (w < minW || w > maxW) {
-      const originalAspect = naturalWidth / cfg.targetRowHeight;
-      w = Math.max(minW, Math.min(maxW, w));
-      h = w / originalAspect; // Preserve aspect ratio
-    }
-    
-    // Calculate organic offsets using Halton sequences
-    const hashBase = hash32(book.id);
-    
-    // Horizontal jitter with overlap prevention
-    let jx = (halton(hashBase ^ 0x1, 2) - 0.5) * (cfg.jitterX * 2);
-    
-    // Clamp jitter to prevent overlaps
-    if (i < rowBooks.length - 1) {
-      const nextX = currentX + w + cfg.gutterX;
-      const gap = cfg.gutterX;
-      jx = Math.max(-gap * 0.45, Math.min(gap * 0.45, jx));
-    }
-    
-    // Rotation and depth
-    const ry = (halton(hashBase ^ 0x2, 3) - 0.5) * (cfg.maxTiltY * 2);
-    const tz = halton(hashBase ^ 0x3, 5) * cfg.maxDepth;
-    
-    // Create layout item
-    const layoutItem: LayoutItem = {
-      id: book.id,
-      x: currentX + jx,
+    // Deterministic jitter seeds
+    const seed = hash32(item.id);
+    const jxRaw = (halton(seed, 2) - 0.5) * (cfg.jitterX * 2);
+    const ry = (halton(seed, 3) - 0.5) * (cfg.maxTiltY * 2);
+    const tz = halton(seed, 5) * cfg.maxDepth;
+
+    // Calculate local free gaps using nominal positions
+    const leftGap = i === 0 ? Infinity : (item.x - (nominalItems[i-1].x + nominalItems[i-1].w));
+    const rightGap = i === nominalItems.length - 1 ? Infinity : (nominalItems[i+1].x - (item.x + item.w));
+
+    // Asymmetric clamp: use ≤40% of each gap
+    const maxLeft = isFinite(leftGap) ? -leftGap * 0.40 : -1000;
+    const maxRight = isFinite(rightGap) ? rightGap * 0.40 : 1000;
+    const jx = Math.min(Math.max(jxRaw, maxLeft), maxRight);
+
+    layoutItems.push({
+      id: item.id,
+      x: item.x + jx,
       y: yCursor + jy,
-      z: tz,
-      w: w,
-      h: h,
-      d: d,
-      ry: ry
-    };
-    
-    layoutItems.push(layoutItem);
-    
-    // Advance to next position
-    currentX += w + cfg.gutterX;
+      w: item.w,
+      h: item.h,
+      d: item.d,
+      ry,
+      z: tz
+    });
   }
 }
