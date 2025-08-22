@@ -123,9 +123,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Remove query parameters for file path resolution
     let filePath = req.path.replace('/scanbot-sdk/', '');
     
-    // Handle direct file requests (like ScanbotSDK.Core-simd.js)
-    // The SDK looks for files in bin/barcode-scanner/ subdirectory
-    if (!filePath.includes('/') && filePath.endsWith('.js')) {
+    // Handle specific Core files that need to be in bin/barcode-scanner/
+    // Only redirect ScanbotSDK.Core-*.js files, not UI or other files
+    if (!filePath.includes('/') && filePath.startsWith('ScanbotSDK.Core') && filePath.endsWith('.js')) {
       filePath = `bin/barcode-scanner/${filePath}`;
     }
     
