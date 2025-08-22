@@ -392,6 +392,18 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       
       console.log('Creating barcode scanner with config:', config);
       
+      // Set up a global style override for Scanbot elements
+      const styleElement = document.createElement('style');
+      styleElement.innerHTML = `
+        [class*="scanbot-"] { z-index: 999999 !important; }
+        [id*="scanbot"] { z-index: 999999 !important; }
+        .scanbot-ui { z-index: 999999 !important; }
+        .scanbot-scanner { z-index: 999999 !important; }
+        .sb-scanner-ui { z-index: 999999 !important; }
+        .sb-overlay { z-index: 999999 !important; }
+      `;
+      document.head.appendChild(styleElement);
+      
       // Create and present the scanner with a timeout fallback
       const scannerPromise = window.ScanbotSDK.UI.createBarcodeScanner(config);
       
@@ -404,6 +416,14 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       
       setIsScanning(false);
       console.log('Scanner result:', result);
+      
+      // Clean up the injected styles
+      const injectedStyles = document.querySelectorAll('style');
+      injectedStyles.forEach((style) => {
+        if (style.innerHTML.includes('scanbot-')) {
+          style.remove();
+        }
+      });
       
       if (result && result.items && result.items.length > 0) {
         const scannedCode = result.items[0].barcode.text;
@@ -445,6 +465,14 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
       console.error('Scanbot scanning error:', error);
       setIsScanning(false);
       
+      // Clean up the injected styles on error
+      const injectedStyles = document.querySelectorAll('style');
+      injectedStyles.forEach((style) => {
+        if (style.innerHTML.includes('scanbot-')) {
+          style.remove();
+        }
+      });
+      
       if ((error as Error).message.includes('timeout')) {
         toast({
           title: "Scanner Timeout",
@@ -470,6 +498,15 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
 
   const stopScanner = () => {
     setIsScanning(false);
+    
+    // Clean up the injected styles when manually stopping
+    const injectedStyles = document.querySelectorAll('style');
+    injectedStyles.forEach((style) => {
+      if (style.innerHTML.includes('scanbot-')) {
+        style.remove();
+      }
+    });
+    
     // Clean up mobile interaction styles
     const bodyStyle = document.body.style as any;
     bodyStyle.userSelect = '';
@@ -550,7 +587,7 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md" data-testid="modal-scanner">
+      <DialogContent className={`max-w-md ${isScanning ? 'z-0' : 'z-50'}`} data-testid="modal-scanner">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <div>
