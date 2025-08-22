@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Book } from "@shared/schema";
-import { X, Trash2, Star, Calendar, Users, BookOpen, DollarSign, Package, Globe, Ruler, Weight } from "lucide-react";
+import { X, Trash2, Star, Calendar, Users, BookOpen, DollarSign, Package, Globe, Ruler, Weight, Crop } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { ImageCropper } from "@/components/image-cropper";
 
 interface BookDetailsModalProps {
   book: Book | null;
@@ -28,6 +29,7 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
   // Track the current cover state within the modal
   const [currentCoverIndex, setCurrentCoverIndex] = useState(book?.selectedCoverIndex || 0);
   const [currentCoverImage, setCurrentCoverImage] = useState(book?.coverImage || '');
+  const [showCropper, setShowCropper] = useState(false);
   
   // Update local state when book prop changes (modal opens with new book)
   useEffect(() => {
@@ -104,6 +106,47 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
       toast({
         title: "Error",
         description: "Failed to update book cover",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const uploadCroppedImageMutation = useMutation({
+    mutationFn: async (croppedImageData: string) => {
+      if (!book) return;
+      
+      const response = await fetch(`/api/books/${book.id}/crop-cover`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          croppedImageData,
+          originalImageUrl: currentCoverImage
+        }),
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save cropped image');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setCurrentCoverImage(data.croppedImageUrl);
+      setShowCropper(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/books'] });
+      onUpdate();
+      toast({
+        title: "Success",
+        description: "Cropped cover image saved successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to save cropped image",
         variant: "destructive",
       });
     },
@@ -229,8 +272,9 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="modal-book-details">
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="modal-book-details">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span className="text-xl sm:text-2xl font-bold text-monochrome-black">Book Details</span>
@@ -245,18 +289,35 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
           <div className="flex gap-3 sm:gap-4">
             {/* Mobile Book Cover - Smaller */}
             <div className="flex-shrink-0 w-20 sm:w-28">
-              {currentCoverImage ? (
-                <img 
-                  src={currentCoverImage} 
-                  alt={`${book.title} book cover`}
-                  className="w-full rounded-lg shadow-lg"
-                  data-testid="img-book-cover-mobile"
-                />
-              ) : (
-                <div className="w-full aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg shadow-lg flex items-center justify-center">
-                  <BookOpen className="w-8 h-8 text-gray-400" />
-                </div>
-              )}
+              <div className="relative">
+                {currentCoverImage ? (
+                  <img 
+                    src={currentCoverImage} 
+                    alt={`${book.title} book cover`}
+                    className="w-full rounded-lg shadow-lg"
+                    data-testid="img-book-cover-mobile"
+                  />
+                ) : (
+                  <div className="w-full aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg shadow-lg flex items-center justify-center">
+                    <BookOpen className="w-8 h-8 text-gray-400" />
+                  </div>
+                )}
+                
+                {/* Mobile Crop Button */}
+                {currentCoverImage && (
+                  <div className="absolute top-1 right-1">
+                    <Button
+                      onClick={() => setShowCropper(true)}
+                      size="sm"
+                      variant="secondary"
+                      className="bg-white/90 hover:bg-white text-gray-700 shadow-md h-5 w-5 p-0"
+                      data-testid="button-crop-cover-mobile"
+                    >
+                      <Crop className="w-2.5 h-2.5" />
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
             
             {/* Mobile Title and Author */}
@@ -294,21 +355,39 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
           {/* Left Column - Cover Image (Desktop Only) */}
           <div className="lg:col-span-1 hidden md:block">
             <div className="sticky top-4">
-              {currentCoverImage ? (
-                <img 
-                  src={currentCoverImage} 
-                  alt={`${book.title} book cover`}
-                  className="w-full rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300"
-                  data-testid="img-book-cover"
-                />
-              ) : (
-                <div className="w-full aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl shadow-lg flex items-center justify-center">
-                  <div className="text-center p-6">
-                    <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-3" />
-                    <span className="text-gray-500 text-lg font-medium">No Cover Available</span>
+              <div className="relative">
+                {currentCoverImage ? (
+                  <img 
+                    src={currentCoverImage} 
+                    alt={`${book.title} book cover`}
+                    className="w-full rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300"
+                    data-testid="img-book-cover"
+                  />
+                ) : (
+                  <div className="w-full aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl shadow-lg flex items-center justify-center">
+                    <div className="text-center p-6">
+                      <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-3" />
+                      <span className="text-gray-500 text-lg font-medium">No Cover Available</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+                
+                {/* Desktop Crop Button */}
+                {currentCoverImage && (
+                  <div className="absolute top-3 right-3">
+                    <Button
+                      onClick={() => setShowCropper(true)}
+                      size="sm"
+                      variant="secondary"
+                      className="bg-white/90 hover:bg-white text-gray-700 shadow-md"
+                      data-testid="button-crop-cover-desktop"
+                    >
+                      <Crop className="w-4 h-4 mr-1" />
+                      Crop
+                    </Button>
+                  </div>
+                )}
+              </div>
               
               {/* Cover Selection - Desktop */}
               <CoverSelector className="mt-6" />
@@ -612,5 +691,14 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
           </div>
         </DialogContent>
       </Dialog>
-    );
+      
+      {/* Image Cropper Modal */}
+      <ImageCropper
+        isOpen={showCropper}
+        onClose={() => setShowCropper(false)}
+        imageUrl={currentCoverImage}
+        onCropComplete={(croppedImageData) => uploadCroppedImageMutation.mutate(croppedImageData)}
+      />
+    </>
+  );
 }

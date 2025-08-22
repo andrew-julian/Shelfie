@@ -649,6 +649,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Upload cropped cover image - POST /api/books/:id/crop-cover
+  app.post("/api/books/:id/crop-cover", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { croppedImageData, originalImageUrl } = req.body;
+      const userId = req.user.claims.sub;
+      
+      const book = await storage.getBook(id, userId);
+      if (!book) {
+        return res.status(404).json({ message: "Book not found" });
+      }
+      
+      // For now, we'll simulate saving the cropped image and return a modified URL
+      // In a real implementation, you would:
+      // 1. Decode the base64 image data
+      // 2. Upload to a cloud storage service (like AWS S3, Google Cloud Storage, etc.)
+      // 3. Get a permanent URL
+      // 4. Update the book record
+      
+      // Generate a timestamp-based cropped URL (simulation)
+      const timestamp = Date.now();
+      const croppedImageUrl = `${originalImageUrl}?crop=${timestamp}`;
+      
+      // Update the book with the new cropped image
+      const updatedBook = await storage.updateBookData(id, {
+        coverImage: croppedImageUrl,
+        // Add to cover images if not already present
+        coverImages: book.coverImages 
+          ? [...book.coverImages, croppedImageUrl]
+          : [croppedImageUrl]
+      }, userId);
+      
+      res.json({ 
+        success: true, 
+        croppedImageUrl,
+        book: updatedBook 
+      });
+    } catch (error) {
+      console.error("Crop image error:", error);
+      res.status(500).json({ message: "Failed to save cropped image" });
+    }
+  });
+
   // Refresh book data from API
   app.patch("/api/books/:id/refresh", isAuthenticated, async (req: any, res) => {
     try {
