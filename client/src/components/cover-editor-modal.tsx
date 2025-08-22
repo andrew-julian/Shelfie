@@ -38,8 +38,8 @@ export function CoverEditorModal({
     rotation: 0,
     x: 0,
     y: 0,
-    width: 100,
-    height: 133 // Aspect ratio for book covers (3:4)
+    width: 75, // Start with 75% width
+    height: 100 // Full height
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -131,8 +131,8 @@ export function CoverEditorModal({
       rotation: 0,
       x: 0,
       y: 0,
-      width: 100,
-      height: 133
+      width: 75, // Start with 75% width
+      height: 100 // Full height
     });
   };
 
@@ -236,11 +236,11 @@ export function CoverEditorModal({
             </TabsContent>
 
             {cropMode && (
-              <TabsContent value="crop" className="space-y-4 flex-1">
+              <TabsContent value="crop" className="space-y-4 flex-1 max-h-96 overflow-y-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Image Preview */}
                   <div className="relative">
-                    <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden relative">
+                    <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden relative max-h-80">
                       <img
                         ref={imageRef}
                         src={cropImageUrl}
@@ -253,7 +253,7 @@ export function CoverEditorModal({
                       />
                       {/* Crop Overlay */}
                       <div
-                        className="absolute border-2 border-coral-red bg-coral-red/10"
+                        className="absolute border-2 border-coral-red bg-coral-red/10 pointer-events-none"
                         style={{
                           left: `${cropSettings.x}%`,
                           top: `${cropSettings.y}%`,
@@ -265,66 +265,110 @@ export function CoverEditorModal({
                   </div>
 
                   {/* Crop Controls */}
-                  <div className="space-y-6">
+                  <div className="space-y-4 min-h-80">
+                    <h3 className="text-lg font-semibold">Crop Controls</h3>
+                    
                     <div>
-                      <label className="text-sm font-medium mb-2 block">Zoom</label>
-                      <div className="flex items-center gap-2">
-                        <ZoomOut className="w-4 h-4" />
-                        <Slider
-                          value={[cropSettings.zoom]}
-                          onValueChange={([zoom]) =>
-                            setCropSettings(prev => ({ ...prev, zoom }))
-                          }
-                          min={0.5}
-                          max={3}
-                          step={0.1}
-                          className="flex-1"
-                        />
+                      <label className="text-sm font-medium mb-2 block flex items-center gap-2">
                         <ZoomIn className="w-4 h-4" />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Rotation</label>
-                      <div className="flex items-center gap-2">
-                        <RotateCcw className="w-4 h-4" />
-                        <Slider
-                          value={[cropSettings.rotation]}
-                          onValueChange={([rotation]) =>
-                            setCropSettings(prev => ({ ...prev, rotation }))
-                          }
-                          min={-45}
-                          max={45}
-                          step={1}
-                          className="flex-1"
-                        />
-                        <span className="text-sm w-8">{cropSettings.rotation}°</span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Position X</label>
+                        Zoom: {cropSettings.zoom.toFixed(1)}x
+                      </label>
                       <Slider
-                        value={[cropSettings.x]}
-                        onValueChange={([x]) =>
-                          setCropSettings(prev => ({ ...prev, x }))
+                        value={[cropSettings.zoom]}
+                        onValueChange={([zoom]) =>
+                          setCropSettings(prev => ({ ...prev, zoom }))
                         }
-                        min={0}
-                        max={100 - cropSettings.width}
+                        min={0.5}
+                        max={3}
+                        step={0.1}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                        <RotateCcw className="w-4 h-4" />
+                        Rotation: {cropSettings.rotation}°
+                      </label>
+                      <Slider
+                        value={[cropSettings.rotation]}
+                        onValueChange={([rotation]) =>
+                          setCropSettings(prev => ({ ...prev, rotation }))
+                        }
+                        min={-45}
+                        max={45}
                         step={1}
                         className="w-full"
                       />
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium mb-2 block">Position Y</label>
+                      <label className="text-sm font-medium mb-2 block">
+                        Horizontal Position: {cropSettings.x}%
+                      </label>
+                      <Slider
+                        value={[cropSettings.x]}
+                        onValueChange={([x]) =>
+                          setCropSettings(prev => ({ ...prev, x }))
+                        }
+                        min={0}
+                        max={Math.max(0, 100 - cropSettings.width)}
+                        step={1}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        Vertical Position: {cropSettings.y}%
+                      </label>
                       <Slider
                         value={[cropSettings.y]}
                         onValueChange={([y]) =>
                           setCropSettings(prev => ({ ...prev, y }))
                         }
                         min={0}
-                        max={100 - cropSettings.height}
+                        max={Math.max(0, 100 - cropSettings.height)}
+                        step={1}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        Crop Width: {cropSettings.width}%
+                      </label>
+                      <Slider
+                        value={[cropSettings.width]}
+                        onValueChange={([width]) =>
+                          setCropSettings(prev => ({ 
+                            ...prev, 
+                            width,
+                            x: Math.min(prev.x, 100 - width)
+                          }))
+                        }
+                        min={20}
+                        max={100}
+                        step={1}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        Crop Height: {cropSettings.height}%
+                      </label>
+                      <Slider
+                        value={[cropSettings.height]}
+                        onValueChange={([height]) =>
+                          setCropSettings(prev => ({ 
+                            ...prev, 
+                            height,
+                            y: Math.min(prev.y, 100 - height)
+                          }))
+                        }
+                        min={20}
+                        max={100}
                         step={1}
                         className="w-full"
                       />
