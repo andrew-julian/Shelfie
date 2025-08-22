@@ -71,10 +71,14 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
   - Shortened color sort option labels for better fit
 
 ### Scanbot SDK Integration (August 2025)
+- **Fully Functional Barcode Scanner**: Complete implementation of Scanbot SDK v7.2.0 with working camera access and barcode detection
+- **Static File Serving Solution**: Custom Express route handler properly serves SDK files with correct MIME types, handling query parameters
 - **Environment-Based License Keys**: Implemented automatic license key selection based on domain
   - Production: Uses bookscan.vanaheim.com.au license key
   - Development: Uses Replit-specific license key for riker.replit.dev subdomains
   - Automatic detection based on window.location.hostname
+- **Path Resolution Fix**: Intelligent file routing that serves UI files from root and Core/WASM files from bin/barcode-scanner/ subdirectory
+- **Camera Permissions**: Successfully integrated camera access with proper permission handling
 - **Mobile UX Improvements**: Added guidance for mobile cancel button limitations and 30-second timeout fallback
 - **Book Cover Modal Fix**: Fixed immediate visual feedback when selecting different cover options in book details modal
 
