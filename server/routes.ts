@@ -107,7 +107,9 @@ interface RefreshProgress {
   completed: string[];
   currentBook: string | null;
   errors: Array<{ book: string; error: string }>;
-  status: 'running' | 'completed' | 'error';
+  status: 'running' | 'completed' | 'error' | 'paused' | 'stopped';
+  isPaused: boolean;
+  isStopped: boolean;
 }
 
 const progressStore = new Map<string, RefreshProgress>();
@@ -985,7 +987,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completed: [],
         currentBook: null,
         errors: [],
-        status: 'running'
+        status: 'running',
+        isPaused: false,
+        isStopped: false
       };
       
       progressStore.set(userId, progress);
@@ -1013,6 +1017,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const refreshedBooks = [];
         
         for (const book of allBooks) {
+          // Check if operation should be stopped or paused
+          if (progress.isStopped) {
+            progress.status = 'stopped';
+            progress.currentBook = null;
+            broadcastProgress();
+            console.log(`Refresh operation stopped by user at ${progress.current}/${progress.total} books`);
+            return;
+          }
+          
+          // Wait while paused
+          while (progress.isPaused && !progress.isStopped) {
+            await new Promise(resolve => setTimeout(resolve, 500)); // Check every 500ms
+          }
+          
+          // Check again if stopped while paused
+          if (progress.isStopped) {
+            progress.status = 'stopped';
+            progress.currentBook = null;
+            broadcastProgress();
+            console.log(`Refresh operation stopped by user at ${progress.current}/${progress.total} books`);
+            return;
+          }
+          
           progress.currentBook = book.title;
           broadcastProgress();
           
@@ -1255,6 +1282,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Control refresh progress (pause/resume/stop)
+  app.post("/api/refresh-control", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { action } = req.body; // 'pause', 'resume', or 'stop'
+      
+      const progress = progressStore.get(userId);
+      if (!progress) {
+        return res.status(404).json({ message: "No active refresh operation found" });
+      }
+      
+      switch (action) {
+        case 'pause':
+          if (progress.status === 'running') {
+            progress.isPaused = true;
+            progress.status = 'paused';
+            console.log(`Refresh operation paused by user at ${progress.current}/${progress.total} books`);
+          }
+          break;
+          
+        case 'resume':
+          if (progress.status === 'paused') {
+            progress.isPaused = false;
+            progress.status = 'running';
+            console.log(`Refresh operation resumed by user at ${progress.current}/${progress.total} books`);
+          }
+          break;
+          
+        case 'stop':
+          progress.isStopped = true;
+          progress.isPaused = false;
+          progress.status = 'stopped';
+          progress.currentBook = null;
+          console.log(`Refresh operation stopped by user at ${progress.current}/${progress.total} books`);
+          break;
+          
+        default:
+          return res.status(400).json({ message: "Invalid action. Use 'pause', 'resume', or 'stop'" });
+      }
+      
+      // Broadcast updated progress
+      const clients = progressClients.get(userId);
+      if (clients) {
+        const data = `data: ${JSON.stringify(progress)}\n\n`;
+        clients.forEach(client => {
+          try {
+            client.write(data);
+          } catch (error) {
+            clients.delete(client);
+          }
+        });
+      }
+      
+      res.json({ 
+        message: `Refresh operation ${action}d successfully`,
+        status: progress.status 
+      });
+      
+    } catch (error) {
+      console.error('Failed to control refresh operation:', error);
+      res.status(500).json({ message: "Failed to control refresh operation" });
+    }
+  });
 
   // Delete book
   app.delete("/api/books/:id", async (req, res) => {

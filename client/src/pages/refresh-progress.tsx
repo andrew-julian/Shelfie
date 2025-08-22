@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { CheckCircle, Clock, AlertCircle, RefreshCw, Book, ArrowLeft } from "lucide-react";
+import { CheckCircle, Clock, AlertCircle, RefreshCw, Book, ArrowLeft, Pause, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
 
 interface RefreshProgress {
   total: number;
@@ -10,11 +11,14 @@ interface RefreshProgress {
   completed: string[];
   currentBook: string | null;
   errors: Array<{ book: string; error: string }>;
-  status: 'running' | 'completed' | 'error';
+  status: 'running' | 'completed' | 'error' | 'paused' | 'stopped';
+  isPaused?: boolean;
+  isStopped?: boolean;
 }
 
 export default function RefreshProgressPage() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [progress, setProgress] = useState<RefreshProgress>({
     total: 0,
     current: 0,
@@ -24,6 +28,7 @@ export default function RefreshProgressPage() {
     status: 'running'
   });
   const [startTime, setStartTime] = useState<Date>(new Date());
+  const [isControlLoading, setIsControlLoading] = useState(false);
 
   useEffect(() => {
     let eventSource: EventSource | null = null;
@@ -36,7 +41,7 @@ export default function RefreshProgressPage() {
           const data = JSON.parse(event.data);
           setProgress(data);
           
-          if (data.status === 'completed' || data.status === 'error') {
+          if (data.status === 'completed' || data.status === 'error' || data.status === 'stopped') {
             eventSource?.close();
           }
         } catch (error) {
@@ -74,6 +79,38 @@ export default function RefreshProgressPage() {
   const estimatedTimeRemaining = progress.current > 0 && progress.total > progress.current 
     ? Math.round(((new Date().getTime() - startTime.getTime()) / progress.current) * (progress.total - progress.current) / 1000)
     : 0;
+
+  // Control functions
+  const handleControlAction = async (action: 'pause' | 'resume' | 'stop') => {
+    setIsControlLoading(true);
+    try {
+      const response = await fetch('/api/refresh-control', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to control refresh operation');
+      }
+      
+      const result = await response.json();
+      toast({
+        title: "Success",
+        description: result.message,
+      });
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to control refresh operation",
+        variant: "destructive",
+      });
+    } finally {
+      setIsControlLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-blue/5 to-coral-red/5 p-4">
@@ -163,6 +200,46 @@ export default function RefreshProgressPage() {
               </div>
             </div>
 
+            {/* Control Buttons */}
+            {(progress.status === 'running' || progress.status === 'paused') && (
+              <div className="flex items-center justify-center gap-3 mb-6">
+                {progress.status === 'running' ? (
+                  <Button
+                    onClick={() => handleControlAction('pause')}
+                    disabled={isControlLoading}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    data-testid="button-pause"
+                  >
+                    <Pause className="w-4 h-4" />
+                    {isControlLoading ? 'Pausing...' : 'Pause'}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleControlAction('resume')}
+                    disabled={isControlLoading}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    data-testid="button-resume"
+                  >
+                    <Play className="w-4 h-4" />
+                    {isControlLoading ? 'Resuming...' : 'Resume'}
+                  </Button>
+                )}
+                
+                <Button
+                  onClick={() => handleControlAction('stop')}
+                  disabled={isControlLoading}
+                  variant="destructive"
+                  className="flex items-center gap-2"
+                  data-testid="button-stop"
+                >
+                  <Square className="w-4 h-4" />
+                  {isControlLoading ? 'Stopping...' : 'Stop'}
+                </Button>
+              </div>
+            )}
+
             {/* Current Book */}
             {progress.currentBook && progress.status === 'running' && (
               <div className="bg-sky-blue/10 border border-sky-blue/20 rounded-lg p-4 mb-6">
@@ -174,6 +251,40 @@ export default function RefreshProgressPage() {
                     </div>
                     <div className="font-semibold text-monochrome-black">
                       {progress.currentBook}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Paused Status */}
+            {progress.status === 'paused' && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center">
+                  <Pause className="w-5 h-5 text-yellow-600 mr-3" />
+                  <div>
+                    <div className="font-semibold text-yellow-800">
+                      Refresh Paused
+                    </div>
+                    <div className="text-sm text-yellow-600">
+                      The refresh operation has been paused. Click Resume to continue.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Stopped Status */}
+            {progress.status === 'stopped' && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center">
+                  <Square className="w-5 h-5 text-red-600 mr-3" />
+                  <div>
+                    <div className="font-semibold text-red-800">
+                      Refresh Stopped
+                    </div>
+                    <div className="text-sm text-red-600">
+                      The refresh operation was stopped by user request.
                     </div>
                   </div>
                 </div>
@@ -250,7 +361,7 @@ export default function RefreshProgressPage() {
         )}
 
         {/* Action Buttons */}
-        {progress.status === 'completed' && (
+        {(progress.status === 'completed' || progress.status === 'stopped') && (
           <div className="text-center mt-8">
             <Button
               onClick={() => setLocation('/')}

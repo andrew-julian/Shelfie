@@ -22,6 +22,14 @@ Development approach: Avoid hardcoded fixes for specific titles or content - bui
 - **Touch Scroll Detection**: Comprehensive touch event handling to prevent accidental book hover animations during mobile scrolling
 - **Deterministic Positioning**: Uses book ID-based micro-rotations for consistent yet natural appearance without randomness
 
+### Progress Control System (August 2025)
+- **Real-time Progress Tracking**: Server-Sent Events provide live progress updates during refresh operations with visual progress bar
+- **Interactive Control Interface**: Pause, resume, and stop functionality for long-running refresh operations with dedicated buttons
+- **Visual Status Indicators**: Clear status displays for running, paused, and stopped states with appropriate icons and colors
+- **Progress Detail Display**: Shows current book being processed, completed books list, and error tracking
+- **Estimated Time Remaining**: Dynamic calculation based on current progress rate and remaining items
+- **Mobile-responsive Progress UI**: Clean progress page design optimized for mobile with toast notifications for control actions
+
 ### User Management System (August 2025)
 - **Database-Connected User Switcher**: Real-time user switching connected to actual database users, replacing hardcoded test data
 - **Dynamic User Loading**: Fetches all users from database when user switcher is accessed
