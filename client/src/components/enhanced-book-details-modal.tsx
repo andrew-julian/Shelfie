@@ -725,23 +725,25 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                   </div>
 
                   {/* Format Variants */}
-                  {extendedData?.variants && Object.keys(extendedData.variants).length > 0 && (
+                  {extendedData?.variants && Array.isArray(extendedData.variants) && extendedData.variants.length > 0 && (
                     <div>
                       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                         <Bookmark className="w-5 h-5" />
                         Available Formats
                       </h3>
                       <div className="space-y-0">
-                        {Object.entries(extendedData.variants).map(([format, details]: [string, any]) => {
+                        {extendedData.variants.map((variant: any, index: number) => {
+                          // Extract format name from variant data
+                          const format = variant.title || variant.format || variant.binding || `Format ${index + 1}`;
+                          
                           // Determine if this is the user's copy based on stored format or best guess
                           const normalizedFormat = format.toLowerCase().replace(/[^a-z]/g, '');
                           const userFormat = book.format?.toLowerCase().replace(/[^a-z]/g, '') || 'hardcover';
-                          const isUserCopy = normalizedFormat === userFormat || 
-                                           (normalizedFormat === 'hardcover' && !book.format);
+                          const isUserCopy = normalizedFormat.includes('hardcover') || normalizedFormat.includes('hard');
                           
                           return (
                             <div 
-                              key={format} 
+                              key={index} 
                               className={`py-4 px-0 border-b border-gray-200 last:border-b-0 ${
                                 isUserCopy 
                                   ? 'bg-coral-red/5 -mx-6 px-6 border-coral-red/20 rounded-lg border-2 my-2' 
@@ -750,7 +752,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                             >
                               <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-3">
-                                  <span className="font-medium text-gray-900 text-base capitalize">
+                                  <span className="font-medium text-gray-900 text-base">
                                     {format}
                                   </span>
                                   {isUserCopy && (
@@ -760,12 +762,12 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                                   )}
                                 </div>
                                 <div className="text-right">
-                                  {details.price && (
+                                  {variant.price && (
                                     <span className="text-coral-red font-semibold text-lg">
-                                      {details.price.raw || details.price.value || details.price}
+                                      {variant.price.raw || variant.price.value || variant.price}
                                     </span>
                                   )}
-                                  {!details.price && details.available && (
+                                  {!variant.price && variant.available && (
                                     <span className="text-coral-red font-semibold text-lg">
                                       $0.00
                                     </span>
