@@ -6,6 +6,68 @@ import { Camera, Search, ArrowLeft, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 
+// License keys for different environments
+const LICENSE_KEYS = {
+  // Production license for bookscan.vanaheim.com.au
+  production: 
+    "Mpyhq9Yxr3GGf71QkTvpTbBG6PIXby" +
+    "GOpm3xLZKbBoXQb0nzg7kFsrOj1p6j" +
+    "62fXcgBHMXh4c8qGHH+b8enoC7C1Gz" +
+    "aLjmDGkNnW5TrFcrxc/gSzGROlwx7M" +
+    "UZBnTpsNKeFKTBbBDlC1EDcTG2xsMZ" +
+    "KWHZD3SDINOsZBgnDLKpk2LtV8ChX5" +
+    "lns/8kVnLNOkXE/TddX6zHIBc+iGH5" +
+    "QrsR97c/WXMkAn5YdPaiPvKgdiwAp/" +
+    "pszIOcrGRZDTkUUmGm4l4oWClQriue" +
+    "AL0z/H7feafqbQ435IZcAwd6AIRhUc" +
+    "IHDSpexl7qk+o1n7OuCD/ZuU9wPjQ2" +
+    "GjtJ/k6+/XZQ==\nU2NhbmJvdFNESw" +
+    "psb2NhbGhvc3R8Ym9va3NjYW4udmFu" +
+    "YWhlaW0uY29tLmF1CjE3NTYzMzkxOT" +
+    "kKODM4ODYwNwo4\n",
+    
+  // Development license for Replit environment
+  development:
+    "eF/Y56HZpKOTSmY2/E1vvYTAUnpZhT" +
+    "89i/FVKt+VBI2bhYuWAz5a/0PViy+D" +
+    "M4gTzDqMOa1Ythk5SFt9CCmYA8ALUd" +
+    "i+zv3i2xd8ostAwfWOqEeWRioBpvu7" +
+    "Jq9Fe2bIaScxaco68Zi75z6oIGSNre" +
+    "AqkEsNmJgK/i1ndp3vBigTNTtvZsv8" +
+    "v1fNZ6QBoklDhaxSqy1aR3v8hfjnbm" +
+    "By/W8t8AqiYvP33jgYPQ6354aLMV9N" +
+    "A/S8WINGwE7vk/SEwreMlYRS7NoEL1" +
+    "LcS6xgujaNcAmIY/CsRhQ/1hMbayLn" +
+    "1oHVzWhMcQ6v3/ZeR4HeJjs4oWQXV5" +
+    "Xx0N3z96nI9Q==\nU2NhbmJvdFNESw" +
+    "psb2NhbGhvc3R8NzJiN2U4N2YtY2Vl" +
+    "My00NmY2LThhOWEtOTM1ZWFkODE5Mj" +
+    "YxLTAwLTJwYnV4eXp4bW11ZzIucmlr" +
+    "ZXIucmVwbGl0LmRldgoxNzU2NDI1NT" +
+    "k5CjgzODg2MDcKOA==\n"
+};
+
+// Function to get the appropriate license key based on environment
+const getLicenseKey = (): string => {
+  const hostname = window.location.hostname;
+  
+  // Check if we're in production environment
+  if (hostname.includes('bookscan.vanaheim.com.au')) {
+    console.log('Using production license key for bookscan.vanaheim.com.au');
+    return LICENSE_KEYS.production;
+  }
+  
+  // Check if we're in Replit environment
+  if (hostname.includes('replit.dev')) {
+    console.log('Using development license key for Replit environment');
+    return LICENSE_KEYS.development;
+  }
+  
+  // Default to development for localhost and other environments
+  console.log('Using development license key for localhost/other environments');
+  return LICENSE_KEYS.development;
+};
+
 // Queue types (same as scanner-modal)
 interface QueueItem {
   id: string;
@@ -111,16 +173,7 @@ export default function ScanPage() {
   const scannerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Get license key based on environment
-  const getLicenseKey = () => {
-    const hostname = window.location.hostname;
-    if (hostname === 'bookscan.vanaheim.com.au') {
-      return 'Fn+d7geFVGNNnHECGTkgWCdjHjpEt8O5xdGh1YHpGfzfcTx7u4tYFJJTpNmKJqm1sO1Qm+MaJYSCNYaRVoxJCOX9IWkWCVXvbr8cRwTYLjXYjqN7YC+gT9FoLHLzYMGOXfxKaI7rIDYKqgZbdJd1jxqNGOXfxKaI7rIDYKqgZbdJd1jxqN';
-    } else {
-      console.log('Using development license key for Replit environment');
-      return 'hGOb8vhK2p8OBMrXwBH5pbUwUE8nzGRvhR9+vJdGj1m8CyV1P9Y7TQHzb7sVLlVjZI+MaJYSCNYaRVoxJCOX9IWkWCVXvbr8cRwTYLjXYjqN7YC+gT9FoLHLzYMGOXfxKaI7rIDYKqgZbdJd1jxqNGOXfxKaI7rIDYKqgZbdJd1jxqN';
-    }
-  };
+
 
   // Queue management functions
   const addToQueue = useCallback((isbn: string) => {
