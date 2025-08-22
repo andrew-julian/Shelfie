@@ -549,8 +549,9 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
   }, [isOpen]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className={`max-w-md ${isScanning ? 'z-0' : 'z-50'}`} data-testid="modal-scanner">
+    <>
+      <Dialog open={isOpen && !isScanning} onOpenChange={handleClose}>
+        <DialogContent className="max-w-md" data-testid="modal-scanner">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <div>
@@ -692,7 +693,21 @@ export default function ScannerModal({ isOpen, onClose }: ScannerModalProps) {
             Done Scanning
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      {/* Scanning Overlay - Show when camera is active */}
+      {isScanning && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-lg p-4 text-center">
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="w-3 h-3 bg-coral-red rounded-full animate-pulse"></div>
+              <span className="text-gray-900">Scanning for barcodes...</span>
+            </div>
+            <p className="text-sm text-gray-600">Point your camera at a book barcode</p>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
