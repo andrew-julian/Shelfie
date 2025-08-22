@@ -88,6 +88,8 @@ export function CoverEditorModal({
 
   const handleMouseDown = useCallback((e: React.MouseEvent, handle: string) => {
     e.preventDefault();
+    e.stopPropagation();
+    console.log(`Starting drag with handle: ${handle}`);
     setIsDragging(true);
     setDragHandle(handle);
     setDragStart({ x: e.clientX, y: e.clientY });
@@ -96,6 +98,7 @@ export function CoverEditorModal({
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging || !dragHandle || !cropContainerRef.current) return;
 
+    e.preventDefault();
     const container = cropContainerRef.current;
     const rect = container.getBoundingClientRect();
     const deltaX = ((e.clientX - dragStart.x) / rect.width) * 100;
@@ -187,6 +190,7 @@ export function CoverEditorModal({
   }, [isDragging, dragHandle, dragStart]);
 
   const handleMouseUp = useCallback(() => {
+    console.log('Ending drag');
     setIsDragging(false);
     setDragHandle(null);
   }, []);
@@ -376,39 +380,39 @@ export function CoverEditorModal({
                         }}
                         onMouseDown={(e) => handleMouseDown(e, 'move')}
                       >
-                        {/* Corner handles */}
+                        {/* Corner handles - larger and more interactive */}
                         <div 
-                          className="absolute -top-1 -left-1 w-3 h-3 bg-coral-red border border-white cursor-nw-resize"
+                          className="absolute -top-2 -left-2 w-4 h-4 bg-coral-red border-2 border-white cursor-nw-resize hover:bg-coral-red/80 transition-colors"
                           onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'nw'); }}
                         />
                         <div 
-                          className="absolute -top-1 -right-1 w-3 h-3 bg-coral-red border border-white cursor-ne-resize"
+                          className="absolute -top-2 -right-2 w-4 h-4 bg-coral-red border-2 border-white cursor-ne-resize hover:bg-coral-red/80 transition-colors"
                           onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'ne'); }}
                         />
                         <div 
-                          className="absolute -bottom-1 -left-1 w-3 h-3 bg-coral-red border border-white cursor-sw-resize"
+                          className="absolute -bottom-2 -left-2 w-4 h-4 bg-coral-red border-2 border-white cursor-sw-resize hover:bg-coral-red/80 transition-colors"
                           onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'sw'); }}
                         />
                         <div 
-                          className="absolute -bottom-1 -right-1 w-3 h-3 bg-coral-red border border-white cursor-se-resize"
+                          className="absolute -bottom-2 -right-2 w-4 h-4 bg-coral-red border-2 border-white cursor-se-resize hover:bg-coral-red/80 transition-colors"
                           onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'se'); }}
                         />
                         
-                        {/* Edge handles */}
+                        {/* Edge handles - larger and more interactive */}
                         <div 
-                          className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-coral-red border border-white cursor-n-resize"
+                          className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-coral-red border-2 border-white cursor-n-resize hover:bg-coral-red/80 transition-colors"
                           onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'n'); }}
                         />
                         <div 
-                          className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-coral-red border border-white cursor-s-resize"
+                          className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-coral-red border-2 border-white cursor-s-resize hover:bg-coral-red/80 transition-colors"
                           onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 's'); }}
                         />
                         <div 
-                          className="absolute -left-1 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-coral-red border border-white cursor-w-resize"
+                          className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-coral-red border-2 border-white cursor-w-resize hover:bg-coral-red/80 transition-colors"
                           onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'w'); }}
                         />
                         <div 
-                          className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-coral-red border border-white cursor-e-resize"
+                          className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-coral-red border-2 border-white cursor-e-resize hover:bg-coral-red/80 transition-colors"
                           onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'e'); }}
                         />
                         
