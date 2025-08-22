@@ -61,7 +61,7 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<SortOption>('date-added');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [showFilters, setShowFilters] = useState(false);
-  const [tidyMode, setTidyMode] = useState(false);
+
   const [useVirtualization, setUseVirtualization] = useState(false);
   
   // Performance telemetry
@@ -152,7 +152,7 @@ export default function Home() {
   // Container-based responsive configuration
   const [responsiveConfig, setResponsiveConfig] = useState<EngineConfig>({
     ...DEFAULT_CFG,
-    raggedLastRow: !tidyMode
+    raggedLastRow: true
   });
 
   // Update config when container size or tidy mode changes
@@ -191,7 +191,7 @@ export default function Home() {
       ...baseConfig,
       raggedLastRow: true // Always use ragged rows to preserve proportions
     });
-  }, [containerDimensions.width, tidyMode]);
+  }, [containerDimensions.width]);
 
   useEffect(() => {
     if ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && books.length > 0) {
@@ -590,8 +590,6 @@ export default function Home() {
           onFilterStatusChange={setFilterStatus}
           showFilters={showFilters}
           onToggleFilters={() => setShowFilters(!showFilters)}
-          tidyMode={tidyMode}
-          onToggleTidyMode={() => setTidyMode(!tidyMode)}
         />
         
         <main className="w-full px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto py-6 sm:py-12">
@@ -650,7 +648,6 @@ export default function Home() {
               books={finalBooks}
               onBookSelect={handleBookSelect}
               onBookUpdate={handleBookUpdate}
-              tidyMode={tidyMode}
               chunkSize={200}
               bufferSize={2}
             />
@@ -679,10 +676,10 @@ export default function Home() {
                       left: `${item.x}px`,
                       top: `${item.y}px`,
                       zIndex: Math.round(item.z * 100),
-                      transform: `rotateY(${tidyMode ? 0 : item.ry}deg)`,
+                      transform: `rotateY(${item.ry}deg)`,
                       width: `${item.w}px`,
                       height: `${item.h}px`,
-                      transition: tidyMode !== undefined ? 'transform 600ms cubic-bezier(.2,.8,.2,1)' : 'transform 220ms cubic-bezier(.2,.8,.2,1)',
+                      transition: 'transform 220ms cubic-bezier(.2,.8,.2,1)',
                       willChange: 'transform'
                     }}
                   >

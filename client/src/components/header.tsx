@@ -20,8 +20,6 @@ interface HeaderProps {
   onFilterStatusChange: (status: FilterStatus) => void;
   showFilters: boolean;
   onToggleFilters: () => void;
-  tidyMode: boolean;
-  onToggleTidyMode: () => void;
 }
 
 export default function Header({ 
@@ -36,9 +34,7 @@ export default function Header({
   filterStatus,
   onFilterStatusChange,
   showFilters,
-  onToggleFilters,
-  tidyMode,
-  onToggleTidyMode
+  onToggleFilters
 }: HeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -54,27 +50,28 @@ export default function Header({
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            <span className="text-sm text-gray-600 font-medium" data-testid="text-books-count">
-              {filteredCount !== booksCount ? `${filteredCount} of ${booksCount}` : booksCount} {booksCount === 1 ? 'book' : 'books'}
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-4 xl:space-x-6">
+            <span className="text-xs lg:text-sm text-gray-600 font-medium whitespace-nowrap" data-testid="text-books-count">
+              {filteredCount !== booksCount ? `${filteredCount}/${booksCount}` : booksCount} books
             </span>
             <UserMenu />
             {onRefreshAll && booksCount > 0 && (
               <button 
                 onClick={onRefreshAll}
                 disabled={isRefreshing}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-coral-red hover:bg-gray-50 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
+                className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-2 text-xs lg:text-sm font-medium text-gray-600 hover:text-coral-red hover:bg-gray-50 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
                 data-testid="button-refresh-all"
               >
-                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                {isRefreshing ? 'Refreshing...' : 'Refresh All'}
+                <RefreshCw className={`w-3 lg:w-4 h-3 lg:h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span className="hidden lg:inline">{isRefreshing ? 'Refreshing...' : 'Refresh All'}</span>
+                <span className="lg:hidden">Refresh</span>
               </button>
             )}
             <div className="relative">
               <select 
                 value={sortBy}
                 onChange={(e) => onSortChange(e.target.value as SortOption)}
-                className="appearance-none bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:text-coral-red hover:border-coral-red focus:outline-none focus:ring-2 focus:ring-coral-red focus:border-coral-red transition-all"
+                className="appearance-none bg-white border border-gray-200 rounded-lg px-2 lg:px-3 py-2 text-xs lg:text-sm font-medium text-gray-600 hover:text-coral-red hover:border-coral-red focus:outline-none focus:ring-2 focus:ring-coral-red focus:border-coral-red transition-all min-w-0"
                 data-testid="select-sort"
               >
                 <option value="title-asc">Title A-Z</option>
@@ -83,38 +80,29 @@ export default function Header({
                 <option value="author-desc">Author Z-A</option>
                 <option value="status">Status</option>
                 <option value="date-added">Date Added</option>
-                <option value="color-light-to-dark">Colour Sort (Light to Dark)</option>
-                <option value="color-dark-to-light">Colour Sort (Dark to Light)</option>
+                <option value="color-light-to-dark">Color: Light→Dark</option>
+                <option value="color-dark-to-light">Color: Dark→Light</option>
               </select>
-              <SortAsc className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <SortAsc className="absolute right-1 lg:right-2 top-1/2 transform -translate-y-1/2 w-3 lg:w-4 h-3 lg:h-4 text-gray-400 pointer-events-none" />
             </div>
             
             <button 
               onClick={() => setShowSearch(!showSearch)}
-              className={`p-3 rounded-lg transition-all ${showSearch || searchTerm ? 'text-coral-red bg-red-50' : 'text-gray-600 hover:text-coral-red hover:bg-gray-50'}`}
+              className={`p-2 lg:p-3 rounded-lg transition-all ${showSearch || searchTerm ? 'text-coral-red bg-red-50' : 'text-gray-600 hover:text-coral-red hover:bg-gray-50'}`}
               data-testid="button-search"
             >
-              <Search className="w-5 h-5" />
+              <Search className="w-4 lg:w-5 h-4 lg:h-5" />
             </button>
             
             <button 
               onClick={onToggleFilters}
-              className={`p-3 rounded-lg transition-all ${showFilters || filterStatus !== 'all' ? 'text-coral-red bg-red-50' : 'text-gray-600 hover:text-coral-red hover:bg-gray-50'}`}
+              className={`p-2 lg:p-3 rounded-lg transition-all ${showFilters || filterStatus !== 'all' ? 'text-coral-red bg-red-50' : 'text-gray-600 hover:text-coral-red hover:bg-gray-50'}`}
               data-testid="button-filter"
             >
-              <Filter className="w-5 h-5" />
+              <Filter className="w-4 lg:w-5 h-4 lg:h-5" />
             </button>
             
-            <button 
-              onClick={onToggleTidyMode}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
-                tidyMode ? 'text-coral-red bg-red-50 font-medium' : 'text-gray-600 hover:text-coral-red hover:bg-gray-50'
-              }`}
-              data-testid="button-tidy-mode"
-            >
-              <SortAsc className="w-5 h-5" />
-              <span className="text-sm font-medium">Tidy Up</span>
-            </button>
+
           </div>
 
           {/* Mobile Navigation */}
@@ -204,21 +192,7 @@ export default function Header({
                 Filters
               </button>
 
-              <button 
-                onClick={() => {
-                  onToggleTidyMode();
-                  setShowMobileMenu(false);
-                }}
-                className={`w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium border rounded-lg transition-all ${
-                  tidyMode 
-                    ? 'text-coral-red bg-coral-red/10 border-coral-red' 
-                    : 'text-gray-600 hover:text-coral-red border-gray-200'
-                }`}
-                data-testid="button-tidy-mode-mobile"
-              >
-                <SortAsc className="w-4 h-4" />
-                Tidy Up
-              </button>
+
             </div>
           </div>
         )}

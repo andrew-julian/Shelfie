@@ -8,7 +8,6 @@ interface VirtualizedBookGridProps {
   books: Book[];
   onBookSelect: (book: Book) => void;
   onBookUpdate: () => void;
-  tidyMode: boolean;
   chunkSize?: number;
   bufferSize?: number;
 }
@@ -26,7 +25,6 @@ export default function VirtualizedBookGrid({
   books,
   onBookSelect,
   onBookUpdate,
-  tidyMode,
   chunkSize = 200,
   bufferSize = 2
 }: VirtualizedBookGridProps) {
@@ -218,11 +216,11 @@ export default function VirtualizedBookGrid({
                   '--w': `${item.w}px`,
                   '--h': `${item.h}px`,
                   '--d': `${item.d}px`,
-                  '--ry': `${tidyMode ? 0 : item.ry}deg`,
+                  '--ry': `${item.ry}deg`,
                   left: `var(--x)`,
                   top: `var(--y)`,
                   zIndex: Math.min(Math.round(item.z * 100), 100),
-                  transform: `rotateY(${tidyMode ? 0 : item.ry}deg)`,
+                  transform: `rotateY(${item.ry}deg)`,
                   transition: 'transform 220ms cubic-bezier(.2,.8,.2,1)',
                   width: `var(--w)`,
                   height: `var(--h)`

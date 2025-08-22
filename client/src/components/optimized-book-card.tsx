@@ -20,7 +20,6 @@ interface OptimizedBookCardProps {
     z: number;
     rotation: number;
   };
-  tidyMode?: boolean;
 }
 
 export default function OptimizedBookCard({
@@ -28,8 +27,7 @@ export default function OptimizedBookCard({
   onSelect,
   onUpdate,
   customDimensions,
-  position,
-  tidyMode = false
+  position
 }: OptimizedBookCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const { scheduleCommit } = usePerformanceTelemetry();
@@ -39,9 +37,8 @@ export default function OptimizedBookCard({
 
   // Create combined transform to avoid multiple reflows
   const transform = useMemo(() => {
-    const rotation = tidyMode ? 0 : position.rotation;
-    return `translate3d(${position.x}px, ${position.y}px, 0) rotateY(${rotation}deg)`;
-  }, [position.x, position.y, position.rotation, tidyMode]);
+    return `translate3d(${position.x}px, ${position.y}px, 0) rotateY(${position.rotation}deg)`;
+  }, [position.x, position.y, position.rotation]);
 
   // Update position using single rAF commit
   useEffect(() => {
@@ -138,7 +135,7 @@ export default function OptimizedBookCard({
         className="relative w-full h-full rounded-lg shadow-lg overflow-hidden"
         style={{
           background: book.coverImage ? 'transparent' : '#f3f4f6',
-          transform: isHovered && !tidyMode ? 'translateZ(10px) rotateX(-5deg)' : 'translateZ(0)',
+          transform: isHovered ? 'translateZ(10px) rotateX(-5deg)' : 'translateZ(0)',
           transition: 'transform 220ms cubic-bezier(.2,.8,.2,1)',
           filter: isHovered ? 'brightness(1.1)' : 'brightness(1)',
         }}

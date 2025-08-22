@@ -14,7 +14,7 @@ export interface LayoutConfig {
   containerHeight: number;
   padding: number;
   minSpacing: number;
-  tidyMode?: boolean;
+
 }
 
 /**
@@ -32,23 +32,7 @@ export function calculateDynamicLayout(
   const rows: Array<{ books: Book[]; totalWidth: number; height: number }> = [];
   
   // Single-pass book sorting (no O(n²) operations)
-  const sortedBooks = config.tidyMode 
-    ? [...books].sort((a, b) => {
-        const aDim = getDimensions(a);
-        const bDim = getDimensions(b);
-        
-        // Primary sort: by height (tallest first)
-        const heightDiff = bDim.height - aDim.height;
-        if (Math.abs(heightDiff) > 10) return heightDiff;
-        
-        // Secondary sort: by width (widest first) 
-        const widthDiff = bDim.width - aDim.width;
-        if (Math.abs(widthDiff) > 5) return widthDiff;
-        
-        // Tertiary sort: by depth for final organization
-        return bDim.depth - aDim.depth;
-      })
-    : books;
+  const sortedBooks = books;
   
   // First pass: organize books into rows with minimum 2 books per row
   let currentRow: Book[] = [];
