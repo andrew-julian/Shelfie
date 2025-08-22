@@ -675,16 +675,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Book not found" });
       }
       
-      // For now, we'll simulate saving the cropped image and return a modified URL
-      // In a real implementation, you would:
-      // 1. Decode the base64 image data
-      // 2. Upload to a cloud storage service (like AWS S3, Google Cloud Storage, etc.)
-      // 3. Get a permanent URL
-      // 4. Update the book record
-      
-      // Generate a timestamp-based cropped URL (simulation)
-      const timestamp = Date.now();
-      const croppedImageUrl = `${originalImageUrl}?crop=${timestamp}`;
+      // Store the cropped image data directly in the storage system
+      // This creates a data URL that can be used directly by the browser
+      const croppedImageUrl = croppedImageData;
       
       // Update the book with the new cropped image
       const updatedBook = await storage.updateBookData(id, {
