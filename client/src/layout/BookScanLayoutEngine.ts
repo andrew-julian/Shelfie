@@ -205,6 +205,10 @@ function processRow(
     x += w + cfg.gutterX;
   }
   
+  // Calculate row centering offset
+  const totalRowWidth = x - cfg.gutterX; // Remove last gutter
+  const centerOffset = (containerWidth - totalRowWidth) / 2;
+  
   // Apply safe jitter that prevents overlaps
   for (let i = 0; i < nominalItems.length; i++) {
     const item = nominalItems[i];
@@ -226,7 +230,7 @@ function processRow(
 
     layoutItems.push({
       id: item.id,
-      x: item.x + jx,
+      x: item.x + jx + centerOffset, // Apply centering offset
       y: yCursor + jy,
       w: item.w,
       h: item.h,
