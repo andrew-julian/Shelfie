@@ -32,7 +32,8 @@ import {
   Bookmark,
   FileText,
   MessageSquare,
-  BarChart3
+  BarChart3,
+  Quote
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -547,13 +548,85 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
 
                           {extendedData?.editorial_reviews && extendedData.editorial_reviews.length > 0 && (
                             <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Editorial Reviews</h4>
-                              {extendedData.editorial_reviews.map((review, index) => (
-                                <div key={index} className="mb-3 p-3 bg-gray-50 rounded">
-                                  {review.source && <p className="font-medium text-sm text-gray-600 mb-1">{review.source}</p>}
-                                  <p className="text-gray-700 text-sm">{review.body}</p>
-                                </div>
-                              ))}
+                              <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <Quote className="w-4 h-4" />
+                                Editorial Reviews
+                              </h4>
+                              <div className="space-y-4">
+                                {extendedData.editorial_reviews.map((review, index) => {
+                                  // Parse and format the review body to extract individual quotes with sources
+                                  const parseEditorialReview = (text: string) => {
+                                    // Split on common patterns that indicate new quotes
+                                    const quoteParts = text.split(/--/);
+                                    const quotes = [];
+                                    
+                                    for (let i = 0; i < quoteParts.length; i++) {
+                                      const part = quoteParts[i].trim();
+                                      if (part) {
+                                        // Check if this looks like a quote (starts with opening quote or contains quoted content)
+                                        const hasQuotes = part.includes('"') && part.includes('"');
+                                        const startsWithQuote = part.startsWith('"');
+                                        
+                                        if (hasQuotes || startsWithQuote) {
+                                          // Try to extract quote and attribution
+                                          const quoteMatch = part.match(/^[""]([^""]+)[""]?(.*)$/);
+                                          if (quoteMatch) {
+                                            const quoteText = quoteMatch[1];
+                                            let attribution = quoteMatch[2] ? quoteMatch[2].trim() : '';
+                                            
+                                            // Look for attribution in the next part if not found
+                                            if (!attribution && i + 1 < quoteParts.length) {
+                                              attribution = quoteParts[i + 1].trim();
+                                              i++; // Skip the next part since we used it as attribution
+                                            }
+                                            
+                                            // Clean up attribution - remove leading dashes or common prefixes
+                                            attribution = attribution.replace(/^-+/, '').trim();
+                                            
+                                            quotes.push({ text: quoteText, attribution });
+                                          } else {
+                                            // Fallback: treat as quote without clear structure
+                                            quotes.push({ text: part, attribution: '' });
+                                          }
+                                        } else if (part.length > 20) {
+                                          // Long text without quotes - treat as regular text
+                                          quotes.push({ text: part, attribution: '' });
+                                        }
+                                      }
+                                    }
+                                    
+                                    return quotes.length > 0 ? quotes : [{ text: text, attribution: '' }];
+                                  };
+                                  
+                                  const parsedQuotes = parseEditorialReview(review.body || '');
+                                  
+                                  return (
+                                    <div key={index} className="space-y-3">
+                                      {parsedQuotes.map((quote, qIndex) => (
+                                        <div 
+                                          key={qIndex} 
+                                          className="relative p-4 bg-gradient-to-r from-blue-50 to-gray-50 rounded-lg border-l-4 border-blue-400"
+                                        >
+                                          <Quote className="absolute top-2 left-2 w-4 h-4 text-blue-400 opacity-60" />
+                                          <blockquote className="pl-6 text-gray-800 leading-relaxed italic">
+                                            "{quote.text.replace(/^[""]|[""]$/g, '')}"
+                                          </blockquote>
+                                          {quote.attribution && (
+                                            <cite className="block mt-2 text-sm font-medium text-gray-600 not-italic pl-6">
+                                              — {quote.attribution}
+                                            </cite>
+                                          )}
+                                          {review.source && qIndex === 0 && (
+                                            <div className="absolute top-2 right-3 text-xs text-gray-500 bg-white px-2 py-1 rounded">
+                                              {review.source}
+                                            </div>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             </div>
                           )}
 
