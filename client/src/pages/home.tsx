@@ -68,7 +68,7 @@ export default function Home() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -88,6 +88,19 @@ export default function Home() {
   const { data: allBooks = [], isLoading: booksLoading, refetch } = useQuery<Book[]>({
     queryKey: ['/api/books'],
   });
+
+  // Detect navigation from scan page and refresh books
+  useEffect(() => {
+    if (location === '/' && !isLoading && isAuthenticated) {
+      // Check if we navigated from the scan page by looking at the previous location
+      // This effect will run whenever we land on the home page
+      const timeoutId = setTimeout(() => {
+        refetch();
+      }, 100); // Small delay to ensure the page has settled
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [location, isLoading, isAuthenticated, refetch]);
 
   // Filter and sort books based on current state
   const books = useMemo(() => {
