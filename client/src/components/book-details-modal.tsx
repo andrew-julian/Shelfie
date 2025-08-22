@@ -230,10 +230,10 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-screen overflow-y-auto" data-testid="modal-book-details">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="modal-book-details">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-monochrome-black">Book Details</span>
+            <span className="text-xl sm:text-2xl font-bold text-monochrome-black">Book Details</span>
             <Button variant="ghost" size="icon" onClick={onClose} data-testid="button-close-details">
               <X className="w-5 h-5" />
             </Button>
@@ -242,9 +242,9 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
         
         {/* Mobile Header Section */}
         <div className="md:hidden mb-6">
-          <div className="flex gap-4">
+          <div className="flex gap-3 sm:gap-4">
             {/* Mobile Book Cover - Smaller */}
-            <div className="flex-shrink-0 w-24 sm:w-32">
+            <div className="flex-shrink-0 w-20 sm:w-28">
               {currentCoverImage ? (
                 <img 
                   src={currentCoverImage} 
@@ -261,18 +261,18 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
             
             {/* Mobile Title and Author */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-monochrome-black mb-2 leading-tight" data-testid="text-book-title-mobile">
+              <h1 className="text-lg sm:text-xl font-bold text-monochrome-black mb-2 leading-tight line-clamp-3" data-testid="text-book-title-mobile">
                 {book.title}
               </h1>
-              <div className="flex items-center text-base text-gray-700 mb-3" data-testid="text-book-author-mobile">
-                <Users className="w-4 h-4 mr-2 text-sky-blue flex-shrink-0" />
+              <div className="flex items-center text-sm sm:text-base text-gray-700 mb-2" data-testid="text-book-author-mobile">
+                <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-sky-blue flex-shrink-0" />
                 <span className="font-semibold truncate">{book.author}</span>
               </div>
               
               {/* Mobile Rating */}
               {book.rating && (
-                <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-lg w-fit">
-                  <div className="flex text-yellow-400 mr-2">
+                <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-lg w-fit">
+                  <div className="flex text-yellow-400 mr-1">
                     {[...Array(5)].map((_, i) => (
                       <Star 
                         key={i} 
@@ -280,7 +280,7 @@ export default function BookDetailsModal({ book, isOpen, onClose, onUpdate }: Bo
                       />
                     ))}
                   </div>
-                  <span className="font-bold text-sm text-gray-800">{book.rating}</span>
+                  <span className="font-bold text-xs text-gray-800">{book.rating}</span>
                 </div>
               )}
             </div>
