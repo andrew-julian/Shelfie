@@ -294,50 +294,47 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[95vh] p-0 overflow-hidden">
-          <div className="flex flex-col h-full">
-            {/* Header */}
-            <DialogHeader className="flex flex-row items-center justify-between p-6 pb-4 border-b">
-              <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <BookOpen className="w-6 h-6 text-coral-red" />
-                Book Details
-              </DialogTitle>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowCropper(true)}
-                  className="text-gray-500 hover:text-coral-red"
-                  data-testid="button-crop-cover"
-                >
-                  <Crop className="w-4 h-4" />
-                  Edit Cover
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deleteBookMutation.mutate()}
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                  data-testid="button-delete-book"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onClose}
-                  className="text-gray-500 hover:text-gray-700"
-                  data-testid="button-close-modal"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
+          <DialogHeader className="flex flex-row items-center justify-between mb-6">
+            <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <BookOpen className="w-6 h-6 text-coral-red" />
+              Book Details
+            </DialogTitle>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowCropper(true)}
+                className="text-gray-500 hover:text-coral-red"
+                data-testid="button-crop-cover"
+              >
+                <Crop className="w-4 h-4" />
+                Edit Cover
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => deleteBookMutation.mutate()}
+                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                data-testid="button-delete-book"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700"
+                data-testid="button-close-modal"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </DialogHeader>
 
-            <ScrollArea className="flex-1">
-              <div className="p-6">
-                {/* Hero Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          <div className="space-y-6">
+            {/* Hero Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Book Cover and Variants */}
                   <div className="space-y-4">
                     <div className="relative group">
@@ -518,12 +515,12 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                       </div>
                     )}
                   </div>
-                </div>
+            </div>
 
-                <Separator className="my-8" />
+            <Separator className="my-8" />
 
-                {/* Navigation Tabs */}
-                <div className="flex gap-4 mb-6 border-b">
+            {/* Navigation Tabs */}
+            <div className="flex gap-4 mb-6 border-b">
                   {[
                     { id: 'overview', label: 'Overview', icon: Eye },
                     { id: 'reviews', label: 'Reviews', icon: Star },
@@ -542,10 +539,10 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                       {label}
                     </button>
                   ))}
-                </div>
+            </div>
 
-                {/* Tab Content */}
-                <div className="space-y-6">
+            {/* Tab Content */}
+            <div className="space-y-6">
                   {activeTab === 'overview' && (
                     <>
                       {/* Description */}
@@ -762,9 +759,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                       </div>
                     </>
                   )}
-                </div>
-              </div>
-            </ScrollArea>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
