@@ -205,6 +205,37 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
     },
   });
 
+  const refreshBookDataMutation = useMutation({
+    mutationFn: async () => {
+      if (!book) return;
+      
+      const response = await fetch(`/api/books/${book.id}/refresh`, {
+        method: 'PATCH',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to refresh book data');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/books'] });
+      onUpdate();
+      toast({
+        title: "Success",
+        description: "Book data refreshed successfully from Amazon",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to refresh book data from Amazon",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteBookMutation = useMutation({
     mutationFn: async () => {
       if (!book) return;
@@ -280,6 +311,17 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
               Book Details
             </DialogTitle>
             <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => refreshBookDataMutation.mutate()}
+                disabled={refreshBookDataMutation.isPending}
+                className="text-green-600 hover:text-green-800 hover:bg-green-50"
+                data-testid="button-refresh-book"
+              >
+                <CheckCircle className={`w-4 h-4 ${refreshBookDataMutation.isPending ? 'animate-spin' : ''}`} />
+                Refresh Data
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
