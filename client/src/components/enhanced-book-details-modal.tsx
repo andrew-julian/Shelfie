@@ -360,7 +360,9 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                                   </Badge>
                                 )}
                               </div>
-                              <span className="font-semibold text-sm text-coral-red">{variant.price}</span>
+                              <span className="font-semibold text-sm text-coral-red">
+                                {variant.price?.raw || variant.price?.value || variant.price || "N/A"}
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -599,7 +601,9 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                                 <div className="flex-1 min-w-0">
                                   <h4 className="font-medium text-sm line-clamp-2">{item.title}</h4>
                                   <p className="text-xs text-gray-500 mt-1">{item.author}</p>
-                                  <p className="text-sm font-semibold text-coral-red mt-1">{item.price}</p>
+                                  <p className="text-sm font-semibold text-coral-red mt-1">
+                                    {item.price?.raw || item.price?.value || item.price || "N/A"}
+                                  </p>
                                 </div>
                               </div>
                             ))}
