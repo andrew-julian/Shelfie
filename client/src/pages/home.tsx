@@ -203,14 +203,22 @@ export default function Home() {
 
   // Convert books to layout engine format
   const convertToLayoutBooks = (books: Book[]): LayoutBook[] => {
-    return books.map(book => ({
-      id: book.id,
-      phys: {
-        width_mm: book.width ? parseFloat(book.width) : 140,
-        height_mm: book.height ? parseFloat(book.height) : 200, 
-        spine_mm: book.depth ? parseFloat(book.depth) : 15
-      }
-    }));
+    return books.map(book => {
+      // Convert from inches to millimeters (Amazon data is typically in inches)
+      // Default book dimensions: ~5.5" x 8.5" x 0.75" typical paperback
+      const widthInches = book.width ? parseFloat(book.width) : 5.5;
+      const heightInches = book.height ? parseFloat(book.height) : 8.5;
+      const depthInches = book.depth ? parseFloat(book.depth) : 0.75;
+      
+      return {
+        id: book.id,
+        phys: {
+          width_mm: widthInches * 25.4, // Convert inches to mm
+          height_mm: heightInches * 25.4,
+          spine_mm: depthInches * 25.4
+        }
+      };
+    });
   };
 
   // Memoized book normalization
