@@ -119,8 +119,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "User not found" });
       }
 
-      console.log(`Switching session from user ${req.user?.claims?.sub} to user ${userId}`);
-
       // Create user claims based on database user
       const userClaims = {
         sub: targetUser.id,
@@ -130,7 +128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         profile_image_url: targetUser.profileImageUrl,
       };
 
-      // Update session with new user - this completely replaces the user context
+      // Update session with new user
       req.user = {
         claims: userClaims,
         access_token: req.user?.access_token || 'mock-token',
@@ -138,14 +136,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
       };
 
-      // Also update the session to persist this across requests
-      if (req.session) {
-        req.session.passport = {
-          user: req.user
-        };
-      }
-
-      console.log(`User switch complete. New user ID: ${req.user.claims.sub}`);
       res.json({ message: "User switched successfully", userId: targetUser.id });
     } catch (error) {
       console.error("Error switching user:", error);
@@ -197,15 +187,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update user preferences" });
     }
   });
-  // Get all books for the current user (could be switched via user switcher)
+  // Get all books
   app.get("/api/books", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      console.log(`Fetching books for user: ${userId}`); // Debug logging
       const books = await storage.getAllBooks(userId);
       res.json(books);
     } catch (error) {
-      console.error("Error fetching books:", error);
       res.status(500).json({ message: "Failed to fetch books" });
     }
   });
