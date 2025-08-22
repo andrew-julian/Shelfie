@@ -179,8 +179,20 @@ function processRow(
   
   // Preserve natural proportions for all rows, not just the last one
   // Limit scaling to prevent excessive stretching that destroys proportions
-  const maxStretch = 1.3; // Allow some stretching but preserve dramatic size differences
+  const maxStretch = 1.05; // Very minimal stretching to preserve aspect ratios
+  const originalScale = scale;
   scale = Math.min(scale, maxStretch);
+  
+  // Debug scaling for problematic books
+  if (rowBooks.some(book => book.id.includes('nexus') || book.id.includes('drama') || book.id.includes('reading'))) {
+    console.log('Scaling debug:', {
+      rowBooks: rowBooks.map(b => ({ id: b.id.slice(0, 8), title: b.title.slice(0, 30) })),
+      originalScale,
+      finalScale: scale,
+      wsum,
+      usable: containerWidth - totalGutterWidth
+    });
+  }
   
   // Row waviness
   const jy = Math.sin(rowIndex * 1.3) * 4;
