@@ -121,8 +121,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve Scanbot SDK files statically (before auth middleware to avoid auth issues)
   app.get('/scanbot-sdk/*', (req, res, next) => {
     // Remove query parameters for file path resolution
-    const filePath = req.path.replace('/scanbot-sdk/', '');
+    let filePath = req.path.replace('/scanbot-sdk/', '');
+    
+    // Handle direct file requests (like ScanbotSDK.Core-simd.js)
+    // The SDK looks for files in bin/barcode-scanner/ subdirectory
+    if (!filePath.includes('/') && filePath.endsWith('.js')) {
+      filePath = `bin/barcode-scanner/${filePath}`;
+    }
+    
     const fullPath = path.join(process.cwd(), 'client/public/scanbot-sdk', filePath);
+    
+    console.log(`Serving Scanbot file: ${req.path} -> ${fullPath}`);
     
     // Set proper MIME types
     if (filePath.endsWith('.js')) {
