@@ -418,9 +418,9 @@ export default function ScanPage() {
             
             // Try different engine paths to resolve WASM loading issues
             const possiblePaths = [
+              "/scanbot-sdk",
               "/scanbot-sdk/",
-              "https://unpkg.com/scanbot-web-sdk@7.2.0/bundle/",
-              "https://cdn.jsdelivr.net/npm/scanbot-web-sdk@7.2.0/bundle/"
+              "https://unpkg.com/scanbot-web-sdk@7.2.0/bundle"
             ];
             
             let initResult;
