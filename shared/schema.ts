@@ -33,6 +33,7 @@ export const books = pgTable("books", {
   featureBullets: text("feature_bullets").array(),
   availability: text("availability"),
   amazonDomain: varchar("amazon_domain", { length: 50 }).notNull().default("amazon.com.au"),
+  format: varchar("format", { length: 20 }), // Physical format owned by user (hardcover, paperback, etc.)
   userId: varchar("user_id"), // nullable initially to preserve existing data
   status: varchar("status", { length: 20 }).notNull().default("want-to-read"),
   addedAt: timestamp("added_at").defaultNow().notNull(),

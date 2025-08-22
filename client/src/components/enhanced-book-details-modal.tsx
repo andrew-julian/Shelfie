@@ -731,28 +731,50 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                         <Bookmark className="w-5 h-5" />
                         Available Formats
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {Object.entries(extendedData.variants).map(([format, details]: [string, any]) => (
-                          <div key={format} className="p-4 bg-gray-50 rounded border">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <span className="font-medium text-gray-900">
-                                  {format}
-                                </span>
-                                {details.price && (
-                                  <span className="block text-coral-red font-semibold mt-1">
-                                    {details.price.raw || details.price.value || details.price}
+                      <div className="space-y-3">
+                        {Object.entries(extendedData.variants).map(([format, details]: [string, any]) => {
+                          // Determine if this is the user's copy based on stored format or best guess
+                          const normalizedFormat = format.toLowerCase().replace(/[^a-z]/g, '');
+                          const userFormat = book.format?.toLowerCase().replace(/[^a-z]/g, '') || 'hardcover';
+                          const isUserCopy = normalizedFormat === userFormat || 
+                                           (normalizedFormat === 'hardcover' && !book.format);
+                          
+                          return (
+                            <div 
+                              key={format} 
+                              className={`p-4 rounded-lg border transition-all ${
+                                isUserCopy 
+                                  ? 'bg-coral-red/5 border-coral-red/20 shadow-sm ring-2 ring-coral-red/10' 
+                                  : 'bg-gray-50 border-gray-200'
+                              }`}
+                            >
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-3">
+                                  <span className="font-medium text-gray-900 capitalize">
+                                    {format}
                                   </span>
-                                )}
+                                  {isUserCopy && (
+                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-coral-red text-white">
+                                      Your Copy
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-right">
+                                  {details.price && (
+                                    <span className="text-coral-red font-semibold text-lg">
+                                      {details.price.raw || details.price.value || details.price}
+                                    </span>
+                                  )}
+                                  {!details.price && details.available && (
+                                    <span className="text-green-600 font-medium">
+                                      $0.00
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                              {details.available && (
-                                <Badge variant="outline" className="text-xs">
-                                  Available
-                                </Badge>
-                              )}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
