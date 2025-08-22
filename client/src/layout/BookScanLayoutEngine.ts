@@ -117,9 +117,8 @@ export function calculateLayout(
     const guttersNeeded = currentRow.length; // Number of gutters if we add this book
     const totalWidthWithBook = currentRowNaturalWidth + naturalWidth + (guttersNeeded * cfg.gutterX);
     
-    // More aggressive row packing - allow slightly more width usage before starting new row
-    const containerWidthWithBuffer = containerWidth * 1.15; // Allow 15% overflow for better packing
-    const shouldStartNewRow = totalWidthWithBook > containerWidthWithBuffer && currentRow.length > 0;
+    // Check if adding this book would exceed container width
+    const shouldStartNewRow = totalWidthWithBook > containerWidth && currentRow.length > 0;
     
     if (shouldStartNewRow) {
       // Process current row
