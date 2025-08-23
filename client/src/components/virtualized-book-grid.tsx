@@ -94,6 +94,17 @@ export default function VirtualizedBookGrid({
       }
     });
 
+    // Proactive loading: Add next few chunks that are approaching viewport
+    const currentBottomVisible = scrollTop + viewHeight;
+    const proactiveLoadDistance = viewHeight * 1.5; // Load chunks 1.5 viewports ahead
+    
+    chunks.forEach(chunk => {
+      if (chunk.startY <= currentBottomVisible + proactiveLoadDistance && 
+          chunk.startY > currentBottomVisible) {
+        newVisibleChunks.add(chunk.id);
+      }
+    });
+
     // Always include chunk with focused item
     if (focusedItemId) {
       const focusedItem = layoutItems.find(item => item.id === focusedItemId);
