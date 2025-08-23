@@ -177,10 +177,8 @@ export default function ScanPage() {
   // Add item to queue mutation
   const addToQueueMutation = useMutation({
     mutationFn: async (isbn: string) => {
-      return apiRequest('/api/scanning-queue', {
-        method: 'POST',
-        body: { isbn: isbn.trim() }
-      });
+      const response = await apiRequest('POST', '/api/scanning-queue', { isbn: isbn.trim() });
+      return response.json();
     },
     onSuccess: () => {
       setScanCount(prev => prev + 1);
@@ -198,10 +196,8 @@ export default function ScanPage() {
   // Retry queue item mutation
   const retryQueueItemMutation = useMutation({
     mutationFn: async ({ id, retryCount }: { id: string; retryCount: number }) => {
-      return apiRequest(`/api/scanning-queue/${id}/retry`, {
-        method: 'POST',
-        body: { retryCount }
-      });
+      const response = await apiRequest('POST', `/api/scanning-queue/${id}/retry`, { retryCount });
+      return response.json();
     },
     onSuccess: () => {
       refetchQueue();
@@ -211,9 +207,7 @@ export default function ScanPage() {
   // Remove queue item mutation
   const removeQueueItemMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/scanning-queue/${id}`, {
-        method: 'DELETE'
-      });
+      await apiRequest('DELETE', `/api/scanning-queue/${id}`);
     },
     onSuccess: () => {
       refetchQueue();
@@ -223,9 +217,8 @@ export default function ScanPage() {
   // Clear completed items mutation
   const clearCompletedMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/scanning-queue/completed', {
-        method: 'DELETE'
-      });
+      const response = await apiRequest('DELETE', '/api/scanning-queue/completed');
+      return response.json();
     },
     onSuccess: () => {
       refetchQueue();
