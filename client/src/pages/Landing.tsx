@@ -57,7 +57,7 @@ export default function Landing() {
                 <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                   Scan barcodes, fetch the right details, and see your books on a shelf that looks like your shelf.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <div className="flex justify-center lg:justify-start">
                   <Button 
                     size="lg" 
                     asChild
@@ -68,15 +68,6 @@ export default function Landing() {
                       Get the app
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </a>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="lg"
-                    className="px-8 py-4 text-lg font-semibold rounded-full border-2 border-gray-300 hover:border-gray-400"
-                    onClick={() => handleAnalyticsEvent('click_cta_secondary')}
-                    data-testid="button-secondary-cta"
-                  >
-                    Try on the web
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-4">No ads. No clutter.</p>
