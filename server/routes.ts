@@ -1879,31 +1879,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Webhook to handle Stripe events
   app.post("/api/stripe-webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+    console.log('🔔 Webhook received! Headers:', {
+      signature: req.headers['stripe-signature'],
+      contentType: req.headers['content-type'],
+      bodyLength: req.body?.length || 0
+    });
+    
     const sig = req.headers['stripe-signature'];
     let event;
     
     try {
       event = stripe.webhooks.constructEvent(req.body, sig as string, process.env.STRIPE_WEBHOOK_SECRET || '');
+      console.log('✅ Webhook signature verified. Event type:', event.type);
+      console.log('📋 Event data:', JSON.stringify(event.data.object, null, 2));
     } catch (err) {
-      console.error('Webhook signature verification failed:', err);
+      console.error('❌ Webhook signature verification failed:', err);
       return res.status(400).send(`Webhook Error: ${err}`);
     }
     
     // Handle the event
     switch (event.type) {
       case 'checkout.session.completed':
+        console.log('🛒 Processing checkout.session.completed event');
         const session = event.data.object as any;
+        console.log('Session details:', {
+          id: session.id,
+          customer: session.customer,
+          subscription: session.subscription,
+          metadata: session.metadata,
+          paymentStatus: session.payment_status
+        });
+        
         if (session.metadata?.userId) {
-          console.log('Subscription completed for user:', session.metadata.userId);
-          await storage.updateUserSubscription(session.metadata.userId, {
-            stripeSubscriptionId: session.subscription,
-            subscriptionStatus: 'active',
-            subscriptionExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year from now
-          });
+          console.log('👤 Updating subscription for user:', session.metadata.userId);
+          try {
+            await storage.updateUserSubscription(session.metadata.userId, {
+              stripeSubscriptionId: session.subscription,
+              subscriptionStatus: 'active',
+              subscriptionExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year from now
+            });
+            console.log('✅ User subscription updated successfully');
+          } catch (updateError) {
+            console.error('❌ Failed to update user subscription:', updateError);
+          }
+        } else {
+          console.warn('⚠️ No userId found in session metadata');
         }
         break;
         
       case 'customer.subscription.updated':
+        console.log('🔄 Processing customer.subscription.updated event');
         const updatedSubscription = event.data.object as any;
         const customer = await stripe.customers.retrieve(updatedSubscription.customer);
         if (customer && !customer.deleted && customer.metadata?.userId) {
@@ -1913,10 +1938,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             subscriptionExpiresAt: status === 'active' ? 
               new Date(updatedSubscription.current_period_end * 1000) : null
           });
+          console.log('✅ Subscription status updated for user:', customer.metadata.userId);
         }
         break;
         
       case 'customer.subscription.deleted':
+        console.log('❌ Processing customer.subscription.deleted event');
         const deletedSubscription = event.data.object as any;
         const deletedCustomer = await stripe.customers.retrieve(deletedSubscription.customer);
         if (deletedCustomer && !deletedCustomer.deleted && deletedCustomer.metadata?.userId) {
@@ -1924,11 +1951,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
             subscriptionStatus: 'canceled',
             subscriptionExpiresAt: null
           });
+          console.log('✅ Subscription canceled for user:', deletedCustomer.metadata.userId);
         }
         break;
+        
+      default:
+        console.log('ℹ️ Unhandled event type:', event.type);
     }
     
     res.json({ received: true });
+  });
+
+  // Test webhook endpoint
+  app.post("/api/webhook-test", (req, res) => {
+    console.log('🧪 Test webhook called!');
+    console.log('Headers:', req.headers);
+    console.log('Body:', req.body);
+    res.json({ 
+      success: true, 
+      message: 'Webhook endpoint is reachable',
+      timestamp: new Date().toISOString()
+    });
   });
 
   // Scanning Queue API routes
