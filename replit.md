@@ -52,7 +52,7 @@ Currently implements a **session-based approach** using `connect-pg-simple` for 
 - **Navigation & UI Optimization**: Mid-width screen responsive design, automatic book refresh, and mobile layout auto-trigger.
 
 ### Feature Specifications
-- **Barcode Scanning**: Implementation of Scanbot SDK v7.2.0 with camera access and barcode detection, including environment-based license keys and path resolution.
+- **Barcode Scanning**: Implementation of Scanbot SDK v7.2.0 with camera access and barcode detection, including environment-based license keys and path resolution. Supports multiple production domains: shelfie.site and shelfie.vanaheim.com.au.
 - **Persistent Scanning Queue System**: Database-driven queue (PostgreSQL `scanningQueue` table) with background processing, real-time updates, and error recovery.
 - **Progress Control System**: Server-Sent Events for live progress tracking during refresh operations, with interactive controls (pause, resume, stop), visual indicators, and estimated time remaining.
 - **User Management System**: Database-connected user switcher, dynamic user loading, and session context switching.

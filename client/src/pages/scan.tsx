@@ -9,7 +9,24 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // License keys for different environments
 const LICENSE_KEYS = {
-  // Production license for shelfie.vanaheim.com.au
+  // Production license for shelfie.site
+  "shelfie.site": 
+    "HST5knltqsfXtEJPCS8F9mMKEbmJUV" +
+    "SpMeynyNqA7W/9wSjWUo17lhqxig1A" +
+    "9EbAyc2Pz3nVzixwud13YUrhfnEvtA" +
+    "/7SZUWjdwrXXUJZXu5/szlV1E8EIKI" +
+    "/2v3rkcH2nIkd2hAQssKIc89rnYlnc" +
+    "cv6NfxMEu992FX6/0JzHTWApmd3qi8" +
+    "e5U14a0u7eq+7rzztGyY+1qk3gfa0j" +
+    "Omt/Eh96n+RnPE20JKgMmMgqodte6O" +
+    "f3ymJRQbp7g6I/HGhht+z0xqkv2qtj" +
+    "5ABaGcUxIzEHYLF1aHUHlS0kM4FzKq" +
+    "OvUxC9/KQP/CMrAs2t1yBXYlg/ga0h" +
+    "hpcJZ02y98KQ==\nU2NhbmJvdFNESw" +
+    "psb2NhbGhvc3R8c2hlbGZpZS5zaXRl" +
+    "CjE3NTY1OTgzOTkKODM4ODYwNwo4\n",
+    
+  // Production license for shelfie.vanaheim.com.au  
   production: 
     "Mpyhq9Yxr3GGf71QkTvpTbBG6PIXby" +
     "GOpm3xLZKbBoXQb0nzg7kFsrOj1p6j" +
@@ -51,6 +68,12 @@ const LICENSE_KEYS = {
 // Function to get the appropriate license key based on environment
 const getLicenseKey = (): string => {
   const hostname = window.location.hostname;
+  
+  // Check if we're on shelfie.site
+  if (hostname === 'shelfie.site') {
+    console.log('Using production license key for shelfie.site');
+    return LICENSE_KEYS["shelfie.site"];
+  }
   
   // Check if we're in production environment
   if (hostname.includes('shelfie.vanaheim.com.au')) {
