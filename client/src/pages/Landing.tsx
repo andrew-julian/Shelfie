@@ -48,29 +48,29 @@ export default function Landing() {
       <main>
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-blue-50 pt-6 sm:pt-12 md:pt-16 pb-10 sm:pb-16 md:pb-20">
-          <div className="max-w-screen-xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 items-center">
               <div className="text-center lg:text-left">
-                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 leading-tight mb-3 sm:mb-4 md:mb-6 px-1 sm:px-0">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight mb-4 sm:mb-6">
                   Where your books come alive
                 </h1>
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-5 sm:mb-6 md:mb-8 leading-relaxed max-w-xs sm:max-w-sm md:max-w-lg mx-auto lg:mx-0 px-1 sm:px-0">
+                <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-lg mx-auto lg:mx-0">
                   A beautifully designed, intuitive experience for book lovers. With seamless barcode scanning and stunning 3D visualisation, building your collection is effortless and joyful.
                 </p>
                 <div className="flex justify-center lg:justify-start">
                   <Button 
                     size="lg" 
                     asChild
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
                     onClick={() => handleAnalyticsEvent('click_cta_primary')}
                   >
                     <a href="/api/login" data-testid="button-primary-cta">
-                      Start scanning
+                      Start scanning now
                       <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                     </a>
                   </Button>
                 </div>
-                <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">No clutter, no ads, just you and your books.</p>
+                <p className="text-sm text-gray-500 mt-4">No clutter, no ads, just you and your books.</p>
               </div>
               
               <div className="relative">
