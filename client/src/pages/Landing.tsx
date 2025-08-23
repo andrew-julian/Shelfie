@@ -201,27 +201,31 @@ export default function Landing() {
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Simple, transparent pricing</h2>
-              <p className="text-xl text-gray-600">Choose the plan that's right for your library</p>
+              <p className="text-xl text-gray-600">All features available on both plans</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               <Card className="p-8 border-2 border-gray-200">
                 <CardContent className="p-0">
                   <h3 className="text-2xl font-bold mb-2">Free</h3>
-                  <p className="text-gray-600 mb-6">Perfect for getting started</p>
-                  <div className="text-3xl font-bold mb-6">£0<span className="text-lg font-normal text-gray-500">/month</span></div>
+                  <p className="text-gray-600 mb-6">Perfect for smaller libraries</p>
+                  <div className="text-3xl font-bold mb-6">$0<span className="text-lg font-normal text-gray-500">/month</span></div>
                   <ul className="space-y-3 mb-8">
                     <li className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500" />
-                      <span>Unlimited scans up to 100 books</span>
+                      <span>Up to 100 books</span>
                     </li>
                     <li className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500" />
-                      <span>Basic shelf view</span>
+                      <span>Barcode scanning</span>
                     </li>
                     <li className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500" />
-                      <span>CSV export</span>
+                      <span>3D book visualization</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span>All organizational features</span>
                     </li>
                   </ul>
                   <Button variant="outline" className="w-full" data-testid="button-free-plan">Get started</Button>
@@ -230,31 +234,31 @@ export default function Landing() {
 
               <Card className="p-8 border-2 border-orange-500 relative">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Popular</span>
+                  <span className="bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold">For Large Libraries</span>
                 </div>
                 <CardContent className="p-0">
                   <h3 className="text-2xl font-bold mb-2">Pro</h3>
-                  <p className="text-gray-600 mb-6">For serious book lovers</p>
-                  <div className="text-3xl font-bold mb-6">£5<span className="text-lg font-normal text-gray-500">/month</span></div>
+                  <p className="text-gray-600 mb-6">For serious book collectors</p>
+                  <div className="text-3xl font-bold mb-6">$17<span className="text-lg font-normal text-gray-500">/year</span></div>
                   <ul className="space-y-3 mb-8">
                     <li className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500" />
-                      <span>Unlimited library</span>
+                      <span>Unlimited books</span>
                     </li>
                     <li className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500" />
-                      <span>Smart shelves & 3D realism</span>
+                      <span>Barcode scanning</span>
                     </li>
                     <li className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500" />
-                      <span>Bulk import & loan tracking</span>
+                      <span>3D book visualization</span>
                     </li>
                     <li className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500" />
-                      <span>Family sharing</span>
+                      <span>All organizational features</span>
                     </li>
                   </ul>
-                  <Button className="w-full bg-orange-500 hover:bg-orange-600" data-testid="button-pro-plan">Start free trial</Button>
+                  <Button className="w-full bg-orange-500 hover:bg-orange-600" data-testid="button-pro-plan">Upgrade to Pro</Button>
                 </CardContent>
               </Card>
             </div>
