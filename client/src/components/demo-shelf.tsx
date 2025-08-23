@@ -22,11 +22,11 @@ export default function DemoShelf({ books, reducedMotion = false }: DemoShelfPro
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
-  // Viewport-aware scale factor
+  // More realistic scale factor to match app presentation
   const getScaleFactor = () => {
-    if (containerWidth < 640) return 0.45; // mobile
-    if (containerWidth < 1024) return 0.6; // tablet
-    return 0.8; // desktop
+    if (containerWidth < 640) return 0.35; // mobile - smaller
+    if (containerWidth < 1024) return 0.4; // tablet - smaller
+    return 0.5; // desktop - smaller for more realistic feel
   };
 
   const scaleFactor = getScaleFactor();
@@ -56,12 +56,9 @@ export default function DemoShelf({ books, reducedMotion = false }: DemoShelfPro
   }, []);
 
   return (
-    <div className="relative bg-gradient-to-b from-amber-50 to-amber-100 rounded-2xl p-8 overflow-hidden">
-      {/* Shelf background */}
-      <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-b from-amber-200 to-amber-300 rounded-b-2xl" />
-      
+    <div className="relative bg-white rounded-2xl p-6 shadow-lg border border-gray-200 overflow-hidden">
       {/* Navigation buttons */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold text-gray-800">Your library preview</h3>
         <div className="flex gap-2">
           <Button
@@ -86,16 +83,16 @@ export default function DemoShelf({ books, reducedMotion = false }: DemoShelfPro
         </div>
       </div>
 
-      {/* Books container */}
+      {/* Books container with more realistic styling */}
       <div 
-        className="relative overflow-hidden"
-        style={{ height: `${Math.max(...books.map(book => book.h)) * scaleFactor + 40}px` }}
+        className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 rounded-lg p-4"
+        style={{ height: `${Math.max(...books.map(book => book.h)) * scaleFactor + 30}px` }}
       >
         <div 
-          className="flex transition-transform duration-300 ease-out"
+          className="flex items-end transition-transform duration-300 ease-out"
           style={{ 
             transform: `translateX(-${scrollPosition}px)`,
-            gap: `clamp(8px, 2vw, 24px)`
+            gap: `${Math.max(4, scaleFactor * 8)}px`
           }}
           role="region"
           aria-live="polite"
@@ -104,62 +101,84 @@ export default function DemoShelf({ books, reducedMotion = false }: DemoShelfPro
           {books.map((book, index) => {
             const width = book.w * scaleFactor;
             const height = book.h * scaleFactor;
-            const thickness = Math.max(book.t * scaleFactor, 3);
+            const thickness = Math.max(book.t * scaleFactor, 2);
 
             return (
               <div
                 key={index}
-                className="relative flex-shrink-0 group cursor-pointer"
+                className="relative flex-shrink-0 group cursor-pointer perspective-1000"
                 style={{ 
                   width: `${width}px`,
-                  height: `${height}px`,
-                  marginBottom: '20px'
+                  height: `${height}px`
                 }}
                 title={`${book.title} by ${book.author}`}
                 data-testid={`book-${index}`}
               >
-                {/* Book spine/3D effect */}
-                {!reducedMotion && (
-                  <div
-                    className="absolute inset-0 bg-gray-400 rounded-r-sm transform origin-left"
-                    style={{
-                      transform: `rotateY(-15deg) translateZ(${thickness/2}px)`,
-                      width: `${thickness}px`,
-                      left: `${width - thickness}px`,
-                      boxShadow: `inset -2px 0 4px rgba(0,0,0,0.3)`
-                    }}
-                  />
-                )}
-                
-                {/* Book cover */}
-                <div
-                  className={`relative rounded-sm overflow-hidden shadow-lg transition-transform duration-200 ${
-                    !reducedMotion ? 'group-hover:scale-105 group-hover:-translate-y-1' : ''
-                  }`}
-                  style={{
-                    width: `${width}px`,
-                    height: `${height}px`,
-                    boxShadow: `${thickness/4}px ${thickness/4}px ${thickness/2}px rgba(0,0,0,0.3)`
-                  }}
-                >
-                  <img
-                    src={book.cover}
-                    alt={`Cover of ${book.title} by ${book.author}`}
-                    className="w-full h-full object-cover"
-                    style={{ aspectRatio: `${book.w}/${book.h}` }}
-                    loading="lazy"
-                  />
-                  
-                  {/* Subtle highlight overlay */}
-                  {!reducedMotion && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                {/* 3D Book Container */}
+                <div className="relative preserve-3d transform-gpu">
+                  {/* Book spine - more realistic 3D effect */}
+                  {!reducedMotion && thickness > 3 && (
+                    <div
+                      className="absolute bg-gradient-to-r from-gray-600 to-gray-700 rounded-r-sm"
+                      style={{
+                        transform: `rotateY(-12deg) translateZ(${thickness/2}px)`,
+                        width: `${thickness}px`,
+                        height: `${height}px`,
+                        left: `${width - thickness/2}px`,
+                        boxShadow: `inset -1px 0 2px rgba(0,0,0,0.4), 2px 0 6px rgba(0,0,0,0.2)`,
+                        background: `linear-gradient(to right, #4a5568, #2d3748)`
+                      }}
+                    />
                   )}
-                </div>
+                  
+                  {/* Book cover with enhanced 3D styling */}
+                  <div
+                    className={`relative rounded-sm overflow-hidden transition-all duration-200 ${
+                      !reducedMotion ? 'group-hover:scale-[1.02] group-hover:-translate-y-1 group-hover:rotate-y-2' : ''
+                    }`}
+                    style={{
+                      width: `${width}px`,
+                      height: `${height}px`,
+                      boxShadow: `
+                        0 2px 4px rgba(0,0,0,0.1),
+                        0 4px 8px rgba(0,0,0,0.1),
+                        0 8px 16px rgba(0,0,0,0.1),
+                        ${thickness}px ${thickness}px ${thickness * 2}px rgba(0,0,0,0.15)
+                      `,
+                      transform: !reducedMotion ? 'rotateY(-2deg) rotateX(1deg)' : 'none'
+                    }}
+                  >
+                    <img
+                      src={book.cover}
+                      alt={`Cover of ${book.title} by ${book.author}`}
+                      className="w-full h-full object-cover"
+                      style={{ aspectRatio: `${book.w}/${book.h}` }}
+                      loading="lazy"
+                    />
+                    
+                    {/* Paper texture overlay */}
+                    <div 
+                      className="absolute inset-0 opacity-20 mix-blend-multiply"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23000' fill-opacity='0.1' d='m0,0h2v2h-2zm2,2h2v2h-2z'/%3E%3C/svg%3E")`
+                      }}
+                    />
+                    
+                    {/* Subtle gradient for depth */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10 pointer-events-none" />
+                    
+                    {/* Highlight on hover */}
+                    {!reducedMotion && (
+                      <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    )}
+                  </div>
 
-                {/* Tooltip on hover */}
-                <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                  {book.title}
-                  <div className="text-gray-300">{book.author}</div>
+                  {/* Enhanced tooltip */}
+                  <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-20 shadow-lg">
+                    <div className="font-medium">{book.title}</div>
+                    <div className="text-gray-300 text-xs">{book.author}</div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900/95"></div>
+                  </div>
                 </div>
               </div>
             );
@@ -168,8 +187,8 @@ export default function DemoShelf({ books, reducedMotion = false }: DemoShelfPro
       </div>
 
       {/* Subtle hint text */}
-      <p className="text-sm text-gray-600 text-center mt-4">
-        Scroll to see how books display with realistic proportions
+      <p className="text-sm text-gray-600 text-center mt-4 italic">
+        Scroll to see how books display with realistic proportions — just like in the app
       </p>
     </div>
   );

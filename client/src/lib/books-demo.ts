@@ -7,86 +7,86 @@ export interface BookDemoItem {
   cover: string;
 }
 
-// Sample books with realistic dimensions for demo shelf
+// Sample books with realistic dimensions and covers for demo shelf
 export const demoBooksData: BookDemoItem[] = [
   {
-    title: "Stolen Focus",
-    author: "Johann Hari",
+    title: "Capital in the Twenty-First Century",
+    author: "Thomas Piketty",
+    w: 156,
+    h: 234,
+    t: 35,
+    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='156' height='234' viewBox='0 0 156 234'%3E%3Crect width='156' height='234' fill='%23ffffff' stroke='%23dc2626' stroke-width='3'/%3E%3Ctext x='50%25' y='20%25' dominant-baseline='middle' text-anchor='middle' fill='%23dc2626' font-family='serif' font-size='14' font-weight='bold'%3ECAPITAL%3C/text%3E%3Ctext x='50%25' y='30%25' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-family='serif' font-size='10'%3Ein the Twenty-First Century%3C/text%3E%3Ctext x='50%25' y='80%25' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-family='serif' font-size='12' font-weight='bold'%3ETHOMAS%3C/text%3E%3Ctext x='50%25' y='85%25' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-family='serif' font-size='12' font-weight='bold'%3EPIKETTY%3C/text%3E%3C/svg%3E"
+  },
+  {
+    title: "Capital: Karl Marx",
+    author: "Karl Marx",
     w: 129,
     h: 198,
-    t: 22,
-    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='129' height='198' viewBox='0 0 129 198'%3E%3Crect width='129' height='198' fill='%23E74C3C'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='12' font-weight='bold'%3EStolen Focus%3C/text%3E%3C/svg%3E"
+    t: 28,
+    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='129' height='198' viewBox='0 0 129 198'%3E%3Crect width='129' height='198' fill='%23dc2626'/%3E%3Ctext x='50%25' y='25%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='16' font-weight='bold'%3ECAPITAL%3C/text%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='20' font-weight='bold'%3EKARL%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='20' font-weight='bold'%3EMARX%3C/text%3E%3C/svg%3E"
   },
   {
-    title: "Horology",
-    author: "Remi Casteran",
-    w: 170,
-    h: 240,
-    t: 30,
-    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='240' viewBox='0 0 170 240'%3E%3Crect width='170' height='240' fill='%232C3E50'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='14' font-weight='bold'%3EHorology%3C/text%3E%3C/svg%3E"
-  },
-  {
-    title: "The Thursday Murder Club",
-    author: "Richard Osman",
-    w: 110,
-    h: 180,
-    t: 18,
-    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='180' viewBox='0 0 110 180'%3E%3Crect width='110' height='180' fill='%23F39C12'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='10' font-weight='bold'%3EThursday Murder Club%3C/text%3E%3C/svg%3E"
-  },
-  {
-    title: "Atomic Habits",
-    author: "James Clear",
+    title: "The Underground Railroad",
+    author: "Colson Whitehead",
     w: 140,
     h: 210,
-    t: 25,
-    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='210' viewBox='0 0 140 210'%3E%3Crect width='140' height='210' fill='%2327AE60'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='12' font-weight='bold'%3EAtomic Habits%3C/text%3E%3C/svg%3E"
+    t: 24,
+    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='210' viewBox='0 0 140 210'%3E%3Crect width='140' height='210' fill='%23ea580c'/%3E%3Cpath d='M20,40 Q70,20 120,40 Q70,60 20,40' fill='%23fbbf24'/%3E%3Cpath d='M20,80 Q70,60 120,80 Q70,100 20,80' fill='%23fbbf24'/%3E%3Ctext x='50%25' y='25%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='10' font-weight='bold'%3ECOLSON%3C/text%3E%3Ctext x='50%25' y='150%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='9'%3EWHITEHEAD%3C/text%3E%3C/svg%3E"
   },
   {
-    title: "Project Hail Mary",
-    author: "Andy Weir",
-    w: 125,
-    h: 195,
-    t: 20,
-    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='125' height='195' viewBox='0 0 125 195'%3E%3Crect width='125' height='195' fill='%238E44AD'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='11' font-weight='bold'%3EProject Hail Mary%3C/text%3E%3C/svg%3E"
+    title: "The Rise and Fall of American Growth",
+    author: "Robert J. Gordon",
+    w: 155,
+    h: 235,
+    t: 40,
+    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='155' height='235' viewBox='0 0 155 235'%3E%3Crect width='155' height='235' fill='%23475569'/%3E%3Ctext x='50%25' y='20%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='12' font-weight='bold'%3ETHE RISE%3C/text%3E%3Ctext x='50%25' y='25%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='10'%3EAND%3C/text%3E%3Ctext x='50%25' y='30%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='12' font-weight='bold'%3EFALL OF%3C/text%3E%3Ctext x='50%25' y='35%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='12' font-weight='bold'%3EAMERICAN%3C/text%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='12' font-weight='bold'%3EGROWTH%3C/text%3E%3C/svg%3E"
   },
   {
-    title: "Klara and the Sun",
-    author: "Kazuo Ishiguro",
-    w: 135,
-    h: 205,
-    t: 23,
-    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='135' height='205' viewBox='0 0 135 205'%3E%3Crect width='135' height='205' fill='%23E67E22'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='11' font-weight='bold'%3EKlara and the Sun%3C/text%3E%3C/svg%3E"
-  },
-  {
-    title: "The Seven Husbands of Evelyn Hugo",
-    author: "Taylor Jenkins Reid",
-    w: 105,
-    h: 175,
-    t: 16,
-    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='105' height='175' viewBox='0 0 105 175'%3E%3Crect width='105' height='175' fill='%23D35400'/%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='9' font-weight='bold'%3EThe Seven Husbands%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='9' font-weight='bold'%3Eof Evelyn Hugo%3C/text%3E%3C/svg%3E"
-  },
-  {
-    title: "The Midnight Library",
-    author: "Matt Haig",
-    w: 130,
-    h: 200,
-    t: 21,
-    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='200' viewBox='0 0 130 200'%3E%3Crect width='130' height='200' fill='%2334495E'/%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='11' font-weight='bold'%3EThe Midnight%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='11' font-weight='bold'%3ELibrary%3C/text%3E%3C/svg%3E"
-  },
-  {
-    title: "Educated",
-    author: "Tara Westover",
+    title: "Invitation to a Banquet",
+    author: "Fuchsia Dunlop",
     w: 145,
-    h: 215,
-    t: 28,
-    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='145' height='215' viewBox='0 0 145 215'%3E%3Crect width='145' height='215' fill='%23C0392B'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='13' font-weight='bold'%3EEducated%3C/text%3E%3C/svg%3E"
+    h: 222,
+    t: 22,
+    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='145' height='222' viewBox='0 0 145 222'%3E%3Crect width='145' height='222' fill='%23eab308'/%3E%3Ctext x='50%25' y='25%25' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-family='serif' font-size='11' font-weight='bold'%3EInvitation%3C/text%3E%3Ctext x='50%25' y='30%25' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-family='serif' font-size='11' font-weight='bold'%3Eto a%3C/text%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-family='serif' font-size='16' font-weight='bold'%3EBanquet%3C/text%3E%3Ctext x='50%25' y='75%25' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-family='serif' font-size='10'%3EFUCHSIA DUNLOP%3C/text%3E%3C/svg%3E"
   },
   {
-    title: "The Silent Patient",
-    author: "Alex Michaelides",
-    w: 120,
-    h: 190,
-    t: 19,
-    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='190' viewBox='0 0 120 190'%3E%3Crect width='120' height='190' fill='%2316A085'/%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='10' font-weight='bold'%3EThe Silent%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='10' font-weight='bold'%3EPatient%3C/text%3E%3C/svg%3E"
+    title: "Titan: The Life of John D. Rockefeller",
+    author: "Ron Chernow",
+    w: 135,
+    h: 203,
+    t: 30,
+    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='135' height='203' viewBox='0 0 135 203'%3E%3Crect width='135' height='203' fill='%23059669'/%3E%3Ctext x='50%25' y='30%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='18' font-weight='bold'%3ETITAN%3C/text%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='8'%3ETHE LIFE OF%3C/text%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='10' font-weight='bold'%3EJOHN D. ROCKEFELLER%3C/text%3E%3Ctext x='50%25' y='75%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='10'%3ERON CHERNOW%3C/text%3E%3C/svg%3E"
+  },
+  {
+    title: "Grant",
+    author: "Ron Chernow",
+    w: 156,
+    h: 234,
+    t: 35,
+    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='156' height='234' viewBox='0 0 156 234'%3E%3Crect width='156' height='234' fill='%23000'/%3E%3Ctext x='50%25' y='75%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='32' font-weight='bold'%3EGRANT%3C/text%3E%3Ctext x='50%25' y='85%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='12'%3ERON CHERNOW%3C/text%3E%3C/svg%3E"
+  },
+  {
+    title: "Alexander Hamilton",
+    author: "Ron Chernow",
+    w: 135,
+    h: 203,
+    t: 28,
+    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='135' height='203' viewBox='0 0 135 203'%3E%3Crect width='135' height='203' fill='%23f59e0b'/%3E%3Ctext x='50%25' y='30%25' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-family='serif' font-size='12' font-weight='bold'%3EALEXANDER%3C/text%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-family='serif' font-size='16' font-weight='bold'%3EHAMILTON%3C/text%3E%3Ctext x='50%25' y='75%25' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-family='serif' font-size='10'%3ERON CHERNOW%3C/text%3E%3C/svg%3E"
+  },
+  {
+    title: "The House of Morgan",
+    author: "Ron Chernow",
+    w: 140,
+    h: 210,
+    t: 32,
+    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='210' viewBox='0 0 140 210'%3E%3Crect width='140' height='210' fill='%23374151'/%3E%3Ctext x='50%25' y='30%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='12' font-weight='bold'%3ETHE%3C/text%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='16' font-weight='bold'%3EHOUSE%3C/text%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='12' font-weight='bold'%3EOF%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='16' font-weight='bold'%3EMORGAN%3C/text%3E%3C/svg%3E"
+  },
+  {
+    title: "Palo Alto",
+    author: "Malcolm Harris",
+    w: 152,
+    h: 229,
+    t: 26,
+    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='152' height='229' viewBox='0 0 152 229'%3E%3Crect width='152' height='229' fill='%2306b6d4'/%3E%3Ctext x='50%25' y='35%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='20' font-weight='bold'%3EPALO%3C/text%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-size='20' font-weight='bold'%3EALTO%3C/text%3E%3Ctext x='50%25' y='75%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='serif' font-size='10'%3EMALCOLM HARRIS%3C/text%3E%3C/svg%3E"
   }
 ];
