@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Camera, Search, ArrowLeft, Loader2 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -439,13 +439,17 @@ export default function ScanPage() {
       <div className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
-              <Button variant="ghost" size="sm" data-testid="button-back-to-library" className="flex-shrink-0">
-                <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" />
-                <span className="hidden xs:inline">Back to Library</span>
-                <span className="xs:hidden">Back</span>
-              </Button>
-            </Link>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              data-testid="button-back-to-library" 
+              className="flex-shrink-0"
+              onClick={() => window.location.href = '/'}
+            >
+              <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline">Back to Library</span>
+              <span className="xs:hidden">Back</span>
+            </Button>
             <h1 className="text-lg sm:text-xl font-semibold absolute left-1/2 transform -translate-x-1/2">Scan</h1>
             <div className="text-xs sm:text-sm text-gray-600 flex-shrink-0">
               {queue.filter(item => item.status === 'success').length} books added
