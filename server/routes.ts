@@ -1791,7 +1791,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           quantity: 1,
         }],
         mode: 'subscription',
-        success_url: `${req.headers.origin}/?subscription=success`,
+        success_url: `${req.headers.origin}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${req.headers.origin}/subscription?subscription=cancelled`,
         metadata: {
           userId: userId
@@ -1802,6 +1802,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating subscription:", error);
       res.status(500).json({ message: "Failed to create subscription" });
+    }
+  });
+  
+  // TEST ENDPOINT: Simulate successful subscription (for testing)
+  app.post("/api/test-subscription-success", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Update user to have active subscription
+      await storage.updateUserSubscription(userId, {
+        subscriptionStatus: 'active',
+        subscriptionExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+        stripeSubscriptionId: 'sub_test_' + Math.random().toString(36).substr(2, 9)
+      });
+      
+      res.json({ success: true, message: 'Subscription activated for testing' });
+    } catch (error) {
+      console.error("Error activating test subscription:", error);
+      res.status(500).json({ message: "Failed to activate test subscription" });
     }
   });
   
@@ -1822,39 +1841,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       case 'checkout.session.completed':
         const session = event.data.object as any;
         if (session.metadata?.userId) {
+          console.log('Subscription completed for user:', session.metadata.userId);
           await storage.updateUserSubscription(session.metadata.userId, {
             stripeSubscriptionId: session.subscription,
-            subscriptionStatus: 'active'
-          });
-        }
-        break;
-        
-      case 'invoice.payment_succeeded':
-        const invoice = event.data.object as any;
-        if (invoice.subscription_details?.metadata?.userId) {
-          const expiresAt = new Date();
-          expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-          await storage.updateUserSubscription(invoice.subscription_details.metadata.userId, {
             subscriptionStatus: 'active',
-            subscriptionExpiresAt: expiresAt
+            subscriptionExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year from now
           });
         }
         break;
         
-      case 'invoice.payment_failed':
-        const failedInvoice = event.data.object as any;
-        if (failedInvoice.subscription_details?.metadata?.userId) {
-          await storage.updateUserSubscription(failedInvoice.subscription_details.metadata.userId, {
-            subscriptionStatus: 'past_due'
+      case 'customer.subscription.updated':
+        const updatedSubscription = event.data.object as any;
+        const customer = await stripe.customers.retrieve(updatedSubscription.customer);
+        if (customer && !customer.deleted && customer.metadata?.userId) {
+          const status = updatedSubscription.status === 'active' ? 'active' : 'inactive';
+          await storage.updateUserSubscription(customer.metadata.userId, {
+            subscriptionStatus: status,
+            subscriptionExpiresAt: status === 'active' ? 
+              new Date(updatedSubscription.current_period_end * 1000) : null
           });
         }
         break;
         
       case 'customer.subscription.deleted':
-        const subscription = event.data.object as any;
-        if (subscription.metadata?.userId) {
-          await storage.updateUserSubscription(subscription.metadata.userId, {
-            subscriptionStatus: 'canceled'
+        const deletedSubscription = event.data.object as any;
+        const deletedCustomer = await stripe.customers.retrieve(deletedSubscription.customer);
+        if (deletedCustomer && !deletedCustomer.deleted && deletedCustomer.metadata?.userId) {
+          await storage.updateUserSubscription(deletedCustomer.metadata.userId, {
+            subscriptionStatus: 'canceled',
+            subscriptionExpiresAt: null
           });
         }
         break;
