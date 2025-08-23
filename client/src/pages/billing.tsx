@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CreditCard, Crown, Calendar, DollarSign, BookOpen, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { ArrowLeft, CreditCard, Crown, Calendar, DollarSign, BookOpen, CheckCircle, XCircle, AlertCircle, TestTube } from "lucide-react";
 import { Link } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserDetails {
   id: string;
@@ -22,10 +24,34 @@ interface UserDetails {
 
 export default function Billing() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch user details with subscription info
   const { data: userDetails, isLoading } = useQuery<UserDetails>({
     queryKey: ["/api/user/details"],
+  });
+
+  // Test subscription activation mutation
+  const testSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/test-subscription-success");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/details"] });
+      toast({
+        title: "Test Subscription Activated",
+        description: "Your account has been upgraded to Pro for testing purposes.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Test Failed",
+        description: error.message || "Failed to activate test subscription",
+        variant: "destructive",
+      });
+    },
   });
 
   const formatDate = (dateString: string) => {
@@ -142,11 +168,23 @@ export default function Billing() {
                     <p className="text-orange-700 mt-1">
                       You've reached {userDetails?.bookCount} books! Upgrade to unlimited for just $17/year.
                     </p>
-                    <Link href="/subscription">
-                      <Button className="mt-3 bg-orange-500 hover:bg-orange-600">
-                        Upgrade Now
+                    <div className="flex gap-2 mt-3">
+                      <Link href="/subscription">
+                        <Button className="bg-orange-500 hover:bg-orange-600">
+                          Upgrade Now
+                        </Button>
+                      </Link>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => testSubscriptionMutation.mutate()}
+                        disabled={testSubscriptionMutation.isPending}
+                        className="text-xs"
+                      >
+                        <TestTube className="w-3 h-3 mr-1" />
+                        Test Upgrade
                       </Button>
-                    </Link>
+                    </div>
                   </div>
                 )}
 
