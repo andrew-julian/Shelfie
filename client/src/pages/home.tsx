@@ -17,7 +17,7 @@ import {
   type Book as LayoutBook, 
   type LayoutItem, 
   type LayoutConfig as EngineConfig 
-} from '@/layout/ShelfieLayoutEngine';
+} from '@/layout/BookScanLayoutEngine';
 import VirtualizedBookGrid from '@/components/virtualized-book-grid';
 import { usePerformanceTelemetry } from '@/hooks/usePerformanceTelemetry';
 import { useLocation, Link } from "wouter";
@@ -428,7 +428,7 @@ export default function Home() {
     return measureLayout(
       () => calculateLayout(layoutBooks, normalizedDimensions, effectiveWidth, responsiveConfig),
       finalBooks.length,
-      'Shelfie Layout Engine'
+      'BookScan Layout Engine'
     );
   }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig.targetRowHeight, responsiveConfig.gutterX, responsiveConfig.gutterY, responsiveConfig.raggedLastRow, measureLayout, isContainerMeasured]);
 
@@ -468,10 +468,10 @@ export default function Home() {
         });
         
         // Only update if the width is significantly different to prevent layout thrashing
-        if (Math.abs(newWidth - containerDimensions.width) > 10 || !isContainerMeasured) {
+        if (Math.abs(newWidth - containerDimensions.width) > 10) {
           setContainerDimensions({ width: newWidth, height: newHeight });
-          setIsContainerMeasured(true);
         }
+        setIsContainerMeasured(true);
       } else {
         console.log('Container ref not available, using smart fallback dimensions');
         // Use the same smart calculation as in the layout effect
@@ -486,10 +486,8 @@ export default function Home() {
         } else {
           fallbackWidth = Math.min(screenWidth - 200, 1200);
         }
-        if (Math.abs(fallbackWidth - containerDimensions.width) > 10 || !isContainerMeasured) {
-          setContainerDimensions({ width: fallbackWidth, height: 600 });
-          setIsContainerMeasured(true);
-        }
+        setContainerDimensions({ width: fallbackWidth, height: 600 });
+        setIsContainerMeasured(true);
       }
     };
 
@@ -517,17 +515,15 @@ export default function Home() {
     
     // Use ResizeObserver for better performance
     const resizeObserver = new ResizeObserver((entries) => {
+      console.log('ResizeObserver update:', { width: entries[0].contentRect.width, height: entries[0].contentRect.height });
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
         const newWidth = Math.max(width || 1200, 300); // Ensure minimum width
         const newHeight = Math.max(height, 600);
         
-        // Only update if significantly different to prevent infinite loop
-        if (Math.abs(newWidth - containerDimensions.width) > 10) {
-          console.log('ResizeObserver update:', { width: newWidth, height: newHeight });
-          setContainerDimensions({ width: newWidth, height: newHeight });
-          setIsContainerMeasured(true);
-        }
+        console.log('ResizeObserver update:', { width: newWidth, height: newHeight });
+        setContainerDimensions({ width: newWidth, height: newHeight });
+        setIsContainerMeasured(true);
       }
     });
 
@@ -570,10 +566,8 @@ export default function Home() {
           
           const newHeight = Math.max(rect.height, 600);
           
-          // Force a layout update only if significantly different
-          if (Math.abs(newWidth - containerDimensions.width) > 10) {
-            setContainerDimensions({ width: newWidth, height: newHeight });
-          }
+          // Force a layout update by re-setting container dimensions
+          setContainerDimensions({ width: newWidth, height: newHeight });
         }
       };
 

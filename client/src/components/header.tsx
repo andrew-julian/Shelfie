@@ -46,7 +46,7 @@ export default function Header({
           {/* Logo */}
           <div className="flex items-center space-x-2 sm:space-x-4">
             <BookOpen className="text-monochrome-black text-xl sm:text-2xl" />
-            <h1 className="text-xl sm:text-2xl font-bold text-monochrome-black tracking-tight">Shelfie</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-monochrome-black tracking-tight">BookScan</h1>
           </div>
 
           {/* Desktop Navigation */}
