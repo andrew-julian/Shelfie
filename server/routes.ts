@@ -1933,10 +1933,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const customer = await stripe.customers.retrieve(updatedSubscription.customer);
         if (customer && !customer.deleted && customer.metadata?.userId) {
           const status = updatedSubscription.status === 'active' ? 'active' : 'inactive';
+          
+          // Safely handle timestamp conversion
+          let expiresAt = null;
+          if (status === 'active' && updatedSubscription.current_period_end) {
+            try {
+              expiresAt = new Date(updatedSubscription.current_period_end * 1000);
+              // Validate the date
+              if (isNaN(expiresAt.getTime())) {
+                console.warn('⚠️ Invalid timestamp from Stripe, using 1 year from now');
+                expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+              }
+            } catch (error) {
+              console.warn('⚠️ Failed to parse Stripe timestamp, using 1 year from now');
+              expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+            }
+          }
+          
           await storage.updateUserSubscription(customer.metadata.userId, {
             subscriptionStatus: status,
-            subscriptionExpiresAt: status === 'active' ? 
-              new Date(updatedSubscription.current_period_end * 1000) : null
+            subscriptionExpiresAt: expiresAt
           });
           console.log('✅ Subscription status updated for user:', customer.metadata.userId);
         }
