@@ -6,7 +6,7 @@ import { Camera, Search, ArrowLeft, Loader2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { SubscriptionMilestoneModal } from "@/components/subscription-milestone-modal";
+
 
 // License keys for different environments
 const LICENSE_KEYS = {
@@ -188,18 +188,12 @@ export default function ScanPage() {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [manualIsbn, setManualIsbn] = useState("");
   const [scanCount, setScanCount] = useState(0);
-  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
   const scannerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
-  // Fetch user details for subscription checking
-  const { data: userDetails } = useQuery({
-    queryKey: ["/api/user/details"],
-  });
 
   // Fetch scanning queue from database
-  const { data: queue = [], refetch: refetchQueue } = useQuery({
+  const { data: queue = [], refetch: refetchQueue } = useQuery<QueueItem[]>({
     queryKey: ['/api/scanning-queue'],
     refetchInterval: 2000, // Poll every 2 seconds for updates
   });
@@ -213,28 +207,15 @@ export default function ScanPage() {
     onSuccess: () => {
       setScanCount(prev => prev + 1);
       refetchQueue();
-      
-      // Check for subscription milestone
-      const currentBookCount = userDetails?.bookCount || 0;
-      const isSubscribed = userDetails?.subscriptionStatus === 'active';
-      
-      // Show milestone modal when user hits exactly 100 books and isn't subscribed
-      if (currentBookCount >= 99 && !isSubscribed) {
-        // Slight delay to allow UI to update
-        setTimeout(() => setShowMilestoneModal(true), 1000);
-      }
+      // Refresh user details to update book count globally
+      queryClient.invalidateQueries({ queryKey: ["/api/user/details"] });
     },
     onError: (error: any) => {
-      // Check for subscription limit error
-      if (error.message && error.message.includes('subscription') || error.message.includes('100 books')) {
-        setShowMilestoneModal(true);
-      } else {
-        toast({
-          title: "Scan Error",
-          description: error.message || "Failed to add book to scanning queue",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Scan Error",
+        description: error.message || "Failed to add book to scanning queue",
+        variant: "destructive",
+      });
     }
   });
 
@@ -630,13 +611,6 @@ export default function ScanPage() {
           </div>
         </div>
       </div>
-      
-      {/* Subscription Milestone Modal */}
-      <SubscriptionMilestoneModal 
-        open={showMilestoneModal}
-        onClose={() => setShowMilestoneModal(false)}
-        bookCount={userDetails?.bookCount || 100}
-      />
     </div>
   );
 }
