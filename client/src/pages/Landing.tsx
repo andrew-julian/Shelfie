@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Camera, Sparkles, Search, Download, ChevronDown, Star, Check, ArrowRight } from "lucide-react";
+import { Camera, Sparkles, Search, Download, Check, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import ShelfieIcon from "@/components/shelfie-icon";
 import DemoShelf from "@/components/demo-shelf";
 import { demoBooksData } from "@/lib/books-demo";
@@ -37,7 +36,6 @@ export default function Landing() {
             <nav className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
-              <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
               <a href="#privacy" className="text-gray-600 hover:text-gray-900 transition-colors">Privacy</a>
             </nav>
             <Button asChild>
@@ -205,45 +203,7 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Social Proof */}
-        <section className="py-20 bg-gray-50">
-          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="flex items-center justify-center gap-2 mb-8">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                ))}
-              </div>
-              <span className="text-lg font-semibold">4.8/5 from early users</span>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card className="p-6">
-                <CardContent className="p-0">
-                  <p className="text-gray-600 mb-4">"Finally, a book app that actually looks like my bookshelf. The scanning is incredibly fast."</p>
-                  <div className="font-semibold">Sarah M.</div>
-                  <div className="text-sm text-gray-500">Avid Reader</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="p-6">
-                <CardContent className="p-0">
-                  <p className="text-gray-600 mb-4">"Perfect for managing our classroom library. The kids love seeing their books in 3D."</p>
-                  <div className="font-semibold">James T.</div>
-                  <div className="text-sm text-gray-500">Primary School Teacher</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="p-6">
-                <CardContent className="p-0">
-                  <p className="text-gray-600 mb-4">"The proportional sizing is brilliant. My coffee table books actually look like coffee table books."</p>
-                  <div className="font-semibold">Emily R.</div>
-                  <div className="text-sm text-gray-500">Book Collector</div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+
 
         {/* Pricing */}
         <section id="pricing" className="py-20">
@@ -310,71 +270,7 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* FAQ */}
-        <section id="faq" className="py-20 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Frequently asked questions</h2>
-              <p className="text-xl text-gray-600">Everything you need to know about Shelfie</p>
-            </div>
 
-            <Accordion type="single" collapsible>
-              <AccordionItem value="lighting">
-                <AccordionTrigger onClick={() => handleAnalyticsEvent('faq_open_lighting')}>
-                  Does it work without perfect light?
-                </AccordionTrigger>
-                <AccordionContent>
-                  Yes — we optimise for shaky hands and everyday lighting. Our barcode scanner works in most lighting conditions.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="import">
-                <AccordionTrigger onClick={() => handleAnalyticsEvent('faq_open_import')}>
-                  Can I import existing spreadsheets?
-                </AccordionTrigger>
-                <AccordionContent>
-                  Yes — CSV import is supported. You can easily migrate your existing book lists into Shelfie.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="photos">
-                <AccordionTrigger onClick={() => handleAnalyticsEvent('faq_open_photos')}>
-                  Do you store my photos?
-                </AccordionTrigger>
-                <AccordionContent>
-                  Only what you save. You can delete everything. We respect your privacy and give you full control over your data.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="covers">
-                <AccordionTrigger onClick={() => handleAnalyticsEvent('faq_open_covers')}>
-                  Will my covers match my region?
-                </AccordionTrigger>
-                <AccordionContent>
-                  We fetch region-specific images where available, including support for different Amazon marketplaces.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="sharing">
-                <AccordionTrigger onClick={() => handleAnalyticsEvent('faq_open_sharing')}>
-                  Can I share a shelf with family?
-                </AccordionTrigger>
-                <AccordionContent>
-                  Yes — invite family members with view-only or edit permissions to collaborate on your library.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="offline">
-                <AccordionTrigger onClick={() => handleAnalyticsEvent('faq_open_offline')}>
-                  Does it work offline?
-                </AccordionTrigger>
-                <AccordionContent>
-                  Yes — you can scan books offline and they'll be processed when you're back online. Perfect for library trips!
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
-        </section>
 
         {/* Privacy Promise */}
         <section id="privacy" className="py-20">
@@ -416,7 +312,6 @@ export default function Landing() {
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Help Centre</a></li>
               </ul>
