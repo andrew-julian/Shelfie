@@ -82,112 +82,108 @@ export function SubscriptionMilestoneModal({
           <div className="bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400 p-6 text-white text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-black/10"></div>
             
-            {/* Floating celebration elements */}
+            {/* Floating celebration elements - confetti style */}
             <div className="absolute top-2 left-4 animate-bounce">
-              <Star className="w-4 h-4 text-yellow-200" />
+              <div className="w-2 h-2 bg-yellow-200 rotate-45"></div>
             </div>
-            <div className="absolute top-3 right-6 animate-pulse">
-              <Sparkles className="w-4 h-4 text-white" />
+            <div className="absolute top-4 right-6 animate-pulse">
+              <div className="w-1.5 h-1.5 bg-white rotate-12"></div>
+            </div>
+            <div className="absolute bottom-3 left-6 animate-bounce delay-300">
+              <div className="w-1 h-1 bg-yellow-200 rounded-full"></div>
+            </div>
+            <div className="absolute top-6 left-1/3 animate-pulse delay-150">
+              <div className="w-1.5 h-1.5 bg-white/80 rotate-45"></div>
             </div>
             
             <div className="relative z-10">
-              <div className="flex items-center justify-center mb-3">
-                <div className="bg-white/20 rounded-full p-2 mr-3">
-                  <Crown className="w-6 h-6 text-yellow-200" />
-                </div>
-                <div className="bg-white/20 text-white border border-white/30 text-sm px-3 py-1 rounded-full">
-                  Library Milestone!
-                </div>
+              {/* 100+ Club Badge */}
+              <div className="inline-flex items-center justify-center bg-yellow-400 text-orange-800 rounded-full px-4 py-2 mb-4 font-bold text-sm border-2 border-yellow-300">
+                <Trophy className="w-4 h-4 mr-2" />
+                100+ CLUB
               </div>
               
-              <h1 className="text-xl sm:text-2xl font-bold mb-1">
-                Amazing Achievement!
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+                Welcome to<br />the 100+ Club ✨
               </h1>
-              <p className="text-lg opacity-90">
-                <span className="font-bold">{bookCount} books</span> collected
+              <p className="text-base opacity-95 leading-relaxed">
+                Congratulations — you've joined the top 5%<br />of collectors with over {bookCount} books!
               </p>
             </div>
           </div>
 
           {/* Main Content */}
           <div className="p-6">
+            {/* Transition Statement */}
             <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
-                You're a Serious Book Collector!
+              <p className="text-gray-800 text-base font-medium leading-relaxed">
+                To keep growing your library beyond 100 books,<br />
+                it's time to upgrade to unlimited.
+              </p>
+            </div>
+
+            {/* Offer Section */}
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Unlock Unlimited — just $17/year
               </h2>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Most people never reach 100 books. You've joined the top 5% of collectors.
-              </p>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              <div className="text-center p-3 bg-white rounded-lg shadow-sm border">
-                <div className="text-xl font-bold text-orange-500">{bookCount}</div>
-                <div className="text-xs text-gray-500">Books</div>
-              </div>
-              <div className="text-center p-3 bg-white rounded-lg shadow-sm border">
-                <div className="text-xl font-bold text-blue-500">Top 5%</div>
-                <div className="text-xs text-gray-500">Collectors</div>
-              </div>
-              <div className="text-center p-3 bg-white rounded-lg shadow-sm border">
-                <div className="text-xl font-bold text-green-500">$17/yr</div>
-                <div className="text-xs text-gray-500">Continue</div>
-              </div>
-            </div>
-
-            {/* Benefits */}
-            <div className="bg-white rounded-lg border p-4 mb-6">
-              <h3 className="font-bold text-base mb-3">Keep Building Your Legacy</h3>
-              <div className="space-y-2 text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-                  <span>Add unlimited books</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                  <span>Rapid barcode scanning</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                  <span>Beautiful 3D visualization</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Price */}
-            <div className="text-center mb-6">
               <p className="text-gray-600 text-sm">
-                Just <span className="font-bold text-orange-500">$0.05/day</span> • Less than one coffee per month
+                Less than one coffee per month for unlimited books, forever.
               </p>
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-3">
+            {/* Value Bullets */}
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center gap-3 text-gray-700">
+                <BookOpen className="w-5 h-5 text-orange-500 flex-shrink-0" />
+                <span className="text-sm font-medium">Add unlimited books to your library</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-700">
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                  </svg>
+                </div>
+                <span className="text-sm font-medium">Rapid barcode scanning</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-700">
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                  </svg>
+                </div>
+                <span className="text-sm font-medium">Beautiful 3D visualisation</span>
+              </div>
+            </div>
+
+            {/* Call-to-Action */}
+            <div className="space-y-4">
               <Button 
                 onClick={handleSubscribe}
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold py-3 rounded-xl shadow-lg transition-all transform hover:scale-[1.02]"
+                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] text-base"
                 data-testid="button-subscribe-milestone"
               >
                 {isLoading ? (
                   "Processing..."
                 ) : (
                   <>
-                    Continue Building Your Library
-                    <ArrowRight className="ml-2 w-4 h-4" />
+                    Upgrade Now — Unlock Unlimited Books
+                    <ArrowRight className="ml-2 w-5 h-5" />
                   </>
                 )}
               </Button>
               
-              <Button 
-                variant="ghost"
-                onClick={onClose}
-                className="w-full text-gray-500 hover:text-gray-700 text-sm py-2"
-                data-testid="button-maybe-later"
-              >
-                Maybe later - I'll stop at {bookCount} books
-              </Button>
+              <div className="text-center">
+                <Button 
+                  variant="ghost"
+                  onClick={onClose}
+                  className="text-gray-500 hover:text-gray-700 text-sm py-1 px-0 h-auto font-normal"
+                  data-testid="button-maybe-later"
+                >
+                  Not now — I'll stop at {bookCount} books.
+                </Button>
+              </div>
             </div>
           </div>
         </div>
