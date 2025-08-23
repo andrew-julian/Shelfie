@@ -9,6 +9,10 @@ import { Crown, Check, ArrowLeft, BookOpen, Star, Zap } from "lucide-react";
 import { Link } from "wouter";
 import { loadStripe } from "@stripe/stripe-js";
 
+if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+  console.error('Missing VITE_STRIPE_PUBLIC_KEY environment variable');
+}
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 export default function Subscription() {
@@ -28,6 +32,17 @@ export default function Subscription() {
       return response.json();
     },
     onSuccess: async (data) => {
+      console.log('Subscription created successfully:', data);
+      
+      if (!data.sessionId) {
+        toast({
+          title: "Payment Error",
+          description: "No checkout session was created. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const stripe = await stripePromise;
       if (!stripe) {
         toast({
@@ -38,14 +53,26 @@ export default function Subscription() {
         return;
       }
 
-      const { error } = await stripe.redirectToCheckout({
-        sessionId: data.sessionId,
-      });
+      console.log('Redirecting to Stripe checkout with session:', data.sessionId);
+      
+      try {
+        const { error } = await stripe.redirectToCheckout({
+          sessionId: data.sessionId,
+        });
 
-      if (error) {
+        if (error) {
+          console.error('Stripe redirect error:', error);
+          toast({
+            title: "Payment Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      } catch (redirectError) {
+        console.error('Error during redirect:', redirectError);
         toast({
-          title: "Payment Error",
-          description: error.message,
+          title: "Payment Error", 
+          description: "Failed to redirect to payment. Please try again.",
           variant: "destructive",
         });
       }
