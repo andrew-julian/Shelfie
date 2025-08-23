@@ -1823,6 +1823,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to activate test subscription" });
     }
   });
+
+  // Cancel subscription endpoint
+  app.post("/api/cancel-subscription", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // If user has a real Stripe subscription, cancel it
+      if (user.stripeSubscriptionId && !user.stripeSubscriptionId.startsWith('sub_test_')) {
+        try {
+          await stripe.subscriptions.cancel(user.stripeSubscriptionId);
+        } catch (stripeError) {
+          console.error("Error canceling Stripe subscription:", stripeError);
+          // Continue with local cancellation even if Stripe fails
+        }
+      }
+
+      // Update local subscription status
+      await storage.updateUserSubscription(userId, {
+        subscriptionStatus: 'canceled',
+        subscriptionExpiresAt: null
+      });
+      
+      res.json({ success: true, message: 'Subscription canceled successfully' });
+    } catch (error) {
+      console.error("Error canceling subscription:", error);
+      res.status(500).json({ message: "Failed to cancel subscription" });
+    }
+  });
+
+  // Reset subscription to free (for testing)
+  app.post("/api/reset-subscription", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Reset user to free plan
+      await storage.updateUserSubscription(userId, {
+        subscriptionStatus: 'free',
+        subscriptionExpiresAt: null,
+        stripeSubscriptionId: null,
+        stripeCustomerId: null
+      });
+      
+      res.json({ success: true, message: 'Subscription reset to free plan' });
+    } catch (error) {
+      console.error("Error resetting subscription:", error);
+      res.status(500).json({ message: "Failed to reset subscription" });
+    }
+  });
   
   // Webhook to handle Stripe events
   app.post("/api/stripe-webhook", express.raw({ type: 'application/json' }), async (req, res) => {

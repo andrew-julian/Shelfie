@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CreditCard, Crown, Calendar, DollarSign, BookOpen, CheckCircle, XCircle, AlertCircle, TestTube } from "lucide-react";
+import { ArrowLeft, CreditCard, Crown, Calendar, DollarSign, BookOpen, CheckCircle, XCircle, AlertCircle, TestTube, Trash2, RotateCcw } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -49,6 +49,50 @@ export default function Billing() {
       toast({
         title: "Test Failed",
         description: error.message || "Failed to activate test subscription",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Cancel subscription mutation
+  const cancelSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/cancel-subscription");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/details"] });
+      toast({
+        title: "Subscription Canceled",
+        description: "Your subscription has been canceled. You can still use your library.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Cancellation Failed",
+        description: error.message || "Failed to cancel subscription",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Reset to free plan mutation (for testing)
+  const resetToFreeMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/reset-subscription");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/details"] });
+      toast({
+        title: "Reset to Free Plan",
+        description: "Your account has been reset to the free plan for testing.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Reset Failed",
+        description: error.message || "Failed to reset subscription",
         variant: "destructive",
       });
     },
@@ -282,6 +326,37 @@ export default function Billing() {
                         <label className="text-sm font-medium text-gray-700">Plan</label>
                         <div className="mt-1 text-gray-900">Shelfie Pro Annual ($17/year)</div>
                       </div>
+                    </div>
+
+                    {/* Subscription Management */}
+                    <div className="border-t border-gray-200 pt-4">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Manage Subscription</h4>
+                      <div className="flex flex-wrap gap-2">
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => cancelSubscriptionMutation.mutate()}
+                          disabled={cancelSubscriptionMutation.isPending}
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Cancel Subscription
+                        </Button>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => resetToFreeMutation.mutate()}
+                          disabled={resetToFreeMutation.isPending}
+                          className="text-xs"
+                        >
+                          <RotateCcw className="w-3 h-3 mr-1" />
+                          Reset to Free (Test)
+                        </Button>
+                      </div>
+                      
+                      <p className="text-xs text-gray-500 mt-2">
+                        Canceling will end your subscription at the next billing cycle. Your library will remain accessible but you won't be able to add books beyond the 100-book limit.
+                      </p>
                     </div>
                   </div>
                 </CardContent>
