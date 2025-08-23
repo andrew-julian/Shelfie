@@ -3,6 +3,7 @@ import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
+import ShelfieIcon from "@/components/shelfie-icon";
 
 type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
@@ -45,7 +46,7 @@ export default function Header({
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <BookOpen className="text-monochrome-black text-xl sm:text-2xl" />
+            <ShelfieIcon className="text-monochrome-black" size={32} />
             <h1 className="text-xl sm:text-2xl font-bold text-monochrome-black tracking-tight">Shelfie</h1>
           </div>
 

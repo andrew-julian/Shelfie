@@ -1,5 +1,6 @@
 import { BookOpen, Scan, Users, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ShelfieIcon from "@/components/shelfie-icon";
 
 export default function Landing() {
   return (
@@ -8,7 +9,7 @@ export default function Landing() {
         {/* Header */}
         <header className="text-center mb-16">
           <div className="flex items-center justify-center mb-4">
-            <BookOpen className="h-12 w-12 text-blue-600 mr-2" />
+            <ShelfieIcon className="text-blue-600 mr-2" size={48} />
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Shelfie</h1>
           </div>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
