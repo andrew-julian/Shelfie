@@ -17,16 +17,17 @@ interface EnhancedBookDetailsModalProps {
   book: Book | null;
   isOpen: boolean;
   onClose: () => void;
+  onUpdate?: () => void;
 }
 
-export default function EnhancedBookDetailsModal({ book, isOpen, onClose }: EnhancedBookDetailsModalProps) {
+export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpdate }: EnhancedBookDetailsModalProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'details'>('overview');
   const [showCoverEditor, setShowCoverEditor] = useState(false);
   const [showCropper, setShowCropper] = useState(false);
   const queryClient = useQueryClient();
 
   // Get current cover image
-  const currentCoverIndex = book?.currentCoverIndex ?? 0;
+  const currentCoverIndex = book?.selectedCoverIndex ?? 0;
   const currentCoverImage = book?.coverImages?.[currentCoverIndex] || book?.coverImages?.[0];
 
   // Extended book data from Rainforest API
@@ -38,10 +39,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose }: Enha
   // Mutations
   const updateStatusMutation = useMutation({
     mutationFn: async (status: string) => {
-      return apiRequest(`/api/books/${book?.id}`, {
-        method: 'PATCH',
-        body: { status }
-      });
+      return apiRequest(`/api/books/${book?.id}`, 'PATCH', { status });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/books'] });
@@ -50,9 +48,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose }: Enha
 
   const refreshBookDataMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest(`/api/books/${book?.id}/refresh`, {
-        method: 'POST'
-      });
+      return apiRequest(`/api/books/${book?.id}/refresh`, 'POST');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/books'] });
@@ -62,10 +58,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose }: Enha
 
   const updateCoverMutation = useMutation({
     mutationFn: async (coverIndex: number) => {
-      return apiRequest(`/api/books/${book?.id}/cover`, {
-        method: 'PATCH',
-        body: { coverIndex }
-      });
+      return apiRequest(`/api/books/${book?.id}/cover`, 'PATCH', { coverIndex });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/books'] });
@@ -74,10 +67,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose }: Enha
 
   const uploadCroppedImageMutation = useMutation({
     mutationFn: async (croppedImageData: string) => {
-      return apiRequest(`/api/books/${book?.id}/cover/upload`, {
-        method: 'POST',
-        body: { imageData: croppedImageData }
-      });
+      return apiRequest(`/api/books/${book?.id}/cover/upload`, 'POST', { imageData: croppedImageData });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/books'] });
@@ -87,9 +77,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose }: Enha
 
   const deleteBookMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest(`/api/books/${book?.id}`, {
-        method: 'DELETE'
-      });
+      return apiRequest(`/api/books/${book?.id}`, 'DELETE');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/books'] });
