@@ -1720,6 +1720,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
+      
+      // Get actual book count from database to ensure accuracy
+      const books = await storage.getAllBooks(userId);
+      const actualBookCount = books.length;
+      
+      // Update user record if book count doesn't match
+      if (user.bookCount !== actualBookCount) {
+        console.log(`Updating book count for user ${userId}: ${user.bookCount} -> ${actualBookCount}`);
+        const updatedUser = await storage.updateUserBookCount(userId, actualBookCount);
+        if (updatedUser) {
+          Object.assign(user, updatedUser);
+        }
+      }
+      
       res.json(user);
     } catch (error) {
       console.error("Error fetching user details:", error);

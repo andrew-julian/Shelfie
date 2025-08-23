@@ -19,17 +19,21 @@ export function useSubscriptionCheck() {
   // Fetch user details
   const { data: userDetails, isLoading } = useQuery<UserDetails>({
     queryKey: ["/api/user/details"],
-    refetchInterval: 30000, // Check every 30 seconds
+    refetchInterval: 5000, // Check every 5 seconds for testing
+    staleTime: 0, // Always refetch to ensure accuracy
   });
 
   useEffect(() => {
-    if (isLoading || !userDetails || hasCheckedMilestone) return;
+    if (isLoading || !userDetails) return;
 
     const bookCount = userDetails.bookCount || 0;
     const isSubscribed = userDetails.subscriptionStatus === 'active';
     
+    console.log('Subscription check:', { bookCount, isSubscribed, hasCheckedMilestone, userDetails });
+    
     // Show milestone modal if user has 100+ books but no active subscription
-    if (bookCount >= 100 && !isSubscribed) {
+    if (bookCount >= 100 && !isSubscribed && !hasCheckedMilestone) {
+      console.log('Triggering milestone modal!');
       setShowMilestoneModal(true);
       setHasCheckedMilestone(true);
     }

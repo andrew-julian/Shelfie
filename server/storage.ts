@@ -51,6 +51,7 @@ export interface IStorage {
     subscriptionExpiresAt?: Date;
   }): Promise<User | undefined>;
   incrementUserBookCount(userId: string): Promise<User | undefined>;
+  updateUserBookCount(userId: string, count: number): Promise<User | undefined>;
   getUserBookCount(userId: string): Promise<number>;
 }
 
@@ -58,6 +59,7 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // User operations (IMPORTANT) these user operations are mandatory for Replit Auth.
   async getUser(id: string): Promise<User | undefined> {
+    console.log('Getting user details for:', id);
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
@@ -238,6 +240,18 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ 
         bookCount: sql`${users.bookCount} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
+  
+  async updateUserBookCount(userId: string, count: number): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ 
+        bookCount: count,
         updatedAt: new Date()
       })
       .where(eq(users.id, userId))
