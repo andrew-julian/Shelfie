@@ -296,7 +296,7 @@ export default function ScanPage() {
         
         if (config.topBar.cancelButton) {
           config.topBar.cancelButton.visible = true;
-          config.topBar.cancelButton.text = "✕ Done";
+          config.topBar.cancelButton.text = "Done";
           config.topBar.cancelButton.accessibilityDescription = "Close scanner";
           
           if (config.topBar.cancelButton.foreground) {
