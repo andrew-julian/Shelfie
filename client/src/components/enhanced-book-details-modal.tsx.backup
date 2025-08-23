@@ -33,9 +33,11 @@ import {
   FileText,
   MessageSquare,
   BarChart3,
-  Quote
+  Quote,
+  CheckCircle
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
+import { CoverEditorModal } from "./cover-editor-modal";
 import { useToast } from "@/hooks/use-toast";
 import { ImageCropper } from "@/components/image-cropper";
 
@@ -74,6 +76,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
   const [currentCoverIndex, setCurrentCoverIndex] = useState(book?.selectedCoverIndex || 0);
   const [currentCoverImage, setCurrentCoverImage] = useState(book?.coverImage || '');
   const [showCropper, setShowCropper] = useState(false);
+  const [showCoverEditor, setShowCoverEditor] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'details'>('overview');
   
   // Update local state when book prop changes (modal opens with new book)
@@ -178,10 +181,16 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
       
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Update local state immediately with the new cropped image
+      if (data?.croppedImageUrl) {
+        setCurrentCoverImage(data.croppedImageUrl);
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['/api/books'] });
       onUpdate();
       setShowCropper(false);
+      setShowCoverEditor(false);
       toast({
         title: "Success", 
         description: "Cover image updated successfully",
@@ -191,6 +200,37 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
       toast({
         title: "Error",
         description: "Failed to update cover image",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const refreshBookDataMutation = useMutation({
+    mutationFn: async () => {
+      if (!book) return;
+      
+      const response = await fetch(`/api/books/${book.id}/refresh`, {
+        method: 'PATCH',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to refresh book data');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/books'] });
+      onUpdate();
+      toast({
+        title: "Success",
+        description: "Book data refreshed successfully from Amazon",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to refresh book data from Amazon",
         variant: "destructive",
       });
     },
@@ -264,242 +304,148 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
-          <DialogHeader className="flex flex-row items-center justify-between mb-6">
-            <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <BookOpen className="w-6 h-6 text-coral-red" />
-              Book Details
-            </DialogTitle>
-            <div className="flex items-center gap-2">
+        <DialogContent className="w-full max-w-4xl max-h-[95vh] overflow-hidden p-0 sm:p-6">
+          <div className="flex flex-col h-full max-h-[95vh]">
+            <DialogHeader className="flex-shrink-0 px-4 pt-4 pb-4 sm:px-6 sm:pt-6 sm:pb-6 border-b relative">
+              {/* Close Button */}
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowCropper(true)}
-                className="text-gray-500 hover:text-coral-red"
-                data-testid="button-crop-cover"
+                onClick={onClose}
+                className="absolute top-2 right-2 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 p-2 h-auto z-10"
+                data-testid="button-close-modal"
               >
-                <Crop className="w-4 h-4" />
-                Edit Cover
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => deleteBookMutation.mutate()}
-                className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                data-testid="button-delete-book"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          </DialogHeader>
 
-          <div className="space-y-6">
-            {/* Compact Header */}
-            <div className="flex gap-4 pb-4 border-b border-gray-200">
-              {/* Small Book Cover */}
-              <div className="flex-shrink-0">
-                <div className="relative group">
-                  <img
-                    src={currentCoverImage || "/api/placeholder/300/400"}
-                    alt={book.title}
-                    className="w-24 h-32 object-cover rounded shadow-md transition-all duration-300 hover:shadow-lg"
-                    data-testid="book-cover-main"
-                  />
-                  {book.coverImages && book.coverImages.length > 1 && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded flex items-center justify-center">
-                      <Eye className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Title and Key Info */}
-              <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-bold text-gray-900 mb-1 leading-tight">{book.title}</h1>
-                <p className="text-gray-600 mb-2">{book.author}</p>
-                
-                {/* Star Rating */}
-                {extendedData?.rating && (
-                  <div className="flex items-center gap-2 mb-2">
-                    {renderStarRating(extendedData.rating, 16)}
-                    <span className="text-sm text-gray-600">
-                      ({extendedData.rating_count || 'No reviews'})
-                    </span>
-                  </div>
-                )}
-
-                {/* Reading Status */}
-                <div className="flex items-center gap-2">
-                  <Select value={book.status} onValueChange={(value) => updateStatusMutation.mutate(value)}>
-                    <SelectTrigger className="w-40 h-8">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="want-to-read">Want to Read</SelectItem>
-                      <SelectItem value="reading">Currently Reading</SelectItem>
-                      <SelectItem value="read">Read</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  {extendedData?.price && (
-                    <Badge variant="secondary" className="text-sm">
-                      {extendedData.price}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-
-              {/* Cover Options - Horizontal Strip */}
-              {book.coverImages && book.coverImages.length > 1 && (
-                <div className="flex-shrink-0">
-                  <p className="text-xs text-gray-500 mb-1">Other Covers</p>
-                  <div className="flex gap-1 max-w-32 overflow-x-auto">
-                    {book.coverImages.slice(0, 4).map((coverImage, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleCoverSelect(index)}
-                        className={`relative rounded border flex-shrink-0 transition-all ${
-                          index === currentCoverIndex 
-                            ? 'border-coral-red shadow-sm' 
-                            : 'border-gray-200 hover:border-coral-red/50'
-                        }`}
-                        data-testid={`cover-option-${index}`}
-                      >
-                        <img
-                          src={coverImage}
-                          alt={`Cover ${index + 1}`}
-                          className="w-7 h-10 object-cover rounded-sm"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Format Variants - Compact Row */}
-            {extendedData?.variants && (
-              <div className="flex gap-2 flex-wrap pb-4">
-                {extendedData.variants.map((variant, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm transition-all ${
-                      variant.is_current_product
-                        ? 'border-coral-red bg-coral-red/5 text-coral-red font-medium'
-                        : 'border-gray-200 text-gray-600'
-                    }`}
-                  >
-                    <span>{variant.title}</span>
-                    <span className="font-semibold">
-                      {variant.price?.raw || variant.price?.value || variant.price || "N/A"}
-                    </span>
-                    {variant.is_current_product && (
-                      <CheckCircle className="w-3 h-3" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Main Content - Tabbed Interface */}
-            <div className="border-b border-gray-200">
-              <div className="flex space-x-6">
-                {['overview', 'reviews', 'details'].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab as typeof activeTab)}
-                    className={`pb-2 px-1 border-b-2 font-medium text-sm capitalize transition-all ${
-                      activeTab === tab
-                        ? 'border-coral-red text-coral-red'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Tab Content */}
-            <div className="space-y-6">
-              {activeTab === 'overview' && (
-                <div className="space-y-6">
-                  {/* Description */}
-                  {extendedData?.book_description && (
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3">Description</h3>
-                      <p className="text-gray-700 leading-relaxed">{extendedData.book_description}</p>
-                    </div>
-                  )}
-
-                  {/* Quick Info Grid */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {book.publishYear && (
-                      <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                        <Calendar className="w-4 h-4 text-gray-500" />
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Published</p>
-                            <p className="font-semibold text-sm">{book.publishYear}</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {book.pages && (
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                          <BookOpen className="w-4 h-4 text-gray-500" />
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Pages</p>
-                            <p className="font-semibold text-sm">{book.pages}</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {book.language && (
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                          <Languages className="w-4 h-4 text-gray-500" />
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Language</p>
-                            <p className="font-semibold text-sm">{book.language}</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {book.publisher && (
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                          <Building className="w-4 h-4 text-gray-500" />
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Publisher</p>
-                            <p className="font-semibold text-sm">{book.publisher}</p>
-                          </div>
+              {/* Book Header Info */}
+              <div className="pr-12 sm:pr-16">
+                <div className="flex gap-4">
+                  {/* Book Cover */}
+                  <div className="flex-shrink-0">
+                    <div className="relative group">
+                      <img
+                        src={currentCoverImage || "/api/placeholder/300/400"}
+                        alt={book.title}
+                        className="w-20 h-28 sm:w-24 sm:h-32 object-cover rounded shadow-md transition-all duration-300 hover:shadow-lg"
+                        data-testid="book-cover-main"
+                      />
+                      {book.coverImages && book.coverImages.length > 1 && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded flex items-center justify-center">
+                          <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                         </div>
                       )}
                     </div>
+                  </div>
 
-                    {/* Bestseller Ranks */}
-                    {extendedData?.bestsellers_rank && (
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                          <Award className="w-4 h-4" />
-                          Bestseller Ranks
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {extendedData.bestsellers_rank.map((rank: any, index: number) => (
-                            <Badge key={index} variant="secondary" className="bg-yellow-100 text-yellow-800">
-                              #{rank.rank} in {rank.category}
-                            </Badge>
-                              #{rank.rank} in {rank.category}
-                            </Badge>
-                          ))}
-                        </div>
+                  {/* Title and Author */}
+                  <div className="flex-1 min-w-0">
+                    <DialogTitle className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-tight line-clamp-2">{book.title}</DialogTitle>
+                    <p className="text-gray-600 mb-3 text-sm sm:text-base line-clamp-1">{book.author}</p>
+                    
+                    {/* Star Rating */}
+                    {book.rating && (
+                      <div className="flex items-center gap-2 mb-3">
+                        {renderStarRating(parseFloat(book.rating), "sm")}
+                        <span className="text-xs sm:text-sm text-gray-600">
+                          ({book.ratingsTotal || 'No reviews'})
+                        </span>
                       </div>
                     )}
+
+                    {/* Reading Status */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                      <Select value={book.status} onValueChange={(value) => updateStatusMutation.mutate(value)}>
+                        <SelectTrigger className="w-full sm:w-40 h-8 text-xs sm:text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="want-to-read">Want to Read</SelectItem>
+                          <SelectItem value="reading">Currently Reading</SelectItem>
+                          <SelectItem value="read">Read</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      {book.price && (
+                        <Badge variant="secondary" className="text-xs sm:text-sm">
+                          ${book.price}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-            </div>
+                </div>
+              </div>
+            </DialogHeader>
 
-            <Separator className="my-8" />
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6">
+              <div className="space-y-4 sm:space-y-6">
+                {/* Action Buttons Section */}
+                <div className="pt-2 pb-4 border-b border-gray-200">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => refreshBookDataMutation.mutate()}
+                      disabled={refreshBookDataMutation.isPending}
+                      className="text-green-600 hover:text-green-800 hover:bg-green-50 border-green-200 hover:border-green-300 px-3 py-2 h-10 text-sm"
+                      data-testid="button-refresh-book"
+                    >
+                      <CheckCircle className={`w-4 h-4 ${refreshBookDataMutation.isPending ? 'animate-spin' : ''} mr-2`} />
+                      <span>Refresh Data</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowCoverEditor(true)}
+                      className="text-gray-600 hover:text-coral-red hover:bg-gray-50 border-gray-200 hover:border-coral-red px-3 py-2 h-10 text-sm"
+                      data-testid="button-edit-cover"
+                    >
+                      <Crop className="w-4 h-4 mr-2" />
+                      <span>Edit Cover</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deleteBookMutation.mutate()}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300 px-3 py-2 h-10 text-sm"
+                      data-testid="button-delete-book"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      <span>Delete Book</span>
+                    </Button>
+                  </div>
+                </div>
 
-            {/* Navigation Tabs */}
-            <div className="flex gap-4 mb-6 border-b">
+                {/* Cover Options */}
+                {book.coverImages && book.coverImages.length > 1 && (
+                  <div className="pb-4 border-b border-gray-200">
+                    <p className="text-sm font-medium text-gray-700 mb-3">Other Covers</p>
+                    <div className="flex gap-2 overflow-x-auto pb-1">
+                      {book.coverImages.slice(0, 4).map((coverImage, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleCoverSelect(index)}
+                          className={`relative rounded border flex-shrink-0 transition-all ${
+                            index === currentCoverIndex 
+                              ? 'border-coral-red shadow-sm' 
+                              : 'border-gray-200 hover:border-coral-red/50'
+                          }`}
+                          data-testid={`cover-option-${index}`}
+                          >
+                            <img
+                              src={coverImage}
+                              alt={`Cover ${index + 1}`}
+                              className="w-6 h-8 sm:w-7 sm:h-10 object-cover rounded-sm"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Navigation Tabs */}
+                <div className="flex border-b overflow-x-auto">
                   {[
                     { id: 'overview', label: 'Overview', icon: Eye },
                     { id: 'reviews', label: 'Reviews', icon: Star },
@@ -508,224 +454,137 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                     <button
                       key={id}
                       onClick={() => setActiveTab(id as any)}
-                      className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+                      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${
                         activeTab === id
                           ? 'border-coral-red text-coral-red'
                           : 'border-transparent text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
                       {label}
                     </button>
                   ))}
-            </div>
+                </div>
 
-            {/* Tab Content */}
-            <div className="space-y-6">
-                  {activeTab === 'overview' && (
-                    <>
-                      {/* Description & Overview */}
-                      <div>
-                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                          <FileText className="w-5 h-5" />
-                          Overview
-                        </h3>
-                        <div className="space-y-4">
-                          {extendedData?.feature_bullets && extendedData.feature_bullets.length > 0 && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Key Features</h4>
-                              <ul className="list-disc list-inside space-y-1">
-                                {extendedData.feature_bullets.map((bullet, index) => (
-                                  <li key={index} className="text-gray-700">{bullet}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                          
-                          {extendedData?.about_this_item && extendedData.about_this_item.length > 0 && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">About This Item</h4>
-                              <ul className="list-disc list-inside space-y-1">
-                                {extendedData.about_this_item.map((item, index) => (
-                                  <li key={index} className="text-gray-700">{item}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                {/* Tab Content */}
+                <div className="space-y-4 sm:space-y-6 pb-4">
+              {activeTab === 'overview' && (
+                <div className="space-y-6">
+                  {/* Description & Overview */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                      <FileText className="w-5 h-5" />
+                      Overview
+                    </h3>
+                    <div className="space-y-4">
+                      {extendedData?.feature_bullets && extendedData.feature_bullets.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-2">Key Features</h4>
+                          <ul className="list-disc list-inside space-y-1">
+                            {extendedData.feature_bullets.map((bullet: string, index: number) => (
+                              <li key={index} className="text-gray-700">{bullet}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {extendedData?.about_this_item && extendedData.about_this_item.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-2">About This Item</h4>
+                          <ul className="list-disc list-inside space-y-1">
+                            {extendedData.about_this_item.map((item: string, index: number) => (
+                              <li key={index} className="text-gray-700">{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
-                          {book.description && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                              <p className="text-gray-700 leading-relaxed">
-                                {book.description}
-                              </p>
-                            </div>
-                          )}
+                      {book.description && (
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
+                          <p className="text-gray-700 leading-relaxed">
+                            {book.description}
+                          </p>
+                        </div>
+                      )}
 
-                          {extendedData?.editorial_reviews && extendedData.editorial_reviews.length > 0 && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <Quote className="w-4 h-4" />
-                                Editorial Reviews
-                              </h4>
-                              <div className="space-y-4">
-                                {extendedData.editorial_reviews.map((review, index) => {
-                                  // Parse and format the review body to extract individual quotes with sources
-                                  const parseEditorialReview = (text: string) => {
-                                    // Split on common patterns that indicate new quotes
-                                    const quoteParts = text.split(/--/);
-                                    const quotes = [];
+                      {extendedData?.editorial_reviews && Array.isArray(extendedData.editorial_reviews) && extendedData.editorial_reviews.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <Quote className="w-4 h-4" />
+                            Editorial Reviews
+                          </h4>
+                          <div className="space-y-4">
+                            {extendedData.editorial_reviews.map((review: any, index: number) => {
+                              // Parse and format the review body to extract individual quotes with sources
+                              const parseEditorialReview = (text: string) => {
+                                // Split on common patterns that indicate new quotes
+                                const quoteParts = text.split(/--/);
+                                const quotes = [];
+                                
+                                for (let i = 0; i < quoteParts.length; i++) {
+                                  const part = quoteParts[i].trim();
+                                  if (part) {
+                                    // Check if this looks like a quote (starts with opening quote or contains quoted content)
+                                    const hasQuotes = part.includes('"') && part.includes('"');
+                                    const startsWithQuote = part.startsWith('"');
                                     
-                                    for (let i = 0; i < quoteParts.length; i++) {
-                                      const part = quoteParts[i].trim();
-                                      if (part) {
-                                        // Check if this looks like a quote (starts with opening quote or contains quoted content)
-                                        const hasQuotes = part.includes('"') && part.includes('"');
-                                        const startsWithQuote = part.startsWith('"');
+                                    if (hasQuotes || startsWithQuote) {
+                                      // Try to extract quote and attribution
+                                      const quoteMatch = part.match(/^[""]([^""]+)[""]?(.*)$/);
+                                      if (quoteMatch) {
+                                        const quoteText = quoteMatch[1];
+                                        let attribution = quoteMatch[2] ? quoteMatch[2].trim() : '';
                                         
-                                        if (hasQuotes || startsWithQuote) {
-                                          // Try to extract quote and attribution
-                                          const quoteMatch = part.match(/^[""]([^""]+)[""]?(.*)$/);
-                                          if (quoteMatch) {
-                                            const quoteText = quoteMatch[1];
-                                            let attribution = quoteMatch[2] ? quoteMatch[2].trim() : '';
-                                            
-                                            // Look for attribution in the next part if not found
-                                            if (!attribution && i + 1 < quoteParts.length) {
-                                              attribution = quoteParts[i + 1].trim();
-                                              i++; // Skip the next part since we used it as attribution
-                                            }
-                                            
-                                            // Clean up attribution - remove leading dashes or common prefixes
-                                            attribution = attribution.replace(/^-+/, '').trim();
-                                            
-                                            quotes.push({ text: quoteText, attribution });
-                                          } else {
-                                            // Fallback: treat as quote without clear structure
-                                            quotes.push({ text: part, attribution: '' });
-                                          }
-                                        } else if (part.length > 20) {
-                                          // Long text without quotes - treat as regular text
-                                          quotes.push({ text: part, attribution: '' });
+                                        // Look for attribution in the next part if not found
+                                        if (!attribution && i + 1 < quoteParts.length) {
+                                          attribution = quoteParts[i + 1].trim();
+                                          i++; // Skip the next part since we used it as attribution
                                         }
+                                        
+                                        // Clean up attribution - remove leading dashes or common prefixes
+                                        attribution = attribution.replace(/^-+/, '').trim();
+                                        
+                                        quotes.push({ text: quoteText, attribution });
+                                      } else {
+                                        // Fallback: treat as quote without clear structure
+                                        quotes.push({ text: part, attribution: '' });
                                       }
+                                    } else if (part.length > 20) {
+                                      // Long text without quotes - treat as regular text
+                                      quotes.push({ text: part, attribution: '' });
                                     }
-                                    
-                                    return quotes.length > 0 ? quotes : [{ text: text, attribution: '' }];
-                                  };
-                                  
-                                  const parsedQuotes = parseEditorialReview(review.body || '');
-                                  
-                                  return (
-                                    <div key={index} className="space-y-3">
-                                      {parsedQuotes.map((quote, qIndex) => (
-                                        <div 
-                                          key={qIndex} 
-                                          className="relative p-4 bg-gradient-to-r from-blue-50 to-gray-50 rounded-lg border-l-4 border-blue-400"
-                                        >
-                                          <Quote className="absolute top-2 left-2 w-4 h-4 text-blue-400 opacity-60" />
-                                          <blockquote className="pl-6 text-gray-800 leading-relaxed italic">
-                                            "{quote.text.replace(/^[""]|[""]$/g, '')}"
-                                          </blockquote>
-                                          {quote.attribution && (
-                                            <cite className="block mt-2 text-sm font-medium text-gray-600 not-italic pl-6">
-                                              — {quote.attribution}
-                                            </cite>
-                                          )}
-                                          {review.source && qIndex === 0 && (
-                                            <div className="absolute top-2 right-3 text-xs text-gray-500 bg-white px-2 py-1 rounded">
-                                              {review.source}
-                                            </div>
-                                          )}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          )}
-
-                          {extendedData?.book_description && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Product Description</h4>
-                              <p className="text-gray-700 leading-relaxed">
-                                {extendedData.book_description}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Categories */}
-                      {book.categories && book.categories.length > 0 && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                            <Tag className="w-5 h-5" />
-                            Categories
-                          </h3>
-                          <div className="flex flex-wrap gap-2">
-                            {book.categories.map((category, index) => (
-                              <Badge key={index} variant="outline">
-                                {category}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Also Bought */}
-                      {extendedData?.also_bought && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                            <Users className="w-5 h-5" />
-                            Customers also bought
-                          </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {extendedData.also_bought.map((item, index) => (
-                              <div key={index} className="flex gap-3 p-3 border rounded-lg hover:shadow-md transition-shadow">
-                                <div className="w-16 h-20 bg-gray-200 rounded flex items-center justify-center">
-                                  <BookOpen className="w-6 h-6 text-gray-400" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="font-medium text-sm line-clamp-2">{item.title}</h4>
-                                  <p className="text-xs text-gray-500 mt-1">{item.author}</p>
-                                  <p className="text-sm font-semibold text-coral-red mt-1">
-                                    {item.price?.raw || item.price?.value || item.price || "N/A"}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {activeTab === 'reviews' && (
-                    <>
-                      {/* Rating Breakdown */}
-                      {extendedData?.rating_breakdown && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-4">Rating Breakdown</h3>
-                          <div className="space-y-2">
-                            {Object.entries(extendedData.rating_breakdown).reverse().map(([key, value], index) => {
-                              const starNum = 5 - index;
+                                  }
+                                }
+                                
+                                return quotes.length > 0 ? quotes : [{ text: text, attribution: '' }];
+                              };
+                              
+                              const parsedQuotes = parseEditorialReview(review.body || '');
+                              
                               return (
-                                <div key={key} className="flex items-center gap-3">
-                                  <span className="text-sm w-8">{starNum} ★</span>
-                                  <div className="flex-1 bg-gray-200 rounded-full h-2">
-                                    <div
-                                      className="bg-yellow-400 h-2 rounded-full"
-                                      style={{ width: `${value.percentage}%` }}
-                                    />
-                                  </div>
-                                  <span className="text-sm text-gray-500 w-12">
-                                    {value.percentage}%
-                                  </span>
-                                  <span className="text-sm text-gray-500 w-16">
-                                    ({value.count.toLocaleString()})
-                                  </span>
+                                <div key={index} className="space-y-3">
+                                  {parsedQuotes.map((quote: any, qIndex: number) => (
+                                    <div 
+                                      key={qIndex} 
+                                      className="relative p-4 bg-gradient-to-r from-blue-50 to-gray-50 rounded-lg border-l-4 border-blue-400"
+                                    >
+                                      <Quote className="absolute top-2 left-2 w-4 h-4 text-blue-400 opacity-60" />
+                                      <blockquote className="pl-6 text-gray-800 leading-relaxed italic">
+                                        "{quote.text.replace(/^[""]|[""]$/g, '')}"
+                                      </blockquote>
+                                      {quote.attribution && (
+                                        <cite className="block mt-2 text-sm font-medium text-gray-600 not-italic pl-6">
+                                          — {quote.attribution}
+                                        </cite>
+                                      )}
+                                      {review.source && qIndex === 0 && (
+                                        <div className="absolute top-2 right-3 text-xs text-gray-500 bg-white px-2 py-1 rounded">
+                                          {review.source}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
                                 </div>
                               );
                             })}
@@ -733,150 +592,326 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                         </div>
                       )}
 
-                      {/* Top Reviews */}
-                      {extendedData?.top_reviews && (
+                      {extendedData?.book_description && (
                         <div>
-                          <h3 className="text-lg font-semibold mb-4">Top Reviews</h3>
-                          <div className="space-y-4">
-                            {extendedData.top_reviews.map((review) => (
-                              <div key={review.id} className="border rounded-lg p-4">
-                                <div className="flex items-start justify-between mb-2">
-                                  <div className="flex items-center gap-2">
-                                    {renderStarRating(review.rating)}
-                                    <span className="font-semibold text-sm">{review.title}</span>
-                                  </div>
-                                  {review.verified_purchase && (
-                                    <Badge variant="outline" className="text-xs">
-                                      Verified Purchase
-                                    </Badge>
-                                  )}
-                                </div>
-                                <p className="text-gray-700 text-sm mb-2 line-clamp-3">{review.body}</p>
-                                <div className="flex items-center gap-4 text-xs text-gray-500">
-                                  <span>
-                                    {review.date?.raw || review.date?.utc || review.date || "N/A"}
-                                  </span>
-                                  <span>{review.helpful_votes} people found this helpful</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                          <h4 className="font-semibold text-gray-900 mb-2">Product Description</h4>
+                          <p className="text-gray-700 leading-relaxed">
+                            {extendedData.book_description}
+                          </p>
                         </div>
                       )}
-                    </>
+                    </div>
+                  </div>
+
+                  {/* Categories */}
+                  {book.categories && book.categories.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                        <Tag className="w-5 h-5" />
+                        Categories
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {book.categories.map((category: string, index: number) => (
+                          <Badge key={index} variant="outline">
+                            {category}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
                   )}
 
-                  {activeTab === 'details' && (
-                    <>
-                      {/* Physical Specifications */}
-                      <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <Ruler className="w-5 h-5" />
-                          Physical Specifications
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {book.dimensions && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Dimensions</span>
-                              <span className="font-medium">{book.dimensions}</span>
+                  {/* Also Bought */}
+                  {extendedData?.also_bought && Array.isArray(extendedData.also_bought) && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <Users className="w-5 h-5" />
+                        Customers also bought
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {extendedData.also_bought.map((item: any, index: number) => (
+                          <div key={index} className="flex gap-3 p-3 border rounded-lg hover:shadow-md transition-shadow">
+                            <div className="w-16 h-20 bg-gray-200 rounded flex items-center justify-center">
+                              <BookOpen className="w-6 h-6 text-gray-400" />
                             </div>
-                          )}
-                          {book.weight && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Weight</span>
-                              <span className="font-medium">{book.weight}</span>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-sm line-clamp-2">{item.title}</h4>
+                              <p className="text-xs text-gray-500 mt-1">{item.author}</p>
+                              <p className="text-sm font-semibold text-coral-red mt-1">
+                                {item.price?.raw || item.price?.value || item.price || "N/A"}
+                              </p>
                             </div>
-                          )}
-                          {book.width && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Width</span>
-                              <span className="font-medium">{book.width}"</span>
-                            </div>
-                          )}
-                          {book.height && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Height</span>
-                              <span className="font-medium">{book.height}"</span>
-                            </div>
-                          )}
-                          {book.depth && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Depth</span>
-                              <span className="font-medium">{book.depth}"</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Publishing Information */}
-                      <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <Building className="w-5 h-5" />
-                          Publishing Information
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {book.isbn && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">ISBN</span>
-                              <span className="font-medium font-mono">{book.isbn}</span>
-                            </div>
-                          )}
-                          {book.asin && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">ASIN</span>
-                              <span className="font-medium font-mono">{book.asin}</span>
-                            </div>
-                          )}
-                          {book.publishDate && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Publication Date</span>
-                              <span className="font-medium">{book.publishDate}</span>
-                            </div>
-                          )}
-                          {book.amazonDomain && (
-                            <div className="flex justify-between p-3 bg-gray-50 rounded">
-                              <span className="text-gray-600">Amazon Region</span>
-                              <span className="font-medium">{book.amazonDomain}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Personal Library Info */}
-                      <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <Bookmark className="w-5 h-5" />
-                          Library Information
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="flex justify-between p-3 bg-gray-50 rounded">
-                            <span className="text-gray-600">Added to Library</span>
-                            <span className="font-medium">
-                              {new Date(book.addedAt).toLocaleDateString()}
-                            </span>
                           </div>
-                          <div className="flex justify-between p-3 bg-gray-50 rounded">
-                            <span className="text-gray-600">Reading Status</span>
-                            <Badge className={statusConfig[book.status as keyof typeof statusConfig]?.color || 'bg-gray-100 text-gray-800'}>
-                              {statusConfig[book.status as keyof typeof statusConfig]?.label || book.status}
-                            </Badge>
-                          </div>
-                        </div>
+                        ))}
                       </div>
-                    </>
+                    </div>
                   )}
+                </div>
+              )}
+
+              {activeTab === 'reviews' && (
+                <div className="space-y-6">
+                  {/* Rating Breakdown */}
+                  {extendedData?.rating_breakdown && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">Rating Breakdown</h3>
+                      <div className="space-y-2">
+                        {Object.entries(extendedData.rating_breakdown).reverse().map(([key, value]: [string, any], index: number) => {
+                          const starNum = 5 - index;
+                          return (
+                            <div key={key} className="flex items-center gap-3">
+                              <span className="text-sm w-8">{starNum} ★</span>
+                              <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                <div
+                                  className="bg-yellow-400 h-2 rounded-full"
+                                  style={{ width: `${value.percentage}%` }}
+                                />
+                              </div>
+                              <span className="text-sm text-gray-500 w-12">
+                                {value.percentage}%
+                              </span>
+                              <span className="text-sm text-gray-500 w-16">
+                                ({value.count.toLocaleString()})
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Top Reviews */}
+                  {extendedData?.top_reviews && Array.isArray(extendedData.top_reviews) && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">Top Reviews</h3>
+                      <div className="space-y-4">
+                        {extendedData.top_reviews.map((review: any) => (
+                          <div key={review.id} className="border rounded-lg p-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                {renderStarRating(review.rating)}
+                                <span className="font-semibold text-sm">{review.title}</span>
+                              </div>
+                              {review.verified_purchase && (
+                                <Badge variant="outline" className="text-xs">
+                                  Verified Purchase
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-gray-700 text-sm mb-2 line-clamp-3">{review.body}</p>
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                              <span>
+                                {review.date?.raw || review.date?.utc || review.date || "N/A"}
+                              </span>
+                              <span>{review.helpful_votes} people found this helpful</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'details' && (
+                <div className="space-y-6">
+                  {/* Physical Specifications */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <Ruler className="w-5 h-5" />
+                      Physical Specifications
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {book.dimensions && (
+                        <div className="flex justify-between p-3 bg-gray-50 rounded">
+                          <span className="text-gray-600">Dimensions</span>
+                          <span className="font-medium">{book.dimensions}</span>
+                        </div>
+                      )}
+                      {book.weight && (
+                        <div className="flex justify-between p-3 bg-gray-50 rounded">
+                          <span className="text-gray-600">Weight</span>
+                          <span className="font-medium">{book.weight}</span>
+                        </div>
+                      )}
+                      {book.pages && (
+                        <div className="flex justify-between p-3 bg-gray-50 rounded">
+                          <span className="text-gray-600">Pages</span>
+                          <span className="font-medium">{book.pages}</span>
+                        </div>
+                      )}
+                      {book.language && (
+                        <div className="flex justify-between p-3 bg-gray-50 rounded">
+                          <span className="text-gray-600">Language</span>
+                          <span className="font-medium">{book.language}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Publication Details */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <Building className="w-5 h-5" />
+                      Publication Details
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {book.publisher && (
+                        <div className="flex justify-between p-3 bg-gray-50 rounded">
+                          <span className="text-gray-600">Publisher</span>
+                          <span className="font-medium">{book.publisher}</span>
+                        </div>
+                      )}
+                      {book.publishYear && (
+                        <div className="flex justify-between p-3 bg-gray-50 rounded">
+                          <span className="text-gray-600">Publication Year</span>
+                          <span className="font-medium">{book.publishYear}</span>
+                        </div>
+                      )}
+                      {book.isbn && (
+                        <div className="flex justify-between p-3 bg-gray-50 rounded">
+                          <span className="text-gray-600">ISBN</span>
+                          <span className="font-medium">{book.isbn}</span>
+                        </div>
+                      )}
+                      {book.isbn && book.isbn.length > 10 && (
+                        <div className="flex justify-between p-3 bg-gray-50 rounded">
+                          <span className="text-gray-600">ISBN-13</span>
+                          <span className="font-medium">{book.isbn}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Format Variants */}
+                  {extendedData?.variants && Array.isArray(extendedData.variants) && extendedData.variants.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <Bookmark className="w-5 h-5" />
+                        Available Formats
+                      </h3>
+                      <div className="space-y-0">
+                        {extendedData.variants.map((variant: any, index: number) => {
+                          // Extract format name from variant data
+                          const format = variant.title || variant.format || variant.binding || `Format ${index + 1}`;
+                          
+                          // Determine if this is the user's copy based on stored format or best guess
+                          const normalizedFormat = format.toLowerCase().replace(/[^a-z]/g, '');
+                          const userFormat = book.format?.toLowerCase().replace(/[^a-z]/g, '') || 'hardcover';
+                          const isUserCopy = normalizedFormat.includes('hardcover') || normalizedFormat.includes('hard');
+                          
+                          return (
+                            <div 
+                              key={index} 
+                              className={`py-4 px-0 border-b border-gray-200 last:border-b-0 ${
+                                isUserCopy 
+                                  ? 'bg-coral-red/5 -mx-6 px-6 border-coral-red/20 rounded-lg border-2 my-2' 
+                                  : ''
+                              }`}
+                            >
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-3">
+                                  <span className="font-medium text-gray-900 text-base">
+                                    {format}
+                                  </span>
+                                  {isUserCopy && (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-coral-red text-white">
+                                      Your Copy
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-right">
+                                  {variant.price && (
+                                    <span className="text-coral-red font-semibold text-lg">
+                                      {variant.price.raw || variant.price.value || variant.price}
+                                    </span>
+                                  )}
+                                  {!variant.price && variant.available && (
+                                    <span className="text-coral-red font-semibold text-lg">
+                                      $0.00
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bestseller Rankings */}
+                  {extendedData?.bestsellers_rank && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5" />
+                        Bestseller Rankings
+                      </h3>
+                      <div className="space-y-0">
+                        {Array.isArray(extendedData.bestsellers_rank) ? 
+                          extendedData.bestsellers_rank.map((rankItem: any, index: number) => {
+                            // Extract category and rank from array item
+                            const category = rankItem.category || rankItem.name || rankItem.title || `Category ${index + 1}`;
+                            const rank = rankItem.rank || rankItem.position || rankItem.number || 'N/A';
+                            
+                            return (
+                              <div key={index} className="flex justify-between py-3 border-b border-gray-200 last:border-b-0">
+                                <span className="text-gray-700">{category}</span>
+                                <span className="font-medium text-gray-900">#{rank}</span>
+                              </div>
+                            );
+                          }) :
+                          Object.entries(extendedData.bestsellers_rank).map(([category, rankData]: [string, any]) => {
+                            // Handle object structure (fallback)
+                            const rank = typeof rankData === 'object' 
+                              ? (rankData?.rank || rankData?.category || JSON.stringify(rankData))
+                              : rankData;
+                            
+                            return (
+                              <div key={category} className="flex justify-between py-3 border-b border-gray-200 last:border-b-0">
+                                <span className="text-gray-700">{category}</span>
+                                <span className="font-medium text-gray-900">#{rank}</span>
+                              </div>
+                            );
+                          })
+                        }
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+                </div>
+              </div>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Image Cropper Modal */}
+      {/* Cover Editor Modal */}
+      <CoverEditorModal
+        isOpen={showCoverEditor}
+        onClose={() => setShowCoverEditor(false)}
+        book={{
+          id: book?.id || '',
+          title: book?.title || '',
+          coverImages: book?.coverImages || []
+        }}
+        currentCoverIndex={currentCoverIndex}
+        onCoverSelect={(index) => {
+          updateCoverMutation.mutate(index);
+          setShowCoverEditor(false);
+        }}
+        onCustomCover={(croppedImageData) => {
+          uploadCroppedImageMutation.mutate(croppedImageData);
+        }}
+        isUpdating={updateCoverMutation.isPending || uploadCroppedImageMutation.isPending}
+      />
+
+      {/* Legacy Image Cropper Modal */}
       <ImageCropper
         isOpen={showCropper}
         onClose={() => setShowCropper(false)}
         imageUrl={currentCoverImage}
-        onSave={handleCroppedImageSave}
-        isLoading={uploadCroppedImageMutation.isPending}
+        onCropComplete={handleCroppedImageSave}
       />
     </>
   );
