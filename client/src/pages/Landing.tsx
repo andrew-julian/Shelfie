@@ -47,21 +47,21 @@ export default function Landing() {
 
       <main>
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-blue-50 pt-12 sm:pt-16 pb-16 sm:pb-20">
+        <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-blue-50 pt-8 sm:pt-12 md:pt-16 pb-12 sm:pb-16 md:pb-20">
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+            <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 items-center">
               <div className="text-center lg:text-left">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight mb-4 sm:mb-6">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight mb-4 sm:mb-6">
                   Where your books come alive
                 </h1>
-                <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-lg mx-auto lg:mx-0">
                   A beautifully designed, intuitive experience for book lovers. With seamless barcode scanning and stunning 3D visualisation, building your collection is effortless and joyful.
                 </p>
                 <div className="flex justify-center lg:justify-start">
                   <Button 
                     size="lg" 
                     asChild
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
                     onClick={() => handleAnalyticsEvent('click_cta_primary')}
                   >
                     <a href="/api/login" data-testid="button-primary-cta">
@@ -70,7 +70,7 @@ export default function Landing() {
                     </a>
                   </Button>
                 </div>
-                <p className="text-sm text-gray-500 mt-4">No clutter, no ads, just you and your books.</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">No clutter, no ads, just you and your books.</p>
               </div>
               
               <div className="relative">
