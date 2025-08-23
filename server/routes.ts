@@ -1627,13 +1627,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update status to looking-up
       await storage.updateScanningQueueItem(queueItemId, { status: 'looking-up' });
       
-      // Call the lookup API
-      const response = await fetch(`http://localhost:5000/api/books/lookup/${queueItem.isbn}`);
-      if (!response.ok) {
-        throw new Error(`Failed to lookup book: ${response.statusText}`);
-      }
-      
-      const bookData = await response.json();
+      // Call the lookup function directly to avoid auth issues
+      const bookData = await lookupBookByISBN(queueItem.isbn, queueItem.userId);
       
       if (!bookData.title) {
         throw new Error('Book not found in our database');
