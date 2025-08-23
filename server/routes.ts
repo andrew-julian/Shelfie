@@ -19,10 +19,10 @@ async function lookupBookByISBN(isbn: string, userId: string) {
   isbn = isbn.trim().replace(/[\s\-]/g, '');
   
   // Get user's preferred region, fallback to default
-  let preferredDomain = "amazon.com.au";
+  let amazonDomain = "amazon.com.au";
   try {
     const userPreferences = await storage.getUserPreferences(userId);
-    preferredDomain = userPreferences?.amazonDomain || "amazon.com.au";
+    amazonDomain = userPreferences?.amazonDomain || "amazon.com.au";
   } catch (error) {
     console.error("Failed to get user preferences:", error);
   }
@@ -33,86 +33,57 @@ async function lookupBookByISBN(isbn: string, userId: string) {
     throw new Error("Book already exists in your library");
   }
 
-  // Define fallback domains to try if the preferred domain fails
-  const domainsToTry = [
-    preferredDomain,
-    "amazon.com",      // US - largest catalog
-    "amazon.co.uk",    // UK - good international coverage
-    "amazon.de",       // Germany - good European coverage
-    "amazon.ca",       // Canada
-    "amazon.fr",       // France
-  ].filter((domain, index, arr) => arr.indexOf(domain) === index); // Remove duplicates
-
+  // Call Rainforest API
   const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
+  const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${isbn}&amazon_domain=${amazonDomain}`;
   
-  let lastError = null;
+  const response = await fetch(rainforestUrl);
   
-  // Try each domain until we find the book
-  for (const amazonDomain of domainsToTry) {
-    try {
-      console.log(`🔍 Trying to find ISBN ${isbn} on ${amazonDomain}...`);
-      
-      const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${isbn}&amazon_domain=${amazonDomain}`;
-      
-      const response = await fetch(rainforestUrl);
-      
-      if (!response.ok) {
-        console.log(`❌ HTTP error for ${amazonDomain}: ${response.status}`);
-        continue;
-      }
+  if (!response.ok) {
+    throw new Error("Book not found");
+  }
 
-      const data = await response.json();
-      
-      // Check if the API call was successful
-      if (data.request_info && !data.request_info.success) {
-        console.log(`❌ API reported failure for ${amazonDomain}: ${data.request_info.message}`);
-        lastError = new Error(data.request_info.message || "Book not found");
-        continue;
-      }
-      
-      if (!data.product) {
-        console.log(`❌ No product data for ${amazonDomain}`);
-        continue;
-      }
-
-      console.log(`✅ Found book on ${amazonDomain}: ${data.product.title}`);
-      
-      // Found the book! Continue with existing processing logic...
-      const product = data.product;
+  const data = await response.json();
   
-      // Extract all available cover images using comprehensive approach
-      const collectImageUrls = (root: any) => {
-        const urls = new Set<string>();
+  if (!data.product) {
+    throw new Error("Book not found");
+  }
 
-        // Helper: add if looks like an image
-        const addIfImage = (u: any) => {
-          if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
-            urls.add(u);
-          }
-        };
+  const product = data.product;
+  
+  // Extract all available cover images using comprehensive approach
+  const collectImageUrls = (root: any) => {
+    const urls = new Set<string>();
 
-        // 1) Product-level
-        addIfImage(root?.product?.main_image?.link);
-        (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+    // Helper: add if looks like an image
+    const addIfImage = (u: any) => {
+      if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
+        urls.add(u);
+      }
+    };
 
-        // images_flat may be a single URL or comma-separated
-        const flat = root?.product?.images_flat;
-        if (typeof flat === 'string') {
-          flat.split(',').map(s => s.trim()).forEach(addIfImage);
-        }
+    // 1) Product-level
+    addIfImage(root?.product?.main_image?.link);
+    (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
 
-        // 2) Reviews (potential alternative covers in review images)
-        (root?.product?.top_reviews ?? []).forEach((r: any) => {
-          // attached review images
-          (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
-          // video thumbnails (images)
-          (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
-        });
+    // images_flat may be a single URL or comma-separated
+    const flat = root?.product?.images_flat;
+    if (typeof flat === 'string') {
+      flat.split(',').map(s => s.trim()).forEach(addIfImage);
+    }
 
-        return Array.from(urls);
-      };
+    // 2) Reviews (potential alternative covers in review images)
+    (root?.product?.top_reviews ?? []).forEach((r: any) => {
+      // attached review images
+      (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+      // video thumbnails (images)
+      (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
+    });
 
-      let coverImages = collectImageUrls(data);
+    return Array.from(urls);
+  };
+
+  let coverImages = collectImageUrls(data);
   
   // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
   if (product.variants && Array.isArray(product.variants)) {
