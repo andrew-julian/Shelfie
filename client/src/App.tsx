@@ -8,6 +8,7 @@ import Home from "@/pages/home";
 import ScanPage from "@/pages/scan";
 import Landing from "@/pages/Landing";
 import Settings from "@/pages/Settings";
+import Subscription from "@/pages/subscription";
 import RefreshProgress from "@/pages/refresh-progress";
 import NotFound from "@/pages/not-found";
 
@@ -23,6 +24,7 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/scan" component={ScanPage} />
           <Route path="/settings" component={Settings} />
+          <Route path="/subscription" component={Subscription} />
           <Route path="/refresh-progress" component={RefreshProgress} />
         </>
       )}

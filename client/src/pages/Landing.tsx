@@ -276,7 +276,9 @@ export default function Landing() {
                         <span className="text-sm md:text-base">All organizational features</span>
                       </li>
                     </ul>
-                    <Button className="w-full bg-orange-500 hover:bg-orange-600" data-testid="button-pro-plan">Upgrade to Pro</Button>
+                    <Button asChild className="w-full bg-orange-500 hover:bg-orange-600" data-testid="button-pro-plan">
+                      <a href="/subscription">Upgrade to Pro</a>
+                    </Button>
                   </CardContent>
                 </Card>
               </div>

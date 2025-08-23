@@ -1,8 +1,17 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import express from "express";
 import path from "path";
+import Stripe from "stripe";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
 
 // Standalone lookup function for background processing
 async function lookupBookByISBN(isbn: string, userId: string) {
@@ -801,6 +810,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const validatedData = insertBookSchema.parse(req.body);
       
+      // Get user details to check subscription status and book count
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check subscription limits
+      const currentBookCount = user.bookCount || 0;
+      const isSubscribed = user.subscriptionStatus === 'active';
+      
+      // Enforce 100-book limit for free users
+      if (currentBookCount >= 100 && !isSubscribed) {
+        return res.status(402).json({ 
+          message: "You've reached the 100-book limit for free accounts. Subscribe to Shelfie Pro to continue adding books.",
+          requiresSubscription: true,
+          bookCount: currentBookCount
+        });
+      }
+      
       // Check if book already exists for this user
       const existingBook = await storage.getBookByIsbn(validatedData.isbn, userId);
       if (existingBook) {
@@ -811,6 +839,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const book = await storage.createBook({ ...validatedData, userId });
+      
+      // Increment user's book count for subscription tracking
+      await storage.incrementUserBookCount(userId);
+      
       res.status(201).json(book);
     } catch (error) {
       console.error("Error adding book to library:", error);
@@ -1676,6 +1708,145 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       res.status(500).json({ message: "Failed to delete book" });
     }
+  });
+
+  // Subscription API routes
+  
+  // Get user details including subscription status and book count
+  app.get("/api/user/details", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      res.status(500).json({ message: "Failed to fetch user details" });
+    }
+  });
+  
+  // Create Stripe subscription for user who reached 100+ books
+  app.post("/api/create-subscription", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!user.email) {
+        return res.status(400).json({ message: "User email is required for subscription" });
+      }
+      
+      let customerId = user.stripeCustomerId;
+      
+      // Create Stripe customer if not exists
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email,
+          metadata: {
+            userId: userId
+          }
+        });
+        
+        customerId = customer.id;
+        await storage.updateUserSubscription(userId, { stripeCustomerId: customerId });
+      }
+      
+      // Create Stripe Checkout session for annual subscription
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Shelfie Pro - Annual Subscription',
+              description: 'Unlimited books, barcode scanning, and 3D visualization',
+              images: ['https://via.placeholder.com/400x300?text=Shelfie+Pro']
+            },
+            recurring: {
+              interval: 'year'
+            },
+            unit_amount: 1700, // $17.00 in cents
+          },
+          quantity: 1,
+        }],
+        mode: 'subscription',
+        success_url: `${req.headers.origin}/?subscription=success`,
+        cancel_url: `${req.headers.origin}/subscription?subscription=cancelled`,
+        metadata: {
+          userId: userId
+        }
+      });
+      
+      res.json({ sessionId: session.id });
+    } catch (error) {
+      console.error("Error creating subscription:", error);
+      res.status(500).json({ message: "Failed to create subscription" });
+    }
+  });
+  
+  // Webhook to handle Stripe events
+  app.post("/api/stripe-webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+    
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig as string, process.env.STRIPE_WEBHOOK_SECRET || '');
+    } catch (err) {
+      console.error('Webhook signature verification failed:', err);
+      return res.status(400).send(`Webhook Error: ${err}`);
+    }
+    
+    // Handle the event
+    switch (event.type) {
+      case 'checkout.session.completed':
+        const session = event.data.object as any;
+        if (session.metadata?.userId) {
+          await storage.updateUserSubscription(session.metadata.userId, {
+            stripeSubscriptionId: session.subscription,
+            subscriptionStatus: 'active'
+          });
+        }
+        break;
+        
+      case 'invoice.payment_succeeded':
+        const invoice = event.data.object as any;
+        if (invoice.subscription_details?.metadata?.userId) {
+          const expiresAt = new Date();
+          expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+          await storage.updateUserSubscription(invoice.subscription_details.metadata.userId, {
+            subscriptionStatus: 'active',
+            subscriptionExpiresAt: expiresAt
+          });
+        }
+        break;
+        
+      case 'invoice.payment_failed':
+        const failedInvoice = event.data.object as any;
+        if (failedInvoice.subscription_details?.metadata?.userId) {
+          await storage.updateUserSubscription(failedInvoice.subscription_details.metadata.userId, {
+            subscriptionStatus: 'past_due'
+          });
+        }
+        break;
+        
+      case 'customer.subscription.deleted':
+        const subscription = event.data.object as any;
+        if (subscription.metadata?.userId) {
+          await storage.updateUserSubscription(subscription.metadata.userId, {
+            subscriptionStatus: 'canceled'
+          });
+        }
+        break;
+    }
+    
+    res.json({ received: true });
   });
 
   // Scanning Queue API routes

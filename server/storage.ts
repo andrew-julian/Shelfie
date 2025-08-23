@@ -13,7 +13,7 @@ import {
   scanningQueue
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, inArray, ne } from "drizzle-orm";
+import { eq, and, desc, inArray, ne, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (IMPORTANT) these user operations are mandatory for Replit Auth.
@@ -42,6 +42,16 @@ export interface IStorage {
   updateScanningQueueItem(id: string, data: Partial<ScanningQueueItem>): Promise<ScanningQueueItem | undefined>;
   removeScanningQueueItem(id: string): Promise<boolean>;
   clearCompletedScanningQueue(userId: string): Promise<void>;
+  
+  // Subscription operations
+  updateUserSubscription(userId: string, data: { 
+    stripeCustomerId?: string; 
+    stripeSubscriptionId?: string; 
+    subscriptionStatus?: string;
+    subscriptionExpiresAt?: Date;
+  }): Promise<User | undefined>;
+  incrementUserBookCount(userId: string): Promise<User | undefined>;
+  getUserBookCount(userId: string): Promise<number>;
 }
 
 // Database Storage Implementation
@@ -206,6 +216,41 @@ export class DatabaseStorage implements IStorage {
         eq(scanningQueue.userId, userId),
         inArray(scanningQueue.status, ['success', 'error'])
       ));
+  }
+  
+  // Subscription operations
+  async updateUserSubscription(userId: string, data: { 
+    stripeCustomerId?: string; 
+    stripeSubscriptionId?: string; 
+    subscriptionStatus?: string;
+    subscriptionExpiresAt?: Date;
+  }): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
+  
+  async incrementUserBookCount(userId: string): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ 
+        bookCount: sql`${users.bookCount} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
+  
+  async getUserBookCount(userId: string): Promise<number> {
+    const [user] = await db
+      .select({ bookCount: users.bookCount })
+      .from(users)
+      .where(eq(users.id, userId));
+    return user?.bookCount || 0;
   }
 }
 
