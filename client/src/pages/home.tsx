@@ -395,13 +395,26 @@ export default function Home() {
       return [];
     }
     
-    // For small screens (mobile), use a more conservative fallback to prevent overflow
+    // Improved initial width calculation to eliminate white space flash
     const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
-    const conservativeFallback = Math.min(screenWidth - 40, 800); // Account for mobile padding
     
-    const effectiveWidth = isContainerMeasured && containerDimensions.width > 0 
-      ? containerDimensions.width 
-      : conservativeFallback;
+    // Use a smart initial width that better matches the final measured width
+    let effectiveWidth;
+    if (isContainerMeasured && containerDimensions.width > 0) {
+      effectiveWidth = containerDimensions.width;
+    } else {
+      // Calculate a more accurate initial width based on viewport and typical container sizing
+      if (screenWidth < 480) {
+        effectiveWidth = screenWidth - 32; // Account for mobile padding (16px each side)
+      } else if (screenWidth < 768) {
+        effectiveWidth = screenWidth - 48; // Tablet padding
+      } else if (screenWidth < 1024) {
+        effectiveWidth = screenWidth - 64; // Small desktop
+      } else {
+        // For larger screens, estimate the centered container width more accurately
+        effectiveWidth = Math.min(screenWidth - 200, 1200); // Max container width with margins
+      }
+    }
     
     console.log('Layout calculation:', { 
       booksCount: finalBooks.length, 
@@ -453,12 +466,26 @@ export default function Home() {
           parentWidth: parentRect?.width,
           windowWidth: window.innerWidth
         });
-        setContainerDimensions({ width: newWidth, height: newHeight });
+        
+        // Only update if the width is significantly different to prevent layout thrashing
+        if (Math.abs(newWidth - containerDimensions.width) > 10) {
+          setContainerDimensions({ width: newWidth, height: newHeight });
+        }
         setIsContainerMeasured(true);
       } else {
-        console.log('Container ref not available, using fallback dimensions');
-        // If container ref isn't available, use window-based fallback
-        const fallbackWidth = window.innerWidth - 100;
+        console.log('Container ref not available, using smart fallback dimensions');
+        // Use the same smart calculation as in the layout effect
+        const screenWidth = window.innerWidth;
+        let fallbackWidth;
+        if (screenWidth < 480) {
+          fallbackWidth = screenWidth - 32;
+        } else if (screenWidth < 768) {
+          fallbackWidth = screenWidth - 48;
+        } else if (screenWidth < 1024) {
+          fallbackWidth = screenWidth - 64;
+        } else {
+          fallbackWidth = Math.min(screenWidth - 200, 1200);
+        }
         setContainerDimensions({ width: fallbackWidth, height: 600 });
         setIsContainerMeasured(true);
       }
