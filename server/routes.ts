@@ -1882,14 +1882,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('🔔 Webhook received! Headers:', {
       signature: req.headers['stripe-signature'],
       contentType: req.headers['content-type'],
-      bodyLength: req.body?.length || 0
+      bodyLength: req.body?.length || 0,
+      environment: process.env.NODE_ENV
     });
     
     const sig = req.headers['stripe-signature'];
     let event;
     
+    // Use environment-specific webhook secret
+    const webhookSecret = process.env.NODE_ENV === 'production' 
+      ? process.env.STRIPE_WEBHOOK_SECRET_PROD 
+      : process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      console.error('❌ Webhook secret not configured for environment:', process.env.NODE_ENV);
+      return res.status(500).send('Webhook Error: Secret not configured');
+    }
+    
     try {
-      event = stripe.webhooks.constructEvent(req.body, sig as string, process.env.STRIPE_WEBHOOK_SECRET || '');
+      event = stripe.webhooks.constructEvent(req.body, sig as string, webhookSecret);
       console.log('✅ Webhook signature verified. Event type:', event.type);
       console.log('📋 Event data:', JSON.stringify(event.data.object, null, 2));
     } catch (err) {
