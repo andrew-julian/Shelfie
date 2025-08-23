@@ -78,6 +78,7 @@ async function lookupBookByISBN(isbn: string, userId: string) {
       console.log(`✅ Found book on ${amazonDomain}: ${data.product.title}`);
       
       // Found the book! Continue with existing processing logic...
+      const product = data.product;
 
   const product = data.product;
   
