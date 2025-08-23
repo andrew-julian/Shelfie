@@ -1,0 +1,75 @@
+Shelfie: Your Personal Library, Reimagined
+Introduction
+
+Shelfie is more than an app – it’s a beautifully designed, intuitive experience for book lovers who want their library to feel alive. With seamless barcode scanning, smart organisation, and stunning 3D visualisation, Shelfie makes building and exploring your collection effortless and joyful.
+
+Core Value Proposition
+
+Instantly add books by scanning barcodes – your collection grows in seconds.
+
+Experience realism with a shelf view that respects true book dimensions.
+
+Stay in control with privacy-first design and portable data exports.
+
+Get local accuracy with regional Amazon support for prices and covers.
+
+Why People Love Shelfie
+Beautiful 3D Shelf
+
+Books appear as they are – tall hardbacks, slim paperbacks, and everything in between. Your library looks like your actual shelf.
+
+Lightning-Fast Capture
+
+Scan offline, sync later. Whether you’re in a store, a friend’s house, or your own living room, Shelfie never misses a book.
+
+Rich Metadata
+
+Every scan fetches title, author, edition, dimensions, and regional covers – so your collection is precise and personal.
+
+Smart Organisation
+
+Tag and categorise with ease: create lists like To Read, Favourites, or Gift Ideas. Track status and reading progress effortlessly.
+
+Portable & Private
+
+Export your collection anytime in CSV/JSON. Your data, your rules – Shelfie is privacy by design.
+
+How It Works
+
+Scan – Point your camera at a barcode.
+
+Auto-enrich – Shelfie recognises the book and adds complete metadata.
+
+Enjoy – Browse, filter, and share your library in stunning 3D.
+
+Key Features
+
+📷 Instant capture – Fetch metadata & cover art.
+
+🔎 Your library, anywhere – Access across all devices.
+
+📚 Looks like your shelf – Proportional 3D book visualisation.
+
+🔐 Privacy by design – You control the data.
+
+⚡ Lightning-fast scanning – Works offline with queue.
+
+📝 Lists & tags – Build personalised reading lists.
+
+🌍 Regional support – Correct covers and pricing.
+
+🔄 Data portability – Export whenever you want.
+
+Pricing
+
+Shelfie keeps it simple:
+
+Free – Up to 100 books, barcode scanning, 3D visualisation.
+
+Pro ($17/year) – Unlimited books, all features, for serious collectors.
+
+The Invitation
+
+Build a library you’ll actually use. One that looks beautiful, feels intuitive, and makes every book easy to find. No clutter, no ads, just you and your books.
+
+➡️ Start scanning now and watch your library come alive.

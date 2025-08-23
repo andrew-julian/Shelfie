@@ -229,7 +229,7 @@ export default function DemoShelfRealistic({ books, reducedMotion = false }: Dem
     <div className="relative bg-white rounded-2xl p-6 shadow-lg border border-gray-200 overflow-hidden">
       {/* Navigation buttons */}
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Your library preview</h3>
+        <h3 className="text-lg font-semibold text-gray-800">Your library reimagined</h3>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -294,7 +294,7 @@ export default function DemoShelfRealistic({ books, reducedMotion = false }: Dem
 
       {/* Enhanced hint text */}
       <p className="text-sm text-gray-600 text-center mt-4 italic">
-        Scroll to explore the realistic 3D layout engine — exactly as used in the full app
+        Books appear as they are — scroll to explore the realistic 3D shelf
       </p>
     </div>
   );
