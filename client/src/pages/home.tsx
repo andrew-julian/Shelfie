@@ -177,7 +177,7 @@ export default function Home() {
         ...baseConfig,
         targetRowHeight: 180, // Increased from 160
         gutterX: 8,
-        gutterY: 12,
+        gutterY: 18, // Increased from 12 for better mobile spacing
         BASE_HEIGHT: 195 // Adjusted for better proportional scaling
       };
     } else if (width < 900) {
@@ -185,7 +185,7 @@ export default function Home() {
         ...baseConfig,
         targetRowHeight: 220, // Increased from 184
         gutterX: 12, // Increased spacing
-        gutterY: 14,
+        gutterY: 20, // Increased from 14 for better tablet spacing
         BASE_HEIGHT: 195
       };
     } else {
@@ -193,7 +193,7 @@ export default function Home() {
         ...baseConfig,
         targetRowHeight: 280, // Dramatically increased from 200 to allow coffee table books
         gutterX: 12, // Reduced spacing to fit more books per row
-        gutterY: 16, // Reduced vertical spacing
+        gutterY: 24, // Increased from 16 for better desktop spacing
         BASE_HEIGHT: 195 // Optimized for better aspect ratio scaling
       };
     }
