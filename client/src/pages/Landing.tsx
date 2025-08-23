@@ -39,7 +39,7 @@ export default function Landing() {
               <a href="#privacy" className="text-gray-600 hover:text-gray-900 transition-colors">Privacy</a>
             </nav>
             <Button asChild>
-              <a href="/api/login" data-testid="button-get-app">Get the app</a>
+              <a href="/api/login" data-testid="button-get-app">Scan your books</a>
             </Button>
           </div>
         </div>
@@ -65,7 +65,7 @@ export default function Landing() {
                     onClick={() => handleAnalyticsEvent('click_cta_primary')}
                   >
                     <a href="/api/login" data-testid="button-primary-cta">
-                      Get the app
+                      Scan your books
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </a>
                   </Button>
