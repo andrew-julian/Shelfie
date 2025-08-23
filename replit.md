@@ -1,11 +1,12 @@
-# BookScan Application
+# Shelfie Application
 
 ## Overview
-BookScan is a full-stack digital library management application designed to help users organize their personal book collections. It features barcode scanning for easy book addition, comprehensive metadata management, and a responsive user interface. The project aims to provide a robust and intuitive solution for personal library organization with strong ambitions for market potential.
+Shelfie is a full-stack digital library management application designed to help users organize their personal book collections. It features barcode scanning for easy book addition, comprehensive metadata management, and a responsive user interface. The project aims to provide a robust and intuitive solution for personal library organization with strong ambitions for market potential.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 Development approach: Avoid hardcoded fixes for specific titles or content - build scalable general solutions that handle edge cases through improved logic.
+Branding: Rebranded from "BookScan" to "Shelfie" (August 2025).
 
 ## System Architecture
 

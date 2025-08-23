@@ -17,7 +17,7 @@ import {
   type Book as LayoutBook, 
   type LayoutItem, 
   type LayoutConfig as EngineConfig 
-} from '@/layout/BookScanLayoutEngine';
+} from '@/layout/ShelfieLayoutEngine';
 import VirtualizedBookGrid from '@/components/virtualized-book-grid';
 import { usePerformanceTelemetry } from '@/hooks/usePerformanceTelemetry';
 import { useLocation, Link } from "wouter";
@@ -428,7 +428,7 @@ export default function Home() {
     return measureLayout(
       () => calculateLayout(layoutBooks, normalizedDimensions, effectiveWidth, responsiveConfig),
       finalBooks.length,
-      'BookScan Layout Engine'
+      'Shelfie Layout Engine'
     );
   }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig.targetRowHeight, responsiveConfig.gutterX, responsiveConfig.gutterY, responsiveConfig.raggedLastRow, measureLayout, isContainerMeasured]);
 

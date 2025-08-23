@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // License keys for different environments
 const LICENSE_KEYS = {
-  // Production license for bookscan.vanaheim.com.au
+  // Production license for shelfie.vanaheim.com.au
   production: 
     "Mpyhq9Yxr3GGf71QkTvpTbBG6PIXby" +
     "GOpm3xLZKbBoXQb0nzg7kFsrOj1p6j" +
@@ -53,8 +53,8 @@ const getLicenseKey = (): string => {
   const hostname = window.location.hostname;
   
   // Check if we're in production environment
-  if (hostname.includes('bookscan.vanaheim.com.au')) {
-    console.log('Using production license key for bookscan.vanaheim.com.au');
+  if (hostname.includes('shelfie.vanaheim.com.au')) {
+    console.log('Using production license key for shelfie.vanaheim.com.au');
     return LICENSE_KEYS.production;
   }
   
