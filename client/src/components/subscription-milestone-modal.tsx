@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
 import { Crown, Star, Sparkles, Trophy, ArrowRight, BookOpen } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -76,10 +77,14 @@ export function SubscriptionMilestoneModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md w-[90vw] sm:max-w-lg p-0 overflow-hidden bg-gradient-to-br from-orange-50 via-white to-blue-50">
+      <DialogContent className="max-w-sm w-[95vw] sm:max-w-md sm:w-[90vw] lg:max-w-lg p-0 overflow-hidden bg-gradient-to-br from-orange-50 via-white to-blue-50">
+        <VisuallyHidden>
+          <DialogTitle>Subscription Milestone - 100+ Club</DialogTitle>
+          <DialogDescription>Upgrade to unlimited subscription to continue adding books beyond 100</DialogDescription>
+        </VisuallyHidden>
         <div className="relative">
           {/* Celebration Header */}
-          <div className="bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400 p-6 text-white text-center relative overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400 p-4 sm:p-6 text-white text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-black/10"></div>
             
             {/* Floating celebration elements - confetti style */}
@@ -103,40 +108,39 @@ export function SubscriptionMilestoneModal({
                 100+ CLUB
               </div>
               
-              <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 leading-tight">
                 Welcome to<br />the 100+ Club ✨
               </h1>
-              <p className="text-base opacity-95 leading-relaxed">
-                Congratulations — you've joined the top 5%<br />of collectors with over {bookCount} books!
+              <p className="text-sm sm:text-base opacity-95 leading-relaxed px-2 sm:px-0">
+                Congratulations — you've joined the top 5% of collectors with over {bookCount} books!
               </p>
             </div>
           </div>
 
           {/* Main Content */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {/* Transition Statement */}
-            <div className="text-center mb-6">
-              <p className="text-gray-800 text-base font-medium leading-relaxed">
-                To keep growing your library beyond 100 books,<br />
-                it's time to upgrade to unlimited.
+            <div className="text-center mb-5 sm:mb-6">
+              <p className="text-gray-800 text-sm sm:text-base font-medium leading-relaxed px-1 sm:px-0">
+                To keep growing your library beyond 100 books, it's time to upgrade to unlimited.
               </p>
             </div>
 
             {/* Offer Section */}
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="text-center mb-5 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 leading-tight">
                 Unlock Unlimited — just $17/year
               </h2>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-xs sm:text-sm px-2 sm:px-0">
                 Less than one coffee per month for unlimited books, forever.
               </p>
             </div>
 
             {/* Value Bullets */}
-            <div className="space-y-3 mb-6">
+            <div className="space-y-2.5 sm:space-y-3 mb-5 sm:mb-6">
               <div className="flex items-center gap-3 text-gray-700">
                 <BookOpen className="w-5 h-5 text-orange-500 flex-shrink-0" />
-                <span className="text-sm font-medium">Add unlimited books to your library</span>
+                <span className="text-xs sm:text-sm font-medium">Add unlimited books to your library</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700">
                 <div className="w-5 h-5 flex items-center justify-center">
@@ -144,7 +148,7 @@ export function SubscriptionMilestoneModal({
                     <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
                   </svg>
                 </div>
-                <span className="text-sm font-medium">Rapid barcode scanning</span>
+                <span className="text-xs sm:text-sm font-medium">Rapid barcode scanning</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700">
                 <div className="w-5 h-5 flex items-center justify-center">
@@ -152,7 +156,7 @@ export function SubscriptionMilestoneModal({
                     <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
                   </svg>
                 </div>
-                <span className="text-sm font-medium">Beautiful 3D visualisation</span>
+                <span className="text-xs sm:text-sm font-medium">Beautiful 3D visualisation</span>
               </div>
             </div>
 
@@ -161,7 +165,7 @@ export function SubscriptionMilestoneModal({
               <Button 
                 onClick={handleSubscribe}
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] text-base"
+                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 sm:py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] text-sm sm:text-base"
                 data-testid="button-subscribe-milestone"
               >
                 {isLoading ? (
@@ -178,7 +182,7 @@ export function SubscriptionMilestoneModal({
                 <Button 
                   variant="ghost"
                   onClick={onClose}
-                  className="text-gray-500 hover:text-gray-700 text-sm py-1 px-0 h-auto font-normal"
+                  className="text-gray-500 hover:text-gray-700 text-xs sm:text-sm py-1 px-0 h-auto font-normal"
                   data-testid="button-maybe-later"
                 >
                   Not now — I'll stop at {bookCount} books.
