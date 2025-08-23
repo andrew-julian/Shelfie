@@ -3,7 +3,7 @@ import { Camera, Sparkles, Search, Download, Check, ArrowRight } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ShelfieIcon from "@/components/shelfie-icon";
-import DemoShelf from "@/components/demo-shelf";
+import DemoShelfRealistic from "@/components/demo-shelf-realistic";
 import { demoBooksData } from "@/lib/books-demo";
 
 export default function Landing() {
@@ -74,7 +74,7 @@ export default function Landing() {
               </div>
               
               <div className="relative">
-                <DemoShelf books={demoBooksData.slice(0, 6)} reducedMotion={reducedMotion} />
+                <DemoShelfRealistic books={demoBooksData.slice(0, 10)} reducedMotion={reducedMotion} />
               </div>
             </div>
           </div>
