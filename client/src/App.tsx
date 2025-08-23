@@ -10,6 +10,7 @@ import Home from "@/pages/home";
 import ScanPage from "@/pages/scan";
 import Landing from "@/pages/Landing";
 import Settings from "@/pages/Settings";
+import Billing from "@/pages/billing";
 import Subscription from "@/pages/subscription";
 import SubscriptionSuccess from "@/pages/subscription-success";
 import RefreshProgress from "@/pages/refresh-progress";
@@ -33,6 +34,7 @@ function Router() {
             <Route path="/" component={Home} />
             <Route path="/scan" component={ScanPage} />
             <Route path="/settings" component={Settings} />
+            <Route path="/billing" component={Billing} />
             <Route path="/subscription" component={Subscription} />
             <Route path="/subscription-success" component={SubscriptionSuccess} />
             <Route path="/refresh-progress" component={RefreshProgress} />

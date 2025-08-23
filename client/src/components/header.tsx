@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut, Menu, Users, ChevronDown, Camera } from "lucide-react";
+import { BookOpen, Search, Filter, RefreshCw, SortAsc, X, User, Settings, LogOut, Menu, Users, ChevronDown, Camera, CreditCard } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
@@ -436,6 +436,16 @@ function UserMenu() {
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Settings
+                </button>
+              </Link>
+              <Link href="/billing">
+                <button 
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  onClick={() => setShowDropdown(false)}
+                  data-testid="button-billing-menu"
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Billing
                 </button>
               </Link>
               <button 
