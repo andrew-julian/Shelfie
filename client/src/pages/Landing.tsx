@@ -9,7 +9,7 @@ export default function Landing() {
         <header className="text-center mb-16">
           <div className="flex items-center justify-center mb-4">
             <BookOpen className="h-12 w-12 text-blue-600 mr-2" />
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">BookScan</h1>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Shelfie</h1>
           </div>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Build and organize your personal book collection with barcode scanning and regional Amazon marketplace support

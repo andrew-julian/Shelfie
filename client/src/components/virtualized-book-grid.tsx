@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import BookCard from '@/components/book-card';
 import { Book } from '@shared/schema';
-import { LayoutItem } from '@/layout/BookScanLayoutEngine';
+import { LayoutItem } from '@/layout/ShelfieLayoutEngine';
 
 interface VirtualizedBookGridProps {
   layoutItems: LayoutItem[];
