@@ -117,26 +117,14 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
 
   if (!book) return null;
 
-  // Modal state logging (can be removed in production)
-  if (isOpen) console.log('Modal opened for:', book?.title);
+
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="w-full max-w-4xl max-h-[95vh] overflow-auto p-4 sm:p-6 relative [&>button]:hidden">
-          {/* Background Cover Image */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-5 z-0"
-            style={{
-              backgroundImage: `url(${currentCoverImage || "/api/placeholder/300/400"})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(1px) saturate(1.2)',
-            }}
-          />
-          
-          {/* Content Overlay */}
-          <div className="relative z-10 flex flex-col h-full bg-white/95 backdrop-blur-sm rounded-lg">
+          {/* Content */}
+          <div className="flex flex-col h-full">
             <DialogHeader className="flex-shrink-0 px-4 pt-4 pb-4 sm:px-6 sm:pt-6 sm:pb-6 border-b relative">
               <DialogTitle className="sr-only">{book.title}</DialogTitle>
               <DialogDescription className="sr-only">Book details and information</DialogDescription>
