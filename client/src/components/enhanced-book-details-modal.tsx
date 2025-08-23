@@ -306,64 +306,61 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="w-full max-w-4xl max-h-[95vh] overflow-hidden p-0 sm:p-6">
           <div className="flex flex-col h-full max-h-[95vh]">
-            <DialogHeader className="flex-shrink-0 px-4 pt-4 pb-2 sm:px-6 sm:pt-6 sm:pb-4 border-b relative">
-              {/* Close Button - Positioned absolutely in top-right corner */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="absolute top-2 right-2 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 p-2 h-auto z-10"
-                data-testid="button-close-modal"
-              >
-                <X className="w-5 h-5 sm:w-6 sm:h-6" />
-              </Button>
-
+            <DialogHeader className="flex-shrink-0 px-4 pt-6 pb-3 sm:px-6 sm:pt-8 sm:pb-4 border-b relative">
               {/* Header Content */}
-              <div className="pr-10 sm:pr-16"> {/* Add right padding to avoid close button */}
-                <DialogTitle className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-1 sm:gap-2 mb-3">
+              <div className="pr-12 sm:pr-16"> {/* Add right padding to avoid close button */}
+                <DialogTitle className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-1 sm:gap-2 mb-4">
                   <BookOpen className="w-4 h-4 sm:w-6 sm:h-6 text-coral-red" />
                   <span className="hidden sm:inline">Book Details</span>
                   <span className="sm:hidden">Details</span>
                 </DialogTitle>
                 
                 {/* Action Buttons Row */}
-                <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => refreshBookDataMutation.mutate()}
                     disabled={refreshBookDataMutation.isPending}
-                    className="text-green-600 hover:text-green-800 hover:bg-green-50 px-3 py-2 h-9 text-sm"
+                    className="text-green-600 hover:text-green-800 hover:bg-green-50 border-green-200 hover:border-green-300 px-3 py-2 h-10 text-sm"
                     data-testid="button-refresh-book"
                   >
-                    <CheckCircle className={`w-4 h-4 ${refreshBookDataMutation.isPending ? 'animate-spin' : ''} mr-1`} />
-                    <span className="hidden sm:inline">Refresh</span>
-                    <span className="sm:hidden">↻</span>
+                    <CheckCircle className={`w-4 h-4 ${refreshBookDataMutation.isPending ? 'animate-spin' : ''} mr-2`} />
+                    <span>Refresh</span>
                   </Button>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => setShowCoverEditor(true)}
-                    className="text-gray-500 hover:text-coral-red hover:bg-gray-50 px-3 py-2 h-9 text-sm"
+                    className="text-gray-600 hover:text-coral-red hover:bg-gray-50 border-gray-200 hover:border-coral-red px-3 py-2 h-10 text-sm"
                     data-testid="button-edit-cover"
                   >
-                    <Crop className="w-4 h-4 mr-1" />
-                    <span className="hidden sm:inline">Edit Cover</span>
-                    <span className="sm:hidden">✂️</span>
+                    <Crop className="w-4 h-4 mr-2" />
+                    <span>Edit Cover</span>
                   </Button>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => deleteBookMutation.mutate()}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-2 h-9 text-sm border border-red-200 hover:border-red-300"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300 px-3 py-2 h-10 text-sm"
                     data-testid="button-delete-book"
                   >
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    <span className="hidden sm:inline">Delete</span>
-                    <span className="sm:hidden">🗑️</span>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    <span>Delete</span>
                   </Button>
                 </div>
               </div>
+
+              {/* Close Button - Positioned lower to ensure visibility */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="absolute top-6 right-2 sm:top-8 sm:right-4 text-gray-400 hover:text-gray-600 p-2 h-auto z-10"
+                data-testid="button-close-modal"
+              >
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
+              </Button>
             </DialogHeader>
 
             <div className="flex-1 overflow-y-auto px-4 sm:px-6">
