@@ -1877,8 +1877,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Webhook to handle Stripe events
-  app.post("/api/stripe-webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+  // Webhook to handle Stripe events (raw middleware applied in index.ts)
+  app.post("/api/stripe-webhook", async (req, res) => {
     console.log('🔔 Webhook received! Headers:', {
       signature: req.headers['stripe-signature'],
       contentType: req.headers['content-type'],

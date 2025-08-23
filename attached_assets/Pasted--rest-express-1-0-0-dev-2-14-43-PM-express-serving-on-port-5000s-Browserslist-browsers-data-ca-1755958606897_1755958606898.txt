@@ -1,0 +1,449 @@
+
+> rest-express@1.0.0 dev
+2:14:43 PM [express] serving on port 5000s
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2:14:49 PM [express] GET /api/auth/user 401 in 2ms :: {"message":"Unauthorized"}
+2:14:49 PM [express] GET /api/user/details 401 in 0ms :: {"message":"Unauthorized"}
+Getting user details for: 21869523
+Getting user details for: 21869523
+2:14:50 PM [express] GET /api/auth/user 304 in 224ms :: {"id":"21869523","email":"andrew@dcr.vc","fi…
+2:14:51 PM [express] GET /api/user/details 304 in 519ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+2:14:56 PM [express] GET /api/books 304 in 389ms :: [{"id":"951e7e47-5044-4f9d-9330-e0f32a4e9e50","i…
+Getting user details for: 21869523
+2:14:56 PM [express] GET /api/user/details 304 in 214ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+Getting user details for: 21869523
+Getting user details for: 21869523
+2:15:05 PM [express] GET /api/auth/user 304 in 97ms :: {"id":"21869523","email":"andrew@dcr.vc","fir…
+2:15:06 PM [express] GET /api/user/details 304 in 549ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+2:15:06 PM [express] GET /api/books 304 in 495ms :: [{"id":"951e7e47-5044-4f9d-9330-e0f32a4e9e50","i…
+Getting user details for: 21869523
+2:15:08 PM [express] POST /api/create-subscription 200 in 530ms :: {"sessionId":"cs_test_a17YfxzgeZQ…
+Getting user details for: 21869523
+2:15:11 PM [express] GET /api/user/details 304 in 373ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+Getting user details for: 21869523
+2:15:17 PM [express] GET /api/user/details 304 in 389ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+Getting user details for: 21869523
+Getting user details for: 21869523
+2:15:22 PM [express] GET /api/auth/user 304 in 96ms :: {"id":"21869523","email":"andrew@dcr.vc","fir…
+2:15:22 PM [express] GET /api/user/details 304 in 493ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+Getting user details for: 21869523
+2:15:22 PM [express] GET /api/user/details 304 in 212ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+Getting user details for: 21869523
+2:15:25 PM [express] POST /api/create-subscription 200 in 421ms :: {"sessionId":"cs_test_a1NF9gweBtg…
+Getting user details for: 21869523
+2:15:28 PM [express] GET /api/user/details 304 in 394ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+🔔 Webhook received! Headers: {
+  signature: 't=1755958532,v1=35ea852dde59209528a502d221e5c533f6d0665c6baf59ea30b3330261fc7056,v0=76ec225272e40edc8975d63062f4701de420988b31f237e1897040320de1ad10',
+  contentType: 'application/json; charset=utf-8',
+  bodyLength: 0
+}
+❌ Webhook signature verification failed: StripeSignatureVerificationError: Webhook payload must be provided as a string or a Buffer (https://nodejs.org/api/buffer.html) instance representing the _raw_ request body.Payload was provided as a parsed JavaScript object instead. 
+Signature verification is impossible without access to the original signed material. 
+
+Learn more about webhook signing and explore webhook integration examples for various frameworks at https://docs.stripe.com/webhooks/signature
+
+    at validateComputedSignature (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:135:23)
+    at Object.verifyHeader (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:67:13)
+    at Object.constructEvent (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:12:32)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:1892:31)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at rawParser (/home/runner/workspace/node_modules/body-parser/lib/types/raw.js:58:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/runner/workspace/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at strategy.pass (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:355:9)
+    at SessionStrategy.authenticate (/home/runner/workspace/node_modules/passport/lib/strategies/session.js:126:10)
+    at attempt (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:378:16)
+    at authenticate (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:379:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at initialize (/home/runner/workspace/node_modules/passport/lib/middleware/initialize.js:98:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at session (/home/runner/workspace/node_modules/express-session/index.js:487:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at <anonymous> (/home/runner/workspace/server/index.ts:36:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at urlencodedParser (/home/runner/workspace/node_modules/body-parser/lib/types/urlencoded.js:85:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/workspace/node_modules/body-parser/lib/read.js:137:5
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at invokeCallback (/home/runner/workspace/node_modules/raw-body/index.js:238:16) {
+  type: 'StripeSignatureVerificationError',
+  raw: {
+    message: 'Webhook payload must be provided as a string or a Buffer (https://nodejs.org/api/buffer.html) instance representing the _raw_ request body.Payload was provided as a parsed JavaScript object instead. \n' +
+      'Signature verification is impossible without access to the original signed material. \n' +
+      '\n' +
+      'Learn more about webhook signing and explore webhook integration examples for various frameworks at https://docs.stripe.com/webhooks/signature\n'
+  },
+  rawType: undefined,
+  code: undefined,
+  doc_url: undefined,
+  param: undefined,
+  detail: undefined,
+  headers: undefined,
+  requestId: undefined,
+  statusCode: undefined,
+  userMessage: undefined,
+  charge: undefined,
+  decline_code: undefined,
+  payment_intent: undefined,
+  payment_method: undefined,
+  payment_method_type: undefined,
+  setup_intent: undefined,
+  source: undefined,
+  header: 't=1755958532,v1=35ea852dde59209528a502d221e5c533f6d0665c6baf59ea30b3330261fc7056,v0=76ec225272e40edc8975d63062f4701de420988b31f237e1897040320de1ad10',
+  payload: {
+    id: 'evt_1RzIECKC0GXEXvjWH5JHnW6V',
+    object: 'event',
+    api_version: '2025-07-30.basil',
+    created: 1755958532,
+    data: { object: [Object] },
+    livemode: false,
+    pending_webhooks: 1,
+    request: { id: null, idempotency_key: null },
+    type: 'checkout.session.completed'
+  }
+}
+2:15:32 PM [express] POST /api/stripe-webhook 400 in 35ms
+🔔 Webhook received! Headers: {
+  signature: 't=1755958532,v1=60ded9ddb4ed5eda98104e1b1cb700883674f91944bb9a7406ffd02cd1a148ad,v0=b2ca32c49940edafe21e655eb24242d30b585e64e5df91febe195a12a9424478',
+  contentType: 'application/json; charset=utf-8',
+  bodyLength: 0
+}
+❌ Webhook signature verification failed: StripeSignatureVerificationError: Webhook payload must be provided as a string or a Buffer (https://nodejs.org/api/buffer.html) instance representing the _raw_ request body.Payload was provided as a parsed JavaScript object instead. 
+Signature verification is impossible without access to the original signed material. 
+
+Learn more about webhook signing and explore webhook integration examples for various frameworks at https://docs.stripe.com/webhooks/signature
+
+    at validateComputedSignature (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:135:23)
+    at Object.verifyHeader (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:67:13)
+    at Object.constructEvent (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:12:32)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:1892:31)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at rawParser (/home/runner/workspace/node_modules/body-parser/lib/types/raw.js:58:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/runner/workspace/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at strategy.pass (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:355:9)
+    at SessionStrategy.authenticate (/home/runner/workspace/node_modules/passport/lib/strategies/session.js:126:10)
+    at attempt (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:378:16)
+    at authenticate (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:379:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at initialize (/home/runner/workspace/node_modules/passport/lib/middleware/initialize.js:98:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at session (/home/runner/workspace/node_modules/express-session/index.js:487:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at <anonymous> (/home/runner/workspace/server/index.ts:36:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at urlencodedParser (/home/runner/workspace/node_modules/body-parser/lib/types/urlencoded.js:85:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/workspace/node_modules/body-parser/lib/read.js:137:5
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at invokeCallback (/home/runner/workspace/node_modules/raw-body/index.js:238:16) {
+  type: 'StripeSignatureVerificationError',
+  raw: {
+    message: 'Webhook payload must be provided as a string or a Buffer (https://nodejs.org/api/buffer.html) instance representing the _raw_ request body.Payload was provided as a parsed JavaScript object instead. \n' +
+      'Signature verification is impossible without access to the original signed material. \n' +
+      '\n' +
+      'Learn more about webhook signing and explore webhook integration examples for various frameworks at https://docs.stripe.com/webhooks/signature\n'
+  },
+  rawType: undefined,
+  code: undefined,
+  doc_url: undefined,
+  param: undefined,
+  detail: undefined,
+  headers: undefined,
+  requestId: undefined,
+  statusCode: undefined,
+  userMessage: undefined,
+  charge: undefined,
+  decline_code: undefined,
+  payment_intent: undefined,
+  payment_method: undefined,
+  payment_method_type: undefined,
+  setup_intent: undefined,
+  source: undefined,
+  header: 't=1755958532,v1=60ded9ddb4ed5eda98104e1b1cb700883674f91944bb9a7406ffd02cd1a148ad,v0=b2ca32c49940edafe21e655eb24242d30b585e64e5df91febe195a12a9424478',
+  payload: {
+    id: 'evt_1RzIECKC0GXEXvjWVY6oOba9',
+    object: 'event',
+    api_version: '2025-07-30.basil',
+    created: 1755958532,
+    data: { object: [Object], previous_attributes: [Object] },
+    livemode: false,
+    pending_webhooks: 1,
+    request: {
+      id: null,
+      idempotency_key: '26dcf435-4954-4126-b3e9-3c8843c2c036'
+    },
+    type: 'customer.subscription.updated'
+  }
+}
+2:15:33 PM [express] POST /api/stripe-webhook 400 in 12ms
+Getting user details for: 21869523
+2:15:34 PM [express] GET /api/user/details 304 in 441ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+Getting user details for: 21869523
+2:15:39 PM [express] GET /api/user/details 304 in 382ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+Getting user details for: 21869523
+2:15:45 PM [express] GET /api/user/details 304 in 376ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+🔔 Webhook received! Headers: {
+  signature: 't=1755958547,v1=6ddb4ec2e37e0e2420473614ec029601d2423e0b9689a0b86701d0190192b295,v0=2bb3f7e273a25191b67e0f579806c1f4961f099b8668748cf33336cb20530284',
+  contentType: 'application/json; charset=utf-8',
+  bodyLength: 0
+}
+❌ Webhook signature verification failed: StripeSignatureVerificationError: Webhook payload must be provided as a string or a Buffer (https://nodejs.org/api/buffer.html) instance representing the _raw_ request body.Payload was provided as a parsed JavaScript object instead. 
+Signature verification is impossible without access to the original signed material. 
+
+Learn more about webhook signing and explore webhook integration examples for various frameworks at https://docs.stripe.com/webhooks/signature
+
+    at validateComputedSignature (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:135:23)
+    at Object.verifyHeader (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:67:13)
+    at Object.constructEvent (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:12:32)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:1892:31)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at rawParser (/home/runner/workspace/node_modules/body-parser/lib/types/raw.js:58:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/runner/workspace/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at strategy.pass (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:355:9)
+    at SessionStrategy.authenticate (/home/runner/workspace/node_modules/passport/lib/strategies/session.js:126:10)
+    at attempt (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:378:16)
+    at authenticate (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:379:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at initialize (/home/runner/workspace/node_modules/passport/lib/middleware/initialize.js:98:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at session (/home/runner/workspace/node_modules/express-session/index.js:487:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at <anonymous> (/home/runner/workspace/server/index.ts:36:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at urlencodedParser (/home/runner/workspace/node_modules/body-parser/lib/types/urlencoded.js:85:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/workspace/node_modules/body-parser/lib/read.js:137:5
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at invokeCallback (/home/runner/workspace/node_modules/raw-body/index.js:238:16) {
+  type: 'StripeSignatureVerificationError',
+  raw: {
+    message: 'Webhook payload must be provided as a string or a Buffer (https://nodejs.org/api/buffer.html) instance representing the _raw_ request body.Payload was provided as a parsed JavaScript object instead. \n' +
+      'Signature verification is impossible without access to the original signed material. \n' +
+      '\n' +
+      'Learn more about webhook signing and explore webhook integration examples for various frameworks at https://docs.stripe.com/webhooks/signature\n'
+  },
+  rawType: undefined,
+  code: undefined,
+  doc_url: undefined,
+  param: undefined,
+  detail: undefined,
+  headers: undefined,
+  requestId: undefined,
+  statusCode: undefined,
+  userMessage: undefined,
+  charge: undefined,
+  decline_code: undefined,
+  payment_intent: undefined,
+  payment_method: undefined,
+  payment_method_type: undefined,
+  setup_intent: undefined,
+  source: undefined,
+  header: 't=1755958547,v1=6ddb4ec2e37e0e2420473614ec029601d2423e0b9689a0b86701d0190192b295,v0=2bb3f7e273a25191b67e0f579806c1f4961f099b8668748cf33336cb20530284',
+  payload: {
+    id: 'evt_1RzIECKC0GXEXvjWH5JHnW6V',
+    object: 'event',
+    api_version: '2025-07-30.basil',
+    created: 1755958532,
+    data: { object: [Object] },
+    livemode: false,
+    pending_webhooks: 1,
+    request: { id: null, idempotency_key: null },
+    type: 'checkout.session.completed'
+  }
+}
+2:15:47 PM [express] POST /api/stripe-webhook 400 in 2ms
+Getting user details for: 21869523
+Getting user details for: 21869523
+2:15:48 PM [express] GET /api/auth/user 304 in 96ms :: {"id":"21869523","email":"andrew@dcr.vc","fir…
+2:15:48 PM [express] GET /api/user/details 304 in 472ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+🔔 Webhook received! Headers: {
+  signature: 't=1755958549,v1=3ef38718dd8a92a9594f3cd8081f5cc0fc55c30ae699a541f85a721726ccafec,v0=ab71dbdb997aff66140ea9276127a586f4452c85e9ca948a5cd3f8f8388da388',
+  contentType: 'application/json; charset=utf-8',
+  bodyLength: 0
+}
+❌ Webhook signature verification failed: StripeSignatureVerificationError: Webhook payload must be provided as a string or a Buffer (https://nodejs.org/api/buffer.html) instance representing the _raw_ request body.Payload was provided as a parsed JavaScript object instead. 
+Signature verification is impossible without access to the original signed material. 
+
+Learn more about webhook signing and explore webhook integration examples for various frameworks at https://docs.stripe.com/webhooks/signature
+
+    at validateComputedSignature (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:135:23)
+    at Object.verifyHeader (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:67:13)
+    at Object.constructEvent (file:///home/runner/workspace/node_modules/stripe/esm/Webhooks.js:12:32)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:1892:31)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at rawParser (/home/runner/workspace/node_modules/body-parser/lib/types/raw.js:58:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/runner/workspace/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at strategy.pass (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:355:9)
+    at SessionStrategy.authenticate (/home/runner/workspace/node_modules/passport/lib/strategies/session.js:126:10)
+    at attempt (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:378:16)
+    at authenticate (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:379:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at initialize (/home/runner/workspace/node_modules/passport/lib/middleware/initialize.js:98:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at session (/home/runner/workspace/node_modules/express-session/index.js:487:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at <anonymous> (/home/runner/workspace/server/index.ts:36:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at urlencodedParser (/home/runner/workspace/node_modules/body-parser/lib/types/urlencoded.js:85:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/workspace/node_modules/body-parser/lib/read.js:137:5
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at invokeCallback (/home/runner/workspace/node_modules/raw-body/index.js:238:16) {
+  type: 'StripeSignatureVerificationError',
+  raw: {
+    message: 'Webhook payload must be provided as a string or a Buffer (https://nodejs.org/api/buffer.html) instance representing the _raw_ request body.Payload was provided as a parsed JavaScript object instead. \n' +
+      'Signature verification is impossible without access to the original signed material. \n' +
+      '\n' +
+      'Learn more about webhook signing and explore webhook integration examples for various frameworks at https://docs.stripe.com/webhooks/signature\n'
+  },
+  rawType: undefined,
+  code: undefined,
+  doc_url: undefined,
+  param: undefined,
+  detail: undefined,
+  headers: undefined,
+  requestId: undefined,
+  statusCode: undefined,
+  userMessage: undefined,
+  charge: undefined,
+  decline_code: undefined,
+  payment_intent: undefined,
+  payment_method: undefined,
+  payment_method_type: undefined,
+  setup_intent: undefined,
+  source: undefined,
+  header: 't=1755958549,v1=3ef38718dd8a92a9594f3cd8081f5cc0fc55c30ae699a541f85a721726ccafec,v0=ab71dbdb997aff66140ea9276127a586f4452c85e9ca948a5cd3f8f8388da388',
+  payload: {
+    id: 'evt_1RzIECKC0GXEXvjWVY6oOba9',
+    object: 'event',
+    api_version: '2025-07-30.basil',
+    created: 1755958532,
+    data: { object: [Object], previous_attributes: [Object] },
+    livemode: false,
+    pending_webhooks: 1,
+    request: {
+      id: null,
+      idempotency_key: '26dcf435-4954-4126-b3e9-3c8843c2c036'
+    },
+    type: 'customer.subscription.updated'
+  }
+}
+2:15:49 PM [express] POST /api/stripe-webhook 400 in 3ms
+Getting user details for: 21869523
+2:15:51 PM [express] GET /api/user/details 304 in 382ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+Getting user details for: 21869523
+2:15:51 PM [express] GET /api/user/details 304 in 193ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+2:15:51 PM [express] GET /api/books 304 in 407ms :: [{"id":"951e7e47-5044-4f9d-9330-e0f32a4e9e50","i…
+Getting user details for: 21869523
+2:15:56 PM [express] GET /api/user/details 304 in 371ms :: {"id":"21869523","email":"andrew@dcr.vc",…
+Getting user details for: 21869523
+2:15:57 PM [express] GET /api/user/details 304 in 210ms :: {"id":"21869523","email":"andrew@dcr.vc",…
