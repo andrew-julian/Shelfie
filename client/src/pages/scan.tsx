@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Camera, Search, ArrowLeft, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // License keys for different environments
 const LICENSE_KEYS = {
@@ -68,17 +69,11 @@ const getLicenseKey = (): string => {
   return LICENSE_KEYS.development;
 };
 
-// Queue types for scan page
-interface QueueItem {
-  id: string;
-  isbn: string;
-  status: 'scanning' | 'looking-up' | 'adding' | 'success' | 'error';
-  title?: string;
-  author?: string;
-  coverUrl?: string;
-  error?: string;
-  retryCount: number;
-}
+// Import queue item type from schema
+import type { ScanningQueueItem } from "@shared/schema";
+
+// Create an alias for easier use
+type QueueItem = ScanningQueueItem;
 
 // Declare Scanbot SDK types
 declare global {
@@ -168,124 +163,92 @@ export default function ScanPage() {
   const [isScanning, setIsScanning] = useState(false);
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [manualIsbn, setManualIsbn] = useState("");
-  const [queue, setQueue] = useState<QueueItem[]>([]);
   const [scanCount, setScanCount] = useState(0);
   const scannerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch scanning queue from database
+  const { data: queue = [], refetch: refetchQueue } = useQuery({
+    queryKey: ['/api/scanning-queue'],
+    refetchInterval: 2000, // Poll every 2 seconds for updates
+  });
+
+  // Add item to queue mutation
+  const addToQueueMutation = useMutation({
+    mutationFn: async (isbn: string) => {
+      return apiRequest('/api/scanning-queue', {
+        method: 'POST',
+        body: { isbn: isbn.trim() }
+      });
+    },
+    onSuccess: () => {
+      setScanCount(prev => prev + 1);
+      refetchQueue();
+    },
+    onError: (error) => {
+      toast({
+        title: "Scan Error",
+        description: (error as Error).message || "Failed to add book to scanning queue",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Retry queue item mutation
+  const retryQueueItemMutation = useMutation({
+    mutationFn: async ({ id, retryCount }: { id: string; retryCount: number }) => {
+      return apiRequest(`/api/scanning-queue/${id}/retry`, {
+        method: 'POST',
+        body: { retryCount }
+      });
+    },
+    onSuccess: () => {
+      refetchQueue();
+    },
+  });
+
+  // Remove queue item mutation
+  const removeQueueItemMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest(`/api/scanning-queue/${id}`, {
+        method: 'DELETE'
+      });
+    },
+    onSuccess: () => {
+      refetchQueue();
+    },
+  });
+
+  // Clear completed items mutation
+  const clearCompletedMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest('/api/scanning-queue/completed', {
+        method: 'DELETE'
+      });
+    },
+    onSuccess: () => {
+      refetchQueue();
+    },
+  });
 
 
 
   // Queue management functions
   const addToQueue = useCallback((isbn: string) => {
-    const queueItem: QueueItem = {
-      id: `${Date.now()}-${isbn}`,
-      isbn,
-      status: 'looking-up',
-      retryCount: 0
-    };
-    
-    setQueue(prev => [...prev, queueItem]);
-    setScanCount(prev => prev + 1);
-    processQueueItem(queueItem);
-  }, []);
-
-  const updateQueueItem = useCallback((id: string, updates: Partial<QueueItem>) => {
-    setQueue(prev => prev.map(item => 
-      item.id === id ? { ...item, ...updates } : item
-    ));
-  }, []);
-
-  const removeFromQueue = useCallback((id: string) => {
-    setQueue(prev => prev.filter(item => item.id !== id));
-  }, []);
-
-  const processQueueItem = async (item: QueueItem) => {
-    try {
-      updateQueueItem(item.id, { status: 'looking-up' });
-      
-      const response = await fetch(`/api/books/lookup/${item.isbn}`);
-      if (!response.ok) {
-        throw new Error(`Failed to lookup book: ${response.statusText}`);
-      }
-      
-      const bookData = await response.json();
-      
-      if (!bookData.title) {
-        throw new Error('Book not found in our database');
-      }
-
-      updateQueueItem(item.id, { 
-        status: 'adding',
-        title: bookData.title,
-        author: bookData.author,
-        coverUrl: bookData.coverImage
-      });
-
-      const addResponse = await fetch('/api/books', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          isbn: item.isbn,
-          title: bookData.title,
-          author: bookData.author,
-          coverImage: bookData.coverImage,
-          coverImages: bookData.coverImages || [],
-          selectedCoverIndex: bookData.selectedCoverIndex || 0,
-          description: bookData.description || '',
-          publishYear: bookData.publishYear,
-          publishDate: bookData.publishDate,
-          publisher: bookData.publisher,
-          language: bookData.language,
-          pages: bookData.pages,
-          dimensions: bookData.dimensions,
-          weight: bookData.weight,
-          rating: bookData.rating,
-          ratingsTotal: bookData.ratingsTotal,
-          categories: bookData.categories || [],
-          featureBullets: bookData.featureBullets || [],
-          amazonDomain: bookData.amazonDomain,
-          userId: bookData.userId,
-          status: bookData.status,
-          
-          // Include comprehensive metadata from lookup
-          aboutThisItem: bookData.aboutThisItem,
-          bookDescription: bookData.bookDescription,
-          editorialReviews: bookData.editorialReviews,
-          ratingBreakdown: bookData.ratingBreakdown,
-          topReviews: bookData.topReviews,
-          bestsellersRank: bookData.bestsellersRank,
-          alsoBought: bookData.alsoBought,
-          variants: bookData.variants,
-          amazonData: bookData.amazonData
-        })
-      });
-      
-      if (!addResponse.ok) {
-        throw new Error(`Failed to add book: ${addResponse.statusText}`);
-      }
-
-      updateQueueItem(item.id, { status: 'success' });
-    } catch (error) {
-      console.error(`Error processing queue item ${item.id}:`, error);
-      updateQueueItem(item.id, { 
-        status: 'error', 
-        error: (error as Error).message || 'Unknown error'
-      });
-    }
-  };
+    addToQueueMutation.mutate(isbn);
+  }, [addToQueueMutation]);
 
   const retryQueueItem = useCallback((item: QueueItem) => {
-    const updatedItem = { 
-      ...item, 
-      status: 'scanning' as const, 
-      retryCount: item.retryCount + 1,
-      error: undefined 
-    };
-    updateQueueItem(item.id, updatedItem);
-    processQueueItem(updatedItem);
-  }, [updateQueueItem]);
+    retryQueueItemMutation.mutate({
+      id: item.id,
+      retryCount: item.retryCount + 1
+    });
+  }, [retryQueueItemMutation]);
+
+  const removeFromQueue = useCallback((id: string) => {
+    removeQueueItemMutation.mutate(id);
+  }, [removeQueueItemMutation]);
 
   // Scanner functions
   const startScanner = async () => {
@@ -594,11 +557,12 @@ export default function ScanPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setQueue([])}
+                      onClick={() => clearCompletedMutation.mutate()}
+                      disabled={clearCompletedMutation.isPending}
                       className="text-sm text-gray-500 hover:text-gray-700"
-                      data-testid="button-clear-queue"
+                      data-testid="button-clear-completed"
                     >
-                      Clear All
+                      {clearCompletedMutation.isPending ? 'Clearing...' : 'Clear Completed'}
                     </Button>
                   </div>
                   

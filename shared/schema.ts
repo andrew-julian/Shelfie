@@ -93,6 +93,25 @@ export const userPreferences = pgTable("user_preferences", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Scanning queue table for persistent background processing
+export const scanningQueue = pgTable("scanning_queue", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  isbn: varchar("isbn", { length: 20 }).notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("scanning"), // scanning, looking-up, adding, success, error
+  retryCount: integer("retry_count").notNull().default(0),
+  title: text("title"),
+  author: text("author"),
+  coverUrl: text("cover_url"),
+  error: text("error"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+}, (table) => ({
+  userIdIdx: index("scanning_queue_user_id_idx").on(table.userId),
+  statusIdx: index("scanning_queue_status_idx").on(table.status),
+}));
+
 // Define relations
 export const usersRelations = relations(users, ({ many, one }) => ({
   books: many(books),
@@ -116,9 +135,25 @@ export const userPreferencesRelations = relations(userPreferences, ({ one }) => 
   }),
 }));
 
+export const scanningQueueRelations = relations(scanningQueue, ({ one }) => ({
+  user: one(users, {
+    fields: [scanningQueue.userId],
+    references: [users.id],
+  }),
+}));
+
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type InsertBook = z.infer<typeof insertBookSchema>;
 export type Book = typeof books.$inferSelect;
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type InsertUserPreferences = typeof userPreferences.$inferInsert;
+export type ScanningQueueItem = typeof scanningQueue.$inferSelect;
+export type InsertScanningQueueItem = typeof scanningQueue.$inferInsert;
+
+// Schema for scanning queue operations
+export const insertScanningQueueSchema = createInsertSchema(scanningQueue).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});

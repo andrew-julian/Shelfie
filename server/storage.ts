@@ -1,6 +1,19 @@
-import { type Book, type InsertBook, type User, type UpsertUser, type UserPreferences, type InsertUserPreferences, books, users, userPreferences } from "@shared/schema";
+import { 
+  type Book, 
+  type InsertBook, 
+  type User, 
+  type UpsertUser, 
+  type UserPreferences, 
+  type InsertUserPreferences,
+  type ScanningQueueItem,
+  type InsertScanningQueueItem,
+  books, 
+  users, 
+  userPreferences,
+  scanningQueue
+} from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc, inArray, ne } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (IMPORTANT) these user operations are mandatory for Replit Auth.
@@ -21,6 +34,14 @@ export interface IStorage {
   updateBookStatus(id: string, status: string, userId?: string): Promise<Book | undefined>;
   updateBookData(id: string, data: Partial<Omit<Book, 'id' | 'isbn' | 'addedAt'>>, userId?: string): Promise<Book | undefined>;
   deleteBook(id: string, userId?: string): Promise<boolean>;
+  
+  // Scanning queue operations
+  addToScanningQueue(item: InsertScanningQueueItem): Promise<ScanningQueueItem>;
+  getScanningQueue(userId: string): Promise<ScanningQueueItem[]>;
+  getPendingScanningQueue(userId: string): Promise<ScanningQueueItem[]>;
+  updateScanningQueueItem(id: string, data: Partial<ScanningQueueItem>): Promise<ScanningQueueItem | undefined>;
+  removeScanningQueueItem(id: string): Promise<boolean>;
+  clearCompletedScanningQueue(userId: string): Promise<void>;
 }
 
 // Database Storage Implementation
@@ -127,6 +148,64 @@ export class DatabaseStorage implements IStorage {
     const conditions = userId ? and(eq(books.id, id), eq(books.userId, userId)) : eq(books.id, id);
     const result = await db.delete(books).where(conditions);
     return (result.rowCount ?? 0) > 0;
+  }
+  
+  // Scanning queue operations
+  async addToScanningQueue(item: InsertScanningQueueItem): Promise<ScanningQueueItem> {
+    const [queueItem] = await db
+      .insert(scanningQueue)
+      .values(item)
+      .returning();
+    return queueItem;
+  }
+  
+  async getScanningQueue(userId: string): Promise<ScanningQueueItem[]> {
+    const items = await db
+      .select()
+      .from(scanningQueue)
+      .where(eq(scanningQueue.userId, userId))
+      .orderBy(desc(scanningQueue.createdAt));
+    return items;
+  }
+  
+  async getPendingScanningQueue(userId: string): Promise<ScanningQueueItem[]> {
+    const items = await db
+      .select()
+      .from(scanningQueue)
+      .where(and(
+        eq(scanningQueue.userId, userId),
+        inArray(scanningQueue.status, ['scanning', 'looking-up', 'adding'])
+      ))
+      .orderBy(desc(scanningQueue.createdAt));
+    return items;
+  }
+  
+  async updateScanningQueueItem(id: string, data: Partial<ScanningQueueItem>): Promise<ScanningQueueItem | undefined> {
+    const [updatedItem] = await db
+      .update(scanningQueue)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(scanningQueue.id, id))
+      .returning();
+    return updatedItem;
+  }
+  
+  async removeScanningQueueItem(id: string): Promise<boolean> {
+    try {
+      await db.delete(scanningQueue).where(eq(scanningQueue.id, id));
+      return true;
+    } catch (error) {
+      console.error("Error removing scanning queue item:", error);
+      return false;
+    }
+  }
+  
+  async clearCompletedScanningQueue(userId: string): Promise<void> {
+    await db
+      .delete(scanningQueue)
+      .where(and(
+        eq(scanningQueue.userId, userId),
+        inArray(scanningQueue.status, ['success', 'error'])
+      ));
   }
 }
 

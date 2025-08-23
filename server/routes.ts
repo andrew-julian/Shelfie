@@ -1492,6 +1492,213 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Scanning Queue API routes
+  
+  // Get scanning queue for current user
+  app.get("/api/scanning-queue", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const queue = await storage.getScanningQueue(userId);
+      res.json(queue);
+    } catch (error) {
+      console.error("Error fetching scanning queue:", error);
+      res.status(500).json({ message: "Failed to fetch scanning queue" });
+    }
+  });
+  
+  // Add item to scanning queue
+  app.post("/api/scanning-queue", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { isbn } = req.body;
+      
+      if (!isbn) {
+        return res.status(400).json({ message: "ISBN is required" });
+      }
+      
+      const queueItem = await storage.addToScanningQueue({
+        userId,
+        isbn: isbn.trim(),
+        status: "scanning"
+      });
+      
+      res.status(201).json(queueItem);
+      
+      // Start processing the item in the background
+      setImmediate(() => processScanningQueueItem(queueItem.id));
+      
+    } catch (error) {
+      console.error("Error adding to scanning queue:", error);
+      res.status(500).json({ message: "Failed to add to scanning queue" });
+    }
+  });
+  
+  // Update scanning queue item
+  app.patch("/api/scanning-queue/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updatedItem = await storage.updateScanningQueueItem(id, req.body);
+      
+      if (!updatedItem) {
+        return res.status(404).json({ message: "Queue item not found" });
+      }
+      
+      res.json(updatedItem);
+    } catch (error) {
+      console.error("Error updating scanning queue item:", error);
+      res.status(500).json({ message: "Failed to update scanning queue item" });
+    }
+  });
+  
+  // Retry scanning queue item
+  app.post("/api/scanning-queue/:id/retry", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updatedItem = await storage.updateScanningQueueItem(id, {
+        status: "scanning",
+        error: null,
+        retryCount: req.body.retryCount || 0
+      });
+      
+      if (!updatedItem) {
+        return res.status(404).json({ message: "Queue item not found" });
+      }
+      
+      res.json(updatedItem);
+      
+      // Start processing the item in the background
+      setImmediate(() => processScanningQueueItem(id));
+      
+    } catch (error) {
+      console.error("Error retrying scanning queue item:", error);
+      res.status(500).json({ message: "Failed to retry scanning queue item" });
+    }
+  });
+  
+  // Remove single queue item
+  app.delete("/api/scanning-queue/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.removeScanningQueueItem(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Queue item not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error removing scanning queue item:", error);
+      res.status(500).json({ message: "Failed to remove scanning queue item" });
+    }
+  });
+
+  // Clear completed items from queue
+  app.delete("/api/scanning-queue/completed", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      await storage.clearCompletedScanningQueue(userId);
+      res.json({ message: "Completed items cleared" });
+    } catch (error) {
+      console.error("Error clearing completed queue items:", error);
+      res.status(500).json({ message: "Failed to clear completed items" });
+    }
+  });
+
+  // Background processing function for scanning queue items
+  async function processScanningQueueItem(queueItemId: string) {
+    try {
+      // Get the queue item by finding it across all user queues
+      let queueItem: any = null;
+      const allUsers = await storage.getAllUsers();
+      
+      for (const user of allUsers) {
+        const userQueue = await storage.getScanningQueue(user.id);
+        const foundItem = userQueue.find(item => item.id === queueItemId);
+        if (foundItem) {
+          queueItem = foundItem;
+          break;
+        }
+      }
+      
+      if (!queueItem || queueItem.status === 'success' || queueItem.status === 'error') {
+        return; // Item already processed or doesn't exist
+      }
+      
+      // Update status to looking-up
+      await storage.updateScanningQueueItem(queueItemId, { status: 'looking-up' });
+      
+      // Call the lookup API
+      const response = await fetch(`http://localhost:5000/api/books/lookup/${queueItem.isbn}`);
+      if (!response.ok) {
+        throw new Error(`Failed to lookup book: ${response.statusText}`);
+      }
+      
+      const bookData = await response.json();
+      
+      if (!bookData.title) {
+        throw new Error('Book not found in our database');
+      }
+
+      // Update queue item with book info
+      await storage.updateScanningQueueItem(queueItemId, { 
+        status: 'adding',
+        title: bookData.title,
+        author: bookData.author,
+        coverUrl: bookData.coverImage
+      });
+
+      // Add book to library
+      const book = await storage.createBook({
+        isbn: queueItem.isbn,
+        title: bookData.title,
+        author: bookData.author,
+        coverImage: bookData.coverImage,
+        coverImages: bookData.coverImages || [],
+        selectedCoverIndex: bookData.selectedCoverIndex || 0,
+        description: bookData.description || '',
+        publishYear: bookData.publishYear,
+        publishDate: bookData.publishDate,
+        publisher: bookData.publisher,
+        language: bookData.language,
+        pages: bookData.pages,
+        dimensions: bookData.dimensions,
+        weight: bookData.weight,
+        rating: bookData.rating,
+        ratingsTotal: bookData.ratingsTotal,
+        categories: bookData.categories || [],
+        featureBullets: bookData.featureBullets || [],
+        amazonDomain: bookData.amazonDomain,
+        userId: queueItem.userId,
+        status: bookData.status,
+        
+        // Include comprehensive metadata
+        aboutThisItem: bookData.aboutThisItem,
+        bookDescription: bookData.bookDescription,
+        editorialReviews: bookData.editorialReviews,
+        ratingBreakdown: bookData.ratingBreakdown,
+        topReviews: bookData.topReviews,
+        bestsellersRank: bookData.bestsellersRank,
+        alsoBought: bookData.alsoBought,
+        variants: bookData.variants,
+        amazonData: bookData.amazonData
+      });
+
+      // Mark as success
+      await storage.updateScanningQueueItem(queueItemId, { 
+        status: 'success',
+        completedAt: new Date()
+      });
+
+    } catch (error) {
+      console.error(`Error processing queue item ${queueItemId}:`, error);
+      await storage.updateScanningQueueItem(queueItemId, { 
+        status: 'error', 
+        error: (error as Error).message || 'Unknown error',
+        completedAt: new Date()
+      });
+    }
+  }
+
   const httpServer = createServer(app);
   return httpServer;
 }
