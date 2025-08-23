@@ -19,10 +19,10 @@ async function lookupBookByISBN(isbn: string, userId: string) {
   isbn = isbn.trim().replace(/[\s\-]/g, '');
   
   // Get user's preferred region, fallback to default
-  let amazonDomain = "amazon.com.au";
+  let preferredDomain = "amazon.com.au";
   try {
     const userPreferences = await storage.getUserPreferences(userId);
-    amazonDomain = userPreferences?.amazonDomain || "amazon.com.au";
+    preferredDomain = userPreferences?.amazonDomain || "amazon.com.au";
   } catch (error) {
     console.error("Failed to get user preferences:", error);
   }
@@ -33,21 +33,51 @@ async function lookupBookByISBN(isbn: string, userId: string) {
     throw new Error("Book already exists in your library");
   }
 
-  // Call Rainforest API
-  const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
-  const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${isbn}&amazon_domain=${amazonDomain}`;
-  
-  const response = await fetch(rainforestUrl);
-  
-  if (!response.ok) {
-    throw new Error("Book not found");
-  }
+  // Define fallback domains to try if the preferred domain fails
+  const domainsToTry = [
+    preferredDomain,
+    "amazon.com",      // US - largest catalog
+    "amazon.co.uk",    // UK - good international coverage
+    "amazon.de",       // Germany - good European coverage
+    "amazon.ca",       // Canada
+    "amazon.fr",       // France
+  ].filter((domain, index, arr) => arr.indexOf(domain) === index); // Remove duplicates
 
-  const data = await response.json();
+  const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
   
-  if (!data.product) {
-    throw new Error("Book not found");
-  }
+  let lastError = null;
+  
+  // Try each domain until we find the book
+  for (const amazonDomain of domainsToTry) {
+    try {
+      console.log(`🔍 Trying to find ISBN ${isbn} on ${amazonDomain}...`);
+      
+      const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${isbn}&amazon_domain=${amazonDomain}`;
+      
+      const response = await fetch(rainforestUrl);
+      
+      if (!response.ok) {
+        console.log(`❌ HTTP error for ${amazonDomain}: ${response.status}`);
+        continue;
+      }
+
+      const data = await response.json();
+      
+      // Check if the API call was successful
+      if (data.request_info && !data.request_info.success) {
+        console.log(`❌ API reported failure for ${amazonDomain}: ${data.request_info.message}`);
+        lastError = new Error(data.request_info.message || "Book not found");
+        continue;
+      }
+      
+      if (!data.product) {
+        console.log(`❌ No product data for ${amazonDomain}`);
+        continue;
+      }
+
+      console.log(`✅ Found book on ${amazonDomain}: ${data.product.title}`);
+      
+      // Found the book! Continue with existing processing logic...
 
   const product = data.product;
   
