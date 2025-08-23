@@ -307,15 +307,15 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
         <DialogContent className="w-full max-w-4xl max-h-[95vh] overflow-hidden p-0 sm:p-6 [&>button]:hidden">
           <div className="flex flex-col h-full max-h-[95vh]">
             <DialogHeader className="flex-shrink-0 px-4 pt-4 pb-4 sm:px-6 sm:pt-6 sm:pb-6 border-b relative">
-              {/* Large Prominent Close Button */}
+              {/* Extra Large Mobile-Friendly Close Button */}
               <Button
                 variant="ghost"
                 size="lg"
                 onClick={onClose}
-                className="absolute top-2 right-2 sm:top-4 sm:right-4 text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-3 h-12 w-12 rounded-full z-20 transition-all duration-200"
+                className="absolute top-1 right-1 sm:top-3 sm:right-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 active:bg-gray-200 p-2 h-14 w-14 sm:h-16 sm:w-16 rounded-full z-20 transition-all duration-200 shadow-sm hover:shadow-md"
                 data-testid="button-close-modal"
               >
-                <X className="w-6 h-6 sm:w-7 sm:h-7" />
+                <X className="w-8 h-8 sm:w-10 sm:h-10 stroke-[2.5]" />
               </Button>
 
               {/* Book Header Info */}
