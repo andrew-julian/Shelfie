@@ -4,6 +4,192 @@ import { storage } from "./storage";
 import express from "express";
 import path from "path";
 
+// Standalone lookup function for background processing
+async function lookupBookByISBN(isbn: string, userId: string) {
+  // Clean ISBN: remove whitespace and hyphens for consistent processing
+  isbn = isbn.trim().replace(/[\s\-]/g, '');
+  
+  // Get user's preferred region, fallback to default
+  let amazonDomain = "amazon.com.au";
+  try {
+    const userPreferences = await storage.getUserPreferences(userId);
+    amazonDomain = userPreferences?.amazonDomain || "amazon.com.au";
+  } catch (error) {
+    console.error("Failed to get user preferences:", error);
+  }
+  
+  // Check if book already exists for this user
+  const existingBook = await storage.getBookByIsbn(isbn, userId);
+  if (existingBook) {
+    throw new Error("Book already exists in your library");
+  }
+
+  // Call Rainforest API
+  const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
+  const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${isbn}&amazon_domain=${amazonDomain}`;
+  
+  const response = await fetch(rainforestUrl);
+  
+  if (!response.ok) {
+    throw new Error("Book not found");
+  }
+
+  const data = await response.json();
+  
+  if (!data.product) {
+    throw new Error("Book not found");
+  }
+
+  const product = data.product;
+  
+  // Extract all available cover images using comprehensive approach
+  const collectImageUrls = (root: any) => {
+    const urls = new Set<string>();
+
+    // Helper: add if looks like an image
+    const addIfImage = (u: any) => {
+      if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
+        urls.add(u);
+      }
+    };
+
+    // 1) Product-level
+    addIfImage(root?.product?.main_image?.link);
+    (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+
+    // images_flat may be a single URL or comma-separated
+    const flat = root?.product?.images_flat;
+    if (typeof flat === 'string') {
+      flat.split(',').map(s => s.trim()).forEach(addIfImage);
+    }
+
+    // 2) Reviews (potential alternative covers in review images)
+    (root?.product?.top_reviews ?? []).forEach((r: any) => {
+      // attached review images
+      (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+      // video thumbnails (images)
+      (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
+    });
+
+    return Array.from(urls);
+  };
+
+  let coverImages = collectImageUrls(data);
+  
+  // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
+  if (product.variants && Array.isArray(product.variants)) {
+    console.log(`Found ${product.variants.length} variants, fetching cover images...`);
+    
+    for (const variant of product.variants.slice(0, 3)) { // Limit to 3 variants to avoid too many API calls
+      if (variant.asin && variant.asin !== product.asin) {
+        try {
+          console.log(`Fetching variant cover for ${variant.title} (${variant.asin})`);
+          const variantUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&asin=${variant.asin}&amazon_domain=${amazonDomain}`;
+          const variantResponse = await fetch(variantUrl);
+          
+          if (variantResponse.ok) {
+            const variantData = await variantResponse.json();
+            
+            if (variantData.product) {
+              const variantImages = collectImageUrls(variantData);
+              variantImages.forEach(img => {
+                if (!coverImages.includes(img)) {
+                  coverImages.push(img);
+                }
+              });
+            }
+          }
+        } catch (variantError) {
+          console.error(`Failed to fetch variant ${variant.asin}:`, variantError);
+        }
+      }
+    }
+  }
+
+  // Enhanced data extraction
+  let author = "Unknown Author";
+  if (product.authors && product.authors.length > 0) {
+    author = product.authors[0].name || product.authors[0];
+  } else if (product.by_line && typeof product.by_line === 'string') {
+    author = product.by_line.replace(/^by\s+/i, '').trim();
+  } else if (product.brand && !product.brand.includes('Amazon') && !product.brand.includes('Publication')) {
+    author = product.brand;
+  }
+  
+  // Extract categories properly
+  let categories: string[] = [];
+  if (product.categories && Array.isArray(product.categories)) {
+    categories = product.categories.map((cat: any) => {
+      if (typeof cat === 'string') return cat;
+      if (cat && cat.name) return cat.name;
+      if (cat && cat.category) return cat.category;
+      return null;
+    }).filter(Boolean);
+  } else if (product.category_path && Array.isArray(product.category_path)) {
+    categories = product.category_path.map((cat: any) => cat.name || cat).filter(Boolean);
+  }
+  
+  // Enhanced dimensions extraction - check multiple locations
+  let extractedDimensions: string | null = null;
+  
+  // Check top-level dimensions field
+  if (product.dimensions) {
+    extractedDimensions = String(product.dimensions);
+  }
+  
+  // Check specifications array (main location for dimensions)
+  if (!extractedDimensions && product.specifications && Array.isArray(product.specifications)) {
+    for (const spec of product.specifications) {
+      if (spec && typeof spec === 'object') {
+        if (spec.name && spec.value) {
+          const name = String(spec.name).toLowerCase();
+          if (name.includes('dimension')) {
+            extractedDimensions = String(spec.value);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  const parsedDimensions = parseAndAssignDimensions(extractedDimensions, product.title);
+
+  return {
+    isbn,
+    title: product.title || "Unknown Title",
+    author,
+    coverImage: coverImages[0] || "",
+    coverImages,
+    selectedCoverIndex: 0,
+    description: product.description || "",
+    publishYear: product.publication_date ? new Date(product.publication_date).getFullYear() : null,
+    publishDate: product.publication_date || null,
+    publisher: product.publisher || null,
+    language: product.language || "English",
+    pages: product.pages ? parseInt(product.pages) : null,
+    dimensions: extractedDimensions,
+    weight: product.weight || null,
+    rating: product.rating ? parseFloat(product.rating) : null,
+    ratingsTotal: product.ratings_total ? parseInt(product.ratings_total) : null,
+    categories,
+    featureBullets: product.feature_bullets || [],
+    amazonDomain,
+    userId,
+    status: "want-to-read",
+    
+    // Include comprehensive metadata
+    aboutThisItem: product.about_this_item || [],
+    bookDescription: product.book_description || null,
+    editorialReviews: product.editorial_reviews || [],
+    ratingBreakdown: product.rating_breakdown || null,
+    topReviews: product.top_reviews || [],
+    bestsellersRank: product.bestsellers_rank || [],
+    alsoBought: product.also_bought || [],
+    variants: product.variants || [],
+    amazonData: data
+  };
+}
+
 // Intelligent dimension parsing utility
 function parseAndAssignDimensions(dimensionText: string | null, title?: string): {
   width: number | null;
