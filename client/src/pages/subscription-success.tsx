@@ -26,14 +26,17 @@ export default function SubscriptionSuccess() {
     setLocation("/");
   };
 
-  // If no session_id, redirect to home
+  // For testing: allow access without session_id if we're in development
+  const isDevelopment = import.meta.env.DEV;
+  
+  // If no session_id and not in development, redirect to home
   useEffect(() => {
-    if (!sessionId) {
+    if (!sessionId && !isDevelopment) {
       setLocation("/");
     }
-  }, [sessionId, setLocation]);
+  }, [sessionId, setLocation, isDevelopment]);
 
-  if (!sessionId || !user || !userDetails) {
+  if ((!sessionId && !isDevelopment) || !user || !userDetails) {
     return null; // Loading or redirecting
   }
 

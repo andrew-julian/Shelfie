@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 
 interface UserDetails {
   id: string;
@@ -13,6 +14,7 @@ interface UserDetails {
 }
 
 export function useSubscriptionCheck() {
+  const [location] = useLocation();
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
   const [hasCheckedMilestone, setHasCheckedMilestone] = useState(false);
 
@@ -29,15 +31,26 @@ export function useSubscriptionCheck() {
     const bookCount = userDetails.bookCount || 0;
     const isSubscribed = userDetails.subscriptionStatus === 'active';
     
-    console.log('Subscription check:', { bookCount, isSubscribed, hasCheckedMilestone, userDetails });
+    // Don't show milestone modal on subscription success page
+    const isOnSuccessPage = location === '/subscription-success';
+    
+    console.log('Subscription check:', { 
+      bookCount, 
+      isSubscribed, 
+      hasCheckedMilestone, 
+      isOnSuccessPage,
+      location,
+      subscriptionStatus: userDetails.subscriptionStatus 
+    });
     
     // Show milestone modal if user has 100+ books but no active subscription
-    if (bookCount >= 100 && !isSubscribed && !hasCheckedMilestone) {
+    // BUT NOT if they're on the success page (where success modal should show instead)
+    if (bookCount >= 100 && !isSubscribed && !hasCheckedMilestone && !isOnSuccessPage) {
       console.log('Triggering milestone modal!');
       setShowMilestoneModal(true);
       setHasCheckedMilestone(true);
     }
-  }, [userDetails, isLoading, hasCheckedMilestone]);
+  }, [userDetails, isLoading, hasCheckedMilestone, location]);
 
   const closeMilestoneModal = () => {
     setShowMilestoneModal(false);
