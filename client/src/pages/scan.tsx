@@ -70,14 +70,14 @@ const getLicenseKey = (): string => {
   const hostname = window.location.hostname;
   
   // Check if we're on shelfie.site
-  if (hostname === 'shelfie.site') {
+  if (hostname.includes('shelfie.site')) {
     console.log('Using production license key for shelfie.site');
     return LICENSE_KEYS["shelfie.site"];
   }
   
   // Check if we're in production environment
-  if (hostname.includes('shelfie.vanaheim.com.au')) {
-    console.log('Using production license key for shelfie.vanaheim.com.au');
+  if (hostname.includes('bookscan.vanaheim.com.au')) {
+    console.log('Using production license key for bookscan.vanaheim.com.au');
     return LICENSE_KEYS.production;
   }
   
