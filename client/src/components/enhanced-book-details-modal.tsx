@@ -117,13 +117,16 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
 
   if (!book) return null;
 
+  // Modal state logging (can be removed in production)
+  if (isOpen) console.log('Modal opened for:', book?.title);
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-full max-w-4xl max-h-[95vh] overflow-hidden p-0 sm:p-6 [&>button]:hidden relative">
+        <DialogContent className="w-full max-w-4xl max-h-[95vh] overflow-auto p-4 sm:p-6 relative [&>button]:hidden">
           {/* Background Cover Image */}
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-5"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-5 z-0"
             style={{
               backgroundImage: `url(${currentCoverImage || "/api/placeholder/300/400"})`,
               backgroundSize: 'cover',
@@ -133,7 +136,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
           />
           
           {/* Content Overlay */}
-          <div className="relative z-10 flex flex-col h-full max-h-[95vh] bg-white/95 backdrop-blur-sm">
+          <div className="relative z-10 flex flex-col h-full bg-white/95 backdrop-blur-sm rounded-lg">
             <DialogHeader className="flex-shrink-0 px-4 pt-4 pb-4 sm:px-6 sm:pt-6 sm:pb-6 border-b relative">
               <DialogTitle className="sr-only">{book.title}</DialogTitle>
               <DialogDescription className="sr-only">Book details and information</DialogDescription>
@@ -142,7 +145,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                 variant="ghost"
                 size="lg"
                 onClick={onClose}
-                className="absolute top-1 right-1 sm:top-3 sm:right-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 active:bg-gray-200 p-2 h-14 w-14 sm:h-16 sm:w-16 rounded-full z-20 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="absolute top-1 right-1 sm:top-3 sm:right-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 active:bg-gray-200 p-2 h-14 w-14 sm:h-16 sm:w-16 rounded-full z-[100] transition-all duration-200 shadow-sm hover:shadow-md"
                 data-testid="button-close-modal"
               >
                 <X className="w-8 h-8 sm:w-10 sm:h-10 stroke-[2.5]" />
