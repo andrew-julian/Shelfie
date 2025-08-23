@@ -324,7 +324,7 @@ export default function Billing() {
                       
                       <div>
                         <label className="text-sm font-medium text-gray-700">Plan</label>
-                        <div className="mt-1 text-gray-900">Shelfie Pro Annual ($17/year)</div>
+                        <div className="mt-1 text-gray-900">Shelfie Unlimited Annual ($17/year)</div>
                       </div>
                     </div>
 

@@ -823,7 +823,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Enforce 100-book limit for free users
       if (currentBookCount >= 100 && !isSubscribed) {
         return res.status(402).json({ 
-          message: "You've reached the 100-book limit for free accounts. Subscribe to Shelfie Pro to continue adding books.",
+          message: "You've reached the 100-book limit for free accounts. Subscribe to Shelfie Unlimited to continue adding books.",
           requiresSubscription: true,
           bookCount: currentBookCount
         });
@@ -1779,9 +1779,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'Shelfie Pro - Annual Subscription',
+              name: 'Shelfie Unlimited - Annual Subscription',
               description: 'Unlimited books, barcode scanning, and 3D visualization',
-              images: ['https://via.placeholder.com/400x300?text=Shelfie+Pro']
+              images: ['https://via.placeholder.com/400x300?text=Shelfie+Unlimited']
             },
             recurring: {
               interval: 'year'

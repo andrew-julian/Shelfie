@@ -6,7 +6,7 @@ Shelfie is a full-stack digital library management application designed to help 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 Development approach: Avoid hardcoded fixes for specific titles or content - build scalable general solutions that handle edge cases through improved logic.
-Branding: Rebranded from "BookScan" to "Shelfie" (August 2025).
+Branding: Rebranded from "BookScan" to "Shelfie" (August 2025). Subscription tier rebranded from "Shelfie Pro" to "Shelfie Unlimited" (August 2025).
 
 ## System Architecture
 

@@ -136,7 +136,7 @@ export default function Subscription() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 rounded-full px-4 py-2 mb-6">
             <Crown className="w-5 h-5" />
-            <span className="font-semibold">Shelfie Pro</span>
+            <span className="font-semibold">Shelfie Unlimited</span>
           </div>
           
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -162,7 +162,7 @@ export default function Subscription() {
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-green-700 mb-4">
-                Your Shelfie Pro subscription is active. Continue building your library with unlimited books!
+                Your Shelfie Unlimited subscription is active. Continue building your library with unlimited books!
               </p>
               <Button asChild className="bg-green-600 hover:bg-green-700">
                 <Link href="/scan">Continue Scanning</Link>
@@ -175,7 +175,7 @@ export default function Subscription() {
             <CardHeader className="text-center bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-t-lg">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Crown className="w-8 h-8" />
-                <CardTitle className="text-3xl">Shelfie Pro</CardTitle>
+                <CardTitle className="text-3xl">Shelfie Unlimited</CardTitle>
               </div>
               <div className="text-5xl font-bold mb-2">
                 $17<span className="text-2xl font-normal opacity-80">/year</span>
@@ -240,7 +240,7 @@ export default function Subscription() {
                 className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-lg py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02]"
                 data-testid="button-subscribe"
               >
-                {isLoading ? "Processing..." : "Subscribe to Shelfie Pro"}
+                {isLoading ? "Processing..." : "Subscribe to Shelfie Unlimited"}
               </Button>
             </CardContent>
           </Card>
