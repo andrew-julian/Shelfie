@@ -307,12 +307,12 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
         <DialogContent className="w-full max-w-4xl max-h-[95vh] overflow-hidden p-0 sm:p-6">
           <div className="flex flex-col h-full max-h-[95vh]">
             <DialogHeader className="flex-shrink-0 px-4 pt-4 pb-4 sm:px-6 sm:pt-6 sm:pb-6 border-b relative">
-              {/* Close Button */}
+              {/* Close Button - Positioned lower to stay on screen */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="absolute top-2 right-2 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 p-2 h-auto z-10"
+                className="absolute top-4 right-2 sm:top-6 sm:right-4 text-gray-400 hover:text-gray-600 p-2 h-auto z-10"
                 data-testid="button-close-modal"
               >
                 <X className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -338,10 +338,10 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                     </div>
                   </div>
 
-                  {/* Title and Author */}
-                  <div className="flex-1 min-w-0">
-                    <DialogTitle className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-tight line-clamp-2">{book.title}</DialogTitle>
-                    <p className="text-gray-600 mb-3 text-sm sm:text-base line-clamp-1">{book.author}</p>
+                  {/* Title and Author - Left Aligned */}
+                  <div className="flex-1 min-w-0 text-left">
+                    <DialogTitle className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-tight line-clamp-2 text-left">{book.title}</DialogTitle>
+                    <p className="text-gray-600 mb-3 text-sm sm:text-base line-clamp-1 text-left">{book.author}</p>
                     
                     {/* Star Rating */}
                     {book.rating && (
@@ -391,7 +391,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                       data-testid="button-refresh-book"
                     >
                       <CheckCircle className={`w-4 h-4 ${refreshBookDataMutation.isPending ? 'animate-spin' : ''} mr-2`} />
-                      <span>Refresh Data</span>
+                      <span>Refresh</span>
                     </Button>
                     <Button
                       variant="outline"
@@ -401,7 +401,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                       data-testid="button-edit-cover"
                     >
                       <Crop className="w-4 h-4 mr-2" />
-                      <span>Edit Cover</span>
+                      <span>Edit</span>
                     </Button>
                     <Button
                       variant="outline"
@@ -411,7 +411,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                       data-testid="button-delete-book"
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
-                      <span>Delete Book</span>
+                      <span>Delete</span>
                     </Button>
                   </div>
                 </div>
