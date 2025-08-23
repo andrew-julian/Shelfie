@@ -8,36 +8,27 @@ export default function ShelfieIcon({ className = "", size = 24 }: ShelfieIconPr
     <svg
       width={size}
       height={size}
-      viewBox="0 0 32 32"
-      fill="none"
+      viewBox="0 0 1024 1024"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      role="img"
+      aria-label="Shelfie logo - orange gradient"
     >
-      {/* Bookshelf Structure */}
-      <rect x="4" y="28" width="24" height="2" rx="1" fill="currentColor" />
-      <rect x="4" y="20" width="24" height="2" rx="1" fill="currentColor" />
-      <rect x="4" y="12" width="24" height="2" rx="1" fill="currentColor" />
-      
-      {/* Books on shelves */}
-      {/* Top shelf books */}
-      <rect x="6" y="14" width="3" height="6" rx="0.5" fill="#FF6B35" />
-      <rect x="10" y="14" width="2.5" height="6" rx="0.5" fill="#4A90E2" />
-      <rect x="13.5" y="14" width="3.5" height="6" rx="0.5" fill="#F39C12" />
-      <rect x="18" y="14" width="2" height="6" rx="0.5" fill="#27AE60" />
-      <rect x="21" y="14" width="3" height="6" rx="0.5" fill="#9B59B6" />
-      <rect x="25" y="14" width="2" height="6" rx="0.5" fill="#E74C3C" />
-      
-      {/* Middle shelf books */}
-      <rect x="6" y="22" width="2.5" height="6" rx="0.5" fill="#3498DB" />
-      <rect x="9.5" y="22" width="3" height="6" rx="0.5" fill="#E67E22" />
-      <rect x="13.5" y="22" width="2" height="6" rx="0.5" fill="#2ECC71" />
-      <rect x="16.5" y="22" width="3.5" height="6" rx="0.5" fill="#8E44AD" />
-      <rect x="21" y="22" width="2.5" height="6" rx="0.5" fill="#F1C40F" />
-      <rect x="24.5" y="22" width="2.5" height="6" rx="0.5" fill="#E91E63" />
-      
-      {/* Top decorative element */}
-      <circle cx="16" cy="6" r="3" fill="#FF6B35" opacity="0.8" />
-      <circle cx="16" cy="6" r="1.5" fill="white" />
+      <defs>
+        <linearGradient id="grad-orange" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFA43A"/>
+          <stop offset="100%" stopColor="#FF6432"/>
+        </linearGradient>
+      </defs>
+      {/* Rounded square background */}
+      <rect x="0" y="0" width="1024" height="1024" rx="220" fill="url(#grad-orange)"/>
+      {/* Shelf */}
+      <rect x="162" y="720" width="700" height="70" rx="35" fill="#FFFFFF"/>
+      {/* Books (left to right, bottoms aligned just above shelf) */}
+      {/* Baseline for books: 696 (24px above shelf) */}
+      <rect x="277" y="416" width="110" height="280" rx="20" fill="#FFFFFF"/>
+      <rect x="457" y="296" width="110" height="400" rx="20" fill="#FFFFFF"/>
+      <rect x="637" y="176" width="110" height="520" rx="20" fill="#FFFFFF"/>
     </svg>
   );
 }
