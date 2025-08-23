@@ -293,6 +293,20 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
       [width, height] = [height, width]; // Swap to make width > height
     }
     
+    // Debug specific problematic books
+    if (title && title.toLowerCase().includes('fresh')) {
+      console.log(`Fresh book detailed analysis:`, {
+        title,
+        originalDimensions: dimensionText,
+        parsedDims: [dim1, dim2, dim3],
+        sortedDims: [smallest, middle, largest],
+        depthIndex,
+        remainingOriginal,
+        assigned: { width, height, depth },
+        isCoffeeTableBook
+      });
+    }
+
     // Round to 2 decimal places
     return {
       width: Math.round(width * 100) / 100,

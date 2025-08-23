@@ -48,6 +48,25 @@ body {
   box-sizing: border-box;
 }
 
+/* Prevent iOS Safari selection UI on book covers */
+.book-cover, .book-card, [data-book-id] {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Prevent text selection on interactive book elements */
+.shelf-container img,
+.book-cover img,
+.book-spine {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  pointer-events: none;
+}
+
 :root {
   /* Tandelo Marketplace Color Palette */
   --monochrome-black: #111111;
