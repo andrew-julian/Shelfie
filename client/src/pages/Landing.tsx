@@ -29,16 +29,16 @@ export default function Landing() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-100">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <ShelfieIcon size={32} />
-              <span className="text-xl font-bold text-gray-900">Shelfie</span>
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <ShelfieIcon size={28} className="sm:w-8 sm:h-8" />
+              <span className="text-lg sm:text-xl font-bold text-gray-900">Shelfie</span>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
               <a href="#privacy" className="text-gray-600 hover:text-gray-900 transition-colors">Privacy</a>
             </nav>
-            <Button asChild>
+            <Button asChild className="text-sm sm:text-base px-3 sm:px-4 py-2">
               <a href="/api/login" data-testid="button-get-app">Scan your books</a>
             </Button>
           </div>
@@ -47,26 +47,26 @@ export default function Landing() {
 
       <main>
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-blue-50 pt-16 pb-20">
+        <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-blue-50 pt-12 sm:pt-16 pb-16 sm:pb-20">
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
               <div className="text-center lg:text-left">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight mb-4 sm:mb-6">
                   Build a beautiful library you'll actually use
                 </h1>
-                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
                   Scan barcodes, fetch the right details, and see your books on a shelf that looks like your shelf.
                 </p>
                 <div className="flex justify-center lg:justify-start">
                   <Button 
                     size="lg" 
                     asChild
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
                     onClick={() => handleAnalyticsEvent('click_cta_primary')}
                   >
                     <a href="/api/login" data-testid="button-primary-cta">
                       Scan your books
-                      <ArrowRight className="ml-2 w-5 h-5" />
+                      <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                     </a>
                   </Button>
                 </div>
