@@ -52,7 +52,7 @@ export default function Landing() {
             <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
               <div className="text-center lg:text-left">
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight mb-4 sm:mb-6">
-                  Your Personal Library, Reimagined
+                  From barcode to digital bookshelf in seconds
                 </h1>
                 <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
                   A beautifully designed, intuitive experience for book lovers. With seamless barcode scanning and stunning 3D visualisation, building your collection is effortless and joyful.
