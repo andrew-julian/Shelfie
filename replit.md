@@ -57,7 +57,7 @@ Currently implements a **session-based approach** using `connect-pg-simple` for 
 - **Progress Control System**: Server-Sent Events for live progress tracking during refresh operations, with interactive controls (pause, resume, stop), visual indicators, and estimated time remaining.
 - **User Management System**: Database-connected user switcher, dynamic user loading, and session context switching.
 - **Input Forgiveness**: Automatic cleanup of whitespace and hyphens from ISBN inputs.
-- **Subscription Monetization**: $17/year Stripe-powered subscription system with 100-book free tier and engaging milestone modal.
+- **Complete Stripe Integration**: $17/year subscription system with secure webhook processing (STRIPE_WEBHOOK_SECRET), comprehensive billing management, subscription lifecycle controls (upgrade/cancel/reset), and real-time status updates via checkout.session.completed events. (August 2025)
 
 ## External Dependencies
 
