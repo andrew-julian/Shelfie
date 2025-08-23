@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -135,6 +135,8 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
           {/* Content Overlay */}
           <div className="relative z-10 flex flex-col h-full max-h-[95vh] bg-white/95 backdrop-blur-sm">
             <DialogHeader className="flex-shrink-0 px-4 pt-4 pb-4 sm:px-6 sm:pt-6 sm:pb-6 border-b relative">
+              <DialogTitle className="sr-only">{book.title}</DialogTitle>
+              <DialogDescription className="sr-only">Book details and information</DialogDescription>
               {/* Extra Large Mobile-Friendly Close Button */}
               <Button
                 variant="ghost"
@@ -372,7 +374,7 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
       <ImageCropper
         isOpen={showCropper}
         onClose={() => setShowCropper(false)}
-        imageUrl={currentCoverImage}
+        imageUrl={currentCoverImage || "/api/placeholder/300/400"}
         onCropComplete={handleCroppedImageSave}
       />
     </>

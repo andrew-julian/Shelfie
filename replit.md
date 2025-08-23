@@ -3,6 +3,12 @@
 ## Overview
 Shelfie is a full-stack digital library management application designed to help users organize their personal book collections. It features barcode scanning for easy book addition, comprehensive metadata management, and a responsive user interface. The project aims to provide a robust and intuitive solution for personal library organization with strong ambitions for market potential.
 
+## Recent Changes (August 23, 2025)
+- **Application Rebranding**: Successfully rebranded from "BookScan" to "Shelfie" across all components, layouts, and references
+- **Performance Optimization**: Fixed critical infinite loop issues causing "Maximum update depth exceeded" errors by improving ResizeObserver and layout update logic
+- **Modal System Repair**: Resolved book details modal display issues by adding required DialogDescription component and fixing API request signatures
+- **Layout Engine Updates**: Updated ShelfieLayoutEngine import paths and references throughout the application
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 Development approach: Avoid hardcoded fixes for specific titles or content - build scalable general solutions that handle edge cases through improved logic.
