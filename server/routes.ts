@@ -5,12 +5,14 @@ import { setupAuth, isAuthenticated } from "./replitAuth.js";
 import express from "express";
 import path from "path";
 import Stripe from "stripe";
+import { insertBookSchema } from "../shared/schema.js";
+import { z } from "zod";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-07-30.basil",
 });
 
 // Standalone lookup function for background processing
@@ -300,8 +302,6 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
         originalDimensions: dimensionText,
         parsedDims: [dim1, dim2, dim3],
         sortedDims: [smallest, middle, largest],
-        depthIndex,
-        remainingOriginal,
         assigned: { width, height, depth },
         isCoffeeTableBook
       });
@@ -319,9 +319,6 @@ function parseAndAssignDimensions(dimensionText: string | null, title?: string):
     return { width: null, height: null, depth: null };
   }
 }
-import { insertBookSchema } from "@shared/schema";
-import { z } from "zod";
-import { setupAuth, isAuthenticated } from "./replitAuth";
 
 // Global progress tracker for refresh operations
 interface RefreshProgress {
@@ -1861,7 +1858,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update local subscription status
       await storage.updateUserSubscription(userId, {
         subscriptionStatus: 'canceled',
-        subscriptionExpiresAt: null
+        subscriptionExpiresAt: undefined
       });
       
       res.json({ success: true, message: 'Subscription canceled successfully' });
@@ -1879,9 +1876,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Reset user to free plan
       await storage.updateUserSubscription(userId, {
         subscriptionStatus: 'free',
-        subscriptionExpiresAt: null,
-        stripeSubscriptionId: null,
-        stripeCustomerId: null
+        subscriptionExpiresAt: undefined,
+        stripeSubscriptionId: undefined,
+        stripeCustomerId: undefined
       });
       
       res.json({ success: true, message: 'Subscription reset to free plan' });
@@ -1977,7 +1974,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           await storage.updateUserSubscription(customer.metadata.userId, {
             subscriptionStatus: status,
-            subscriptionExpiresAt: expiresAt
+            subscriptionExpiresAt: expiresAt || undefined
           });
           console.log('✅ Subscription status updated for user:', customer.metadata.userId);
         }
@@ -1990,7 +1987,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (deletedCustomer && !deletedCustomer.deleted && deletedCustomer.metadata?.userId) {
           await storage.updateUserSubscription(deletedCustomer.metadata.userId, {
             subscriptionStatus: 'canceled',
-            subscriptionExpiresAt: null
+            subscriptionExpiresAt: undefined
           });
           console.log('✅ Subscription canceled for user:', deletedCustomer.metadata.userId);
         }
@@ -2181,7 +2178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         pages: bookData.pages,
         dimensions: bookData.dimensions,
         weight: bookData.weight,
-        rating: bookData.rating,
+        rating: bookData.rating?.toString(),
         ratingsTotal: bookData.ratingsTotal,
         categories: bookData.categories || [],
         featureBullets: bookData.featureBullets || [],
