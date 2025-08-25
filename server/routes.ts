@@ -2059,8 +2059,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(201).json(queueItem);
       
-      // Start processing the item in the background
-      setImmediate(() => processScanningQueueItem(queueItem.id));
+      // Process the item synchronously for Vercel compatibility
+      processScanningQueueItem(queueItem.id).catch(error => {
+        console.error("Error processing queue item:", error);
+      });
       
     } catch (error) {
       console.error("Error adding to scanning queue:", error);
@@ -2101,8 +2103,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(updatedItem);
       
-      // Start processing the item in the background
-      setImmediate(() => processScanningQueueItem(id));
+      // Process the item synchronously for Vercel compatibility
+      processScanningQueueItem(id).catch(error => {
+        console.error("Error processing queue item:", error);
+      });
       
     } catch (error) {
       console.error("Error retrying scanning queue item:", error);
