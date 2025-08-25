@@ -16,7 +16,7 @@
   ],
   "routes": [
     {
-      "src": "/(api/.*)|(auth/.*)|(stripe/.*)",
+      "src": "/api/(.*)",
       "dest": "/api/index.ts"
     },
     {
@@ -25,7 +25,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/api/index.ts"
+      "dest": "/dist/public/index.html"
     }
   ],
   "env": {

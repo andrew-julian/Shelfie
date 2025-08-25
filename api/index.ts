@@ -1,13 +1,12 @@
 // Vercel serverless function entry point
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "../server/routes.js";
-import path from "path";
-import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+// Create app instance
 const app = express();
+
+// Set trust proxy for Vercel
+app.set('trust proxy', 1);
 
 // Webhook needs raw body, so handle it BEFORE other body parsers
 app.use('/api/stripe-webhook', express.raw({ type: 'application/json' }));
@@ -15,22 +14,25 @@ app.use('/api/stripe-webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Initialize the app for Vercel
-(async () => {
-  const server = await registerRoutes(app);
+// Initialize routes
+let routesRegistered = false;
 
+const initializeApp = async () => {
+  if (!routesRegistered) {
+    await registerRoutes(app);
+    routesRegistered = true;
+  }
+  
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
     res.status(status).json({ message });
     console.error('Server error:', err);
   });
+};
 
-  // Serve React app for all non-API routes
-  app.use("*", (_req, res) => {
-    const distPath = path.resolve(__dirname, "../dist/public");
-    res.sendFile(path.join(distPath, "index.html"));
-  });
-})();
-
-export default app;
+// Vercel handler function
+export default async function handler(req: Request, res: Response) {
+  await initializeApp();
+  return app(req, res);
+}

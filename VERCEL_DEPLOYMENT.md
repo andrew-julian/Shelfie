@@ -70,3 +70,25 @@ vercel --prod
 - [ ] Stripe payments working
 - [ ] Book scanning working
 - [ ] Webhook receiving events
+
+## Troubleshooting
+
+### "Cannot GET /" Error
+- Check if all environment variables are set in Vercel
+- Verify DATABASE_URL is correctly configured
+- Ensure REPLIT_DOMAINS includes your Vercel domain
+
+### 401/404 API Errors
+- Check that SESSION_SECRET is set
+- Verify REPL_ID and ISSUER_URL are correct
+- Make sure database tables exist (run db:push)
+
+### Database Connection Issues
+- Verify DATABASE_URL format: `postgresql://user:pass@host/db?sslmode=require`
+- Check if database is accessible from Vercel
+- Ensure sessions table exists
+
+### Authentication Not Working
+- Check REPLIT_DOMAINS matches your domain exactly
+- Verify callback URL in Replit Auth settings
+- Ensure cookies are working in production
