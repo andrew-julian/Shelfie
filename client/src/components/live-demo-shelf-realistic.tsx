@@ -25,13 +25,46 @@ interface LiveDemoShelfRealisticProps {
 
 // Convert database book to layout engine format
 function convertToLayoutBook(book: Book, index: number): LayoutBook {
+  // Generate realistic, varied dimensions when database doesn't have them
+  const generateRealisticDimensions = (bookId: string) => {
+    // Use book ID for consistent but varied dimensions
+    const hash = bookId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const rng = Math.abs(Math.sin(hash));
+    
+    // Realistic book dimension ranges (in mm)
+    const heights = [178, 195, 203, 216, 234, 248, 268, 285]; // Various book heights
+    const widthRatios = [0.65, 0.68, 0.71, 0.74, 0.77, 0.82]; // Width-to-height ratios
+    const spineRatios = [0.08, 0.12, 0.15, 0.18, 0.22, 0.28]; // Spine-to-width ratios
+    
+    const heightIndex = Math.floor(rng * heights.length);
+    const height = heights[heightIndex];
+    
+    const widthRatio = widthRatios[Math.floor((rng * 1000) % widthRatios.length)];
+    const width = height * widthRatio;
+    
+    const spineRatio = spineRatios[Math.floor((rng * 10000) % spineRatios.length)];
+    const spine = width * spineRatio;
+    
+    return { width, height, spine };
+  };
+  
+  // Use actual dimensions if available, otherwise generate realistic ones
+  let width_mm, height_mm, spine_mm;
+  
+  if (book.width && book.height && book.depth) {
+    width_mm = parseFloat(book.width.toString()) * 10;
+    height_mm = parseFloat(book.height.toString()) * 10;
+    spine_mm = parseFloat(book.depth.toString()) * 10;
+  } else {
+    const realistic = generateRealisticDimensions(book.id);
+    width_mm = realistic.width;
+    height_mm = realistic.height;
+    spine_mm = realistic.spine;
+  }
+  
   return {
     id: book.id,
-    phys: {
-      width_mm: book.width ? parseFloat(book.width) * 10 : 120, // Convert cm to mm
-      height_mm: book.height ? parseFloat(book.height) * 10 : 190, // Convert cm to mm  
-      spine_mm: book.depth ? parseFloat(book.depth) * 10 : 15 // Convert cm to mm
-    }
+    phys: { width_mm, height_mm, spine_mm }
   };
 }
 
