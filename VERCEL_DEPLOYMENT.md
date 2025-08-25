@@ -108,8 +108,9 @@ vercel --prod
 4. Go to "Credentials" → "Create Credentials" → "OAuth client ID"
 5. Choose "Web application"
 6. Add these authorized redirect URIs:
-   - `https://www2.shelfie.site/api/auth/google/callback`
-   - `https://your-custom-domain.com/api/auth/google/callback` (if using custom domain)
+   - `https://shelfie-eta.vercel.app/api/auth/google/callback` (primary Vercel URL)
+   - `https://www2.shelfie.site/api/auth/google/callback` (custom domain)
+   - `https://your-custom-domain.com/api/auth/google/callback` (if using additional custom domain)
 7. Copy the Client ID and Client Secret to your Vercel environment variables
 
 **Required Environment Variables for Vercel:**
@@ -128,7 +129,9 @@ vercel --prod
 
 **Ready to Deploy:**
 1. Set all environment variables in Vercel dashboard
-2. Configure Google OAuth redirect URI: `https://www2.shelfie.site/api/auth/google/callback`
+2. Configure Google OAuth redirect URIs:
+   - `https://shelfie-eta.vercel.app/api/auth/google/callback`
+   - `https://www2.shelfie.site/api/auth/google/callback`
 3. Deploy with: `vercel --prod`
 
 **Authentication Flow:**
