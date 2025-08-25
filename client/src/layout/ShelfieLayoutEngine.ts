@@ -147,6 +147,112 @@ export function calculateLayout(
 }
 
 /**
+ * Demo-specific layout that always creates exactly 4 rows
+ * Distributes books evenly across 4 rows regardless of container width
+ */
+export function calculateDemoLayout(
+  books: Book[], 
+  dims: Map<string, { w_norm: number; d_norm: number }>, 
+  containerWidth: number, 
+  cfg: LayoutConfig
+): LayoutItem[] {
+  if (books.length === 0) return [];
+  
+  // Force exactly 4 rows by distributing books evenly
+  const TARGET_ROWS = 4;
+  const layoutItems: LayoutItem[] = [];
+  
+  // Calculate books per row - distribute as evenly as possible
+  const booksPerRow = Math.ceil(books.length / TARGET_ROWS);
+  const rows: Book[][] = [];
+  
+  for (let i = 0; i < TARGET_ROWS; i++) {
+    const startIdx = i * booksPerRow;
+    const endIdx = Math.min(startIdx + booksPerRow, books.length);
+    if (startIdx < books.length) {
+      rows.push(books.slice(startIdx, endIdx));
+    }
+  }
+  
+  // Ensure we have exactly 4 rows (pad with empty if needed)
+  while (rows.length < TARGET_ROWS) {
+    rows.push([]);
+  }
+  
+  let yCursor = 0;
+  
+  for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+    const rowBooks = rows[rowIndex];
+    if (rowBooks.length === 0) continue;
+    
+    // Use consistent row height for demo
+    const demoRowHeight = 160;
+    
+    // Calculate total natural width for this row
+    let totalNaturalWidth = 0;
+    const bookWidths: number[] = [];
+    
+    for (const book of rowBooks) {
+      const bookDims = dims.get(book.id);
+      if (bookDims) {
+        const naturalWidth = (bookDims.w_norm * demoRowHeight) / cfg.BASE_HEIGHT;
+        bookWidths.push(naturalWidth);
+        totalNaturalWidth += naturalWidth;
+      } else {
+        bookWidths.push(120); // fallback width
+        totalNaturalWidth += 120;
+      }
+    }
+    
+    // Calculate scale factor to fit books in container
+    const totalGutterWidth = Math.max(0, rowBooks.length - 1) * cfg.gutterX;
+    const usableWidth = containerWidth - totalGutterWidth;
+    const scale = usableWidth / totalNaturalWidth;
+    
+    // Position books in this row
+    let currentX = 0;
+    const totalScaledWidth = totalNaturalWidth * scale;
+    const centerOffset = Math.max(0, (containerWidth - totalScaledWidth - totalGutterWidth) / 2);
+    currentX = centerOffset;
+    
+    for (let bookIndex = 0; bookIndex < rowBooks.length; bookIndex++) {
+      const book = rowBooks[bookIndex];
+      const bookDims = dims.get(book.id) || { w_norm: 120, d_norm: 15 };
+      
+      // Calculate final dimensions
+      const w = bookWidths[bookIndex] * scale;
+      const h = demoRowHeight;
+      const d = Math.max(2, bookDims.d_norm * 0.6); // Consistent depth
+      
+      // Add subtle jitter for organic feel
+      const seed = hash32(book.id);
+      const jx = (halton(seed, 2) - 0.5) * cfg.jitterX;
+      const jy = (halton(seed, 7) - 0.5) * 8; // Small vertical jitter
+      const ry = (halton(seed, 3) - 0.5) * cfg.maxTiltY;
+      const tz = halton(seed, 5) * (cfg.maxDepth * 0.7);
+      
+      layoutItems.push({
+        id: book.id,
+        x: currentX + jx,
+        y: yCursor + jy,
+        z: Math.floor(tz),
+        w,
+        h,
+        d,
+        ry
+      });
+      
+      currentX += w + cfg.gutterX;
+    }
+    
+    // Move to next row
+    yCursor += demoRowHeight + cfg.gutterY;
+  }
+  
+  return layoutItems;
+}
+
+/**
  * Processes a single row with justification and organic positioning
  */
 function processRow(

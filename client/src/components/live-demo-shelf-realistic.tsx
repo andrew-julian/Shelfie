@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { calculateLayout, normaliseBooks, DEFAULT_CFG, type Book as LayoutBook, type LayoutItem } from '@/layout/ShelfieLayoutEngine';
+import { calculateDemoLayout, normaliseBooks, DEFAULT_CFG, type Book as LayoutBook, type LayoutItem } from '@/layout/ShelfieLayoutEngine';
 import { useQuery } from '@tanstack/react-query';
 import type { Book } from '../../../shared/schema';
 
@@ -190,7 +190,7 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
       maxTiltY: 8
     };
     
-    return calculateLayout(layoutBooks, normalizedDims, containerWidth, demoConfig);
+    return calculateDemoLayout(layoutBooks, normalizedDims, containerWidth, demoConfig);
   }, [books, containerWidth]);
 
   // Calculate total content dimensions
