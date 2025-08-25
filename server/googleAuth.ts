@@ -25,6 +25,7 @@ export function getSession() {
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
       maxAge: sessionTtl,
     },
   });
@@ -113,7 +114,24 @@ export async function setupGoogleAuth(app: Express) {
         if (err) {
           console.error('Session destruction error:', err);
         }
-        res.clearCookie('connect.sid'); // Clear the session cookie
+        
+        // Clear all possible session cookies - mobile browsers can be finicky
+        const cookieOptions = {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
+          path: '/',
+        };
+        
+        res.clearCookie('connect.sid', cookieOptions);
+        res.clearCookie('connect.sid', { path: '/' }); // Fallback without options
+        res.clearCookie('session', cookieOptions); // Alternative session cookie name
+        res.clearCookie('session', { path: '/' }); // Fallback for alternative name
+        
+        // Clear any potential Google OAuth cookies
+        res.clearCookie('oauth2_state', { path: '/' });
+        res.clearCookie('oauth2_callback', { path: '/' });
+        
         res.redirect('/');
       });
     });
@@ -126,7 +144,22 @@ export async function setupGoogleAuth(app: Express) {
         if (err) {
           console.error('Session destruction error:', err);
         }
-        res.clearCookie('connect.sid'); // Clear the session cookie
+        
+        // Clear all possible session cookies - mobile browsers can be finicky
+        const cookieOptions = {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
+          path: '/',
+        };
+        
+        res.clearCookie('connect.sid', cookieOptions);
+        res.clearCookie('connect.sid', { path: '/' });
+        res.clearCookie('session', cookieOptions);
+        res.clearCookie('session', { path: '/' });
+        res.clearCookie('oauth2_state', { path: '/' });
+        res.clearCookie('oauth2_callback', { path: '/' });
+        
         res.json({ message: 'Session forcefully cleared' });
       });
     });
