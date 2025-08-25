@@ -94,7 +94,7 @@ export default function Landing() {
                     <Camera className="w-8 h-8 md:w-10 md:h-10 text-orange-600" />
                   </div>
                   <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">1. Scan</h3>
-                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">Point your camera at a barcode. Works offline, syncs later.</p>
+                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">Point your camera at a book barcode.</p>
                 </div>
                 
                 <div className="text-center">
