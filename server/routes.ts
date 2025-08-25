@@ -12,6 +12,11 @@ import Stripe from "stripe";
 import { insertBookSchema } from "../shared/schema.js";
 import { z } from "zod";
 
+// Helper function to get user ID from request (works with both auth systems)
+function getUserId(req: any): string {
+  return req.user?.claims?.sub || req.user?.id;
+}
+
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
@@ -385,7 +390,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -472,7 +477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User preferences routes
   app.get('/api/user/preferences', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       let preferences = await storage.getUserPreferences(userId);
       
       // Create default preferences if they don't exist
@@ -494,7 +499,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/user/preferences', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const { amazonDomain, currency, measurementUnit } = req.body;
       
       const updatedPreferences = await storage.updateUserPreferences(userId, {
@@ -1736,7 +1741,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user details including subscription status and book count
   app.get("/api/user/details", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -1765,7 +1770,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create Stripe subscription for user who reached 100+ books
   app.post("/api/create-subscription", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const user = await storage.getUser(userId);
       
       if (!user) {
