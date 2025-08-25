@@ -256,7 +256,7 @@ export default function Landing() {
                     <span className="bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold">Recommended</span>
                   </div>
                   <CardContent className="p-0">
-                    <h3 className="text-2xl md:text-3xl font-bold mb-3">Pro plan</h3>
+                    <h3 className="text-2xl md:text-3xl font-bold mb-3">Unlimited plan</h3>
                     <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8">Unlimited books, all features</p>
                     <div className="text-3xl md:text-4xl font-bold mb-2">$17<span className="text-lg md:text-xl font-normal text-gray-500">/year</span></div>
                     <p className="text-sm md:text-base text-gray-500 mb-6 md:mb-8 italic">A whole library, for less than the price of one paperback.</p>
@@ -271,7 +271,7 @@ export default function Landing() {
                       </li>
                     </ul>
                     <Button className="w-full py-3 text-base bg-orange-500 hover:bg-orange-600" asChild data-testid="button-pro-plan">
-                      <a href="/subscription">Upgrade to Pro →</a>
+                      <a href="/subscription">Upgrade to Unlimited →</a>
                     </Button>
                   </CardContent>
                 </Card>
