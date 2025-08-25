@@ -420,13 +420,27 @@ export default function ScanPage() {
             console.log('ScanbotSDK available:', !!window.ScanbotSDK);
             console.log('ScanbotSDK.initialize available:', !!window.ScanbotSDK.initialize);
             
-            // Use local files for better reliability - absolute URL to avoid path issues
-            const enginePath = `${window.location.origin}/scanbot-sdk/`;
+            // Use barcode-scanner specific path for better reliability
+            const enginePath = `${window.location.origin}/scanbot-sdk/bin/barcode-scanner/`;
             
             console.log('Using enginePath:', enginePath);
+            console.log('Full URL being used:', enginePath);
+            
+            // Test if the engine path is accessible
+            try {
+              const testResponse = await fetch(`${enginePath}ScanbotSDK.Core.js`);
+              console.log('Engine path accessibility test:', testResponse.status === 200 ? 'SUCCESS' : 'FAILED');
+            } catch (e) {
+              console.log('Engine path accessibility test: FAILED', e);
+            }
+            
             const initResult = await window.ScanbotSDK.initialize({
               licenseKey: licenseKey,
-              enginePath: enginePath
+              enginePath: enginePath,
+              // Add additional configuration for better reliability
+              features: {
+                barcodeScanner: true
+              }
             });
             
             console.log('SDK Init result:', initResult);
