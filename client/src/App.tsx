@@ -61,6 +61,13 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        {/* Deployment version indicator for debugging */}
+        <div 
+          className="fixed bottom-2 right-2 text-xs text-gray-400 bg-gray-900/80 px-2 py-1 rounded text-[10px] font-mono pointer-events-none z-50"
+          style={{ fontSize: '10px' }}
+        >
+          v2025.01.25.17:52
+        </div>
       </TooltipProvider>
     </QueryClientProvider>
   );
