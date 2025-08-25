@@ -27,8 +27,8 @@ After deploying, you need to configure these environment variables in your Verce
 - `STRIPE_WEBHOOK_SECRET_PROD` - Your production Stripe webhook secret
 - `VITE_STRIPE_PUBLIC_KEY` - Your Stripe publishable key
 - `RAINFOREST_API_KEY` - Your Rainforest API key
-- `REPL_ID` - Your Replit app ID
-- `REPLIT_DOMAINS` - Your Vercel domain (e.g., "yourapp.vercel.app,workspace-92txorcdz-andrew-8095s-projects.vercel.app")
+- `REPL_ID` - Your Replit app ID (found in your Replit project settings, NOT "Shelfie")
+- `REPLIT_DOMAINS` - Your exact Vercel domain (e.g., "workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app")
 - `ISSUER_URL` - "https://replit.com/oidc"
 
 ### How to Set Environment Variables:
@@ -89,6 +89,18 @@ vercel --prod
 - Ensure sessions table exists
 
 ### Authentication Not Working
-- Check REPLIT_DOMAINS matches your domain exactly
-- Verify callback URL in Replit Auth settings
+- Check REPLIT_DOMAINS matches your domain exactly (without https://)
+- Verify REPL_ID is the actual app ID from Replit, not "Shelfie"
+- Verify callback URL in Replit Auth settings matches: `https://your-domain.vercel.app/api/callback`
+- Check that all auth environment variables are set correctly
 - Ensure cookies are working in production
+
+### Invalid Client Error
+This means REPL_ID is incorrect. To find your correct REPL_ID:
+1. Go to your Replit project
+2. Check the URL - the REPL_ID is the unique identifier in your Replit project
+3. Or check your existing environment variables in the Replit project settings
+
+### Malformed Redirect URI
+- Ensure REPLIT_DOMAINS doesn't include `https://` prefix
+- Domain should be exactly: `workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app`

@@ -87,41 +87,49 @@ export async function setupAuth(app: Express) {
   // Register strategies for all configured domains
   const domains = process.env.REPLIT_DOMAINS!.split(",").map(d => d.trim());
   for (const domain of domains) {
+    // Ensure domain doesn't already include protocol
+    const cleanDomain = domain.replace(/^https?:\/\//, '');
+    const callbackURL = `https://${cleanDomain}/api/callback`;
+    
     const strategy = new Strategy(
       {
-        name: `replitauth:${domain}`,
+        name: `replitauth:${cleanDomain}`,
         config,
         scope: "openid email profile offline_access",
-        callbackURL: `https://${domain}/api/callback`,
+        callbackURL,
       },
       verify,
     );
     passport.use(strategy);
-    console.log(`Registered auth strategy for domain: ${domain}`);
+    console.log(`Registered auth strategy for domain: ${cleanDomain}, callback: ${callbackURL}`);
   }
   
   // Also register a fallback strategy for any hostname
+  const firstDomain = process.env.REPLIT_DOMAINS!.split(",")[0].trim().replace(/^https?:\/\//, '');
+  const fallbackCallbackURL = `https://${firstDomain}/api/callback`;
   const fallbackStrategy = new Strategy(
     {
       name: "replitauth:fallback",
       config,
       scope: "openid email profile offline_access",
-      callbackURL: `https://${process.env.REPLIT_DOMAINS!.split(",")[0].trim()}/api/callback`,
+      callbackURL: fallbackCallbackURL,
     },
     verify,
   );
   passport.use(fallbackStrategy);
+  console.log(`Registered fallback auth strategy, callback: ${fallbackCallbackURL}`);
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    const domains = process.env.REPLIT_DOMAINS!.split(",").map(d => d.trim());
-    const strategyName = domains.includes(req.hostname) 
-      ? `replitauth:${req.hostname}` 
+    const domains = process.env.REPLIT_DOMAINS!.split(",").map(d => d.trim().replace(/^https?:\/\//, ''));
+    const hostname = req.hostname;
+    const strategyName = domains.includes(hostname) 
+      ? `replitauth:${hostname}` 
       : "replitauth:fallback";
     
-    console.log(`Login attempt for hostname: ${req.hostname}, using strategy: ${strategyName}`);
+    console.log(`Login attempt for hostname: ${hostname}, configured domains: ${domains.join(', ')}, using strategy: ${strategyName}`);
     
     passport.authenticate(strategyName, {
       prompt: "login consent",
@@ -130,12 +138,13 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
-    const domains = process.env.REPLIT_DOMAINS!.split(",").map(d => d.trim());
-    const strategyName = domains.includes(req.hostname) 
-      ? `replitauth:${req.hostname}` 
+    const domains = process.env.REPLIT_DOMAINS!.split(",").map(d => d.trim().replace(/^https?:\/\//, ''));
+    const hostname = req.hostname;
+    const strategyName = domains.includes(hostname) 
+      ? `replitauth:${hostname}` 
       : "replitauth:fallback";
     
-    console.log(`Callback for hostname: ${req.hostname}, using strategy: ${strategyName}`);
+    console.log(`Callback for hostname: ${hostname}, using strategy: ${strategyName}`);
     
     passport.authenticate(strategyName, {
       successReturnToOrRedirect: "/",
