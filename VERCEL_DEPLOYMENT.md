@@ -95,11 +95,27 @@ vercel --prod
 - Check that all auth environment variables are set correctly
 - Ensure cookies are working in production
 
-### Invalid Client Error
-This means REPL_ID is incorrect. To find your correct REPL_ID:
-1. Go to your Replit project
-2. Check the URL - the REPL_ID is the unique identifier in your Replit project
-3. Or check your existing environment variables in the Replit project settings
+### Invalid Client Error (client_id=Shelfie)
+This means REPL_ID is incorrect. The OAuth URL shows `client_id=Shelfie` but it should be your actual Replit app ID.
+
+**How to find your correct REPL_ID:**
+1. **Method 1 - From Replit URL:**
+   - Look at your Replit project URL: `https://replit.com/@username/project-name`
+   - Your REPL_ID might be in the format like: `@username/project-name` or a UUID
+
+2. **Method 2 - From Environment Variables:**
+   - In Replit, go to Tools → Secrets (or Environment Variables)
+   - Look for existing `REPL_ID` value
+   - Copy that exact value to Vercel
+
+3. **Method 3 - From Project Settings:**
+   - In Replit, check your project settings/info
+   - Look for "App ID" or "Project ID"
+
+**Important:** 
+- REPL_ID should NOT be "Shelfie"  
+- It should be a unique identifier from Replit
+- Use the exact same value that works in your Replit development environment
 
 ### Malformed Redirect URI
 - Ensure REPLIT_DOMAINS doesn't include `https://` prefix
