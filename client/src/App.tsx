@@ -68,12 +68,12 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
-        {/* Deployment version indicator for debugging - make it very visible */}
+        {/* Build timestamp indicator for debugging - make it very visible */}
         <div 
           className="fixed bottom-2 right-2 bg-red-500 text-white px-3 py-2 rounded-lg font-bold text-sm z-[9999] shadow-lg border-2 border-white"
           style={{ fontSize: '14px' }}
         >
-          🚀 v2025.01.25.18:00
+          🚀 {new Date().toISOString().slice(0, 19).replace('T', ' ')}
         </div>
       </TooltipProvider>
     </QueryClientProvider>
