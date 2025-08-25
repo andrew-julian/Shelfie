@@ -28,11 +28,12 @@ The server-side uses a **RESTful API** pattern built with Express.js:
 - **API Design**: RESTful endpoints following `/api/books` patterns.
 
 ### Data Storage Solutions
-The application employs a **dual-storage approach**:
-- **Production Database**: PostgreSQL with Neon serverless database.
-- **Development Storage**: In-memory storage for rapid development and testing.
+The application employs a **PostgreSQL-based approach**:
+- **Production Database**: PostgreSQL with Neon serverless database for both development and production.
+- **Development Database**: Same PostgreSQL setup as production for consistency.
 - **Schema Definition**: Centralized schema definitions in `shared/schema.ts`.
 - **Migration Management**: Drizzle Kit for database schema migrations.
+- **Deployment**: Vercel-compatible configuration with environment-specific database connections.
 
 ### Authentication and Authorization
 Currently implements a **session-based approach** using `connect-pg-simple` for PostgreSQL-backed sessions.
@@ -43,6 +44,7 @@ Currently implements a **session-based approach** using `connect-pg-simple` for 
 - **Dynamic Layout Architecture**: A sophisticated positioning system with an O(n) TypeScript headless engine, justified rows, and Halton sequences for organic positioning. It includes features like physical scaling based on Amazon dimension data, and deterministic positioning.
 - **API Abstraction**: Centralized API client with standardized error handling and React Query integration.
 - **Responsive Design**: Mobile-first approach using Tailwind CSS breakpoints.
+- **Vercel Deployment**: Full-stack deployment with serverless functions, static asset serving, and environment-specific configurations for database and webhooks.
 
 ### UI/UX Decisions
 - **Color Scheme**: Primary blue, secondary gray, and accent orange.
