@@ -95,13 +95,13 @@ function LiveBookCard({
             position: 'relative',
             transformStyle: 'preserve-3d',
             transform: isHovered 
-              ? 'rotateY(-25deg) translateZ(2px)' 
+              ? 'rotateY(0deg) translateZ(8px) scale(1.05)' 
               : 'rotateY(-25deg) translateZ(1px)',
-            transition: 'transform 220ms cubic-bezier(.2,.8,.2,1)',
+            transition: 'transform 320ms cubic-bezier(.2,.8,.2,1)',
             margin: 0,
             boxSizing: 'border-box',
             boxShadow: isHovered
-              ? '0 8px 15px rgba(0,0,0,.22), 0 30px 50px -20px rgba(0,0,0,.4)'
+              ? '0 12px 25px rgba(0,0,0,.25), 0 40px 60px -20px rgba(0,0,0,.45)'
               : '0 6px 10px rgba(0,0,0,.18), 0 24px 40px -20px rgba(0,0,0,.35)'
           }}
         >
