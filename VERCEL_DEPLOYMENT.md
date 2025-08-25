@@ -117,26 +117,32 @@ This means REPL_ID is incorrect. The OAuth URL shows `client_id=Shelfie` but it 
 - It should be a unique identifier from Replit
 - Use the exact same value that works in your Replit development environment
 
-### Invalid Redirect URI Error
-This means your production domain isn't registered in Replit's OAuth settings.
+### Invalid Redirect URI Error - IMPORTANT LIMITATION
 
-**Steps to Fix:**
-1. **In your Replit project:**
-   - Go to your project settings/configuration
-   - Find "OAuth" or "Authentication" settings
-   - Look for "Allowed Redirect URIs" or "Callback URLs"
-   
-2. **Add your production callback URL:**
-   - Add: `https://workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app/api/callback`
-   - Save the settings
-   
-3. **Alternative method:**
-   - Check if there's a `.replit` file or environment configuration
-   - Look for OAuth/auth configuration sections
-   - Add your production domain to allowed domains
+**The Real Issue:** Replit OAuth is designed to work only with Replit domains, not external deployments like Vercel.
 
-**Note:** The redirect URI must be exactly:
-`https://workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app/api/callback`
+**Why This Happens:**
+- `REPLIT_DOMAINS` is automatically set by Replit for Replit-hosted apps
+- Replit's OAuth system only recognizes Replit domains as authorized
+- Your Vercel domain (`workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app`) is not recognized by Replit's OAuth
+
+**Solutions:**
+
+1. **Deploy on Replit Instead (Recommended):**
+   - Use Replit's deployment system instead of Vercel
+   - Replit OAuth will work automatically with Replit domains
+   - Run: `replit deploy` or use the deploy button in Replit
+
+2. **Switch to Different OAuth for Vercel:**
+   - Replace Replit OAuth with Google OAuth, GitHub OAuth, or Auth0
+   - These providers allow you to configure authorized redirect URIs for any domain
+   - Update your authentication system accordingly
+
+3. **Hybrid Approach:**
+   - Keep development on Replit with Replit OAuth
+   - Use a different OAuth provider for Vercel production
+
+**Current Status:** Replit OAuth cannot work on Vercel domains - this is a platform limitation, not a configuration issue.
 
 ### Malformed Redirect URI
 - Ensure REPLIT_DOMAINS doesn't include `https://` prefix
