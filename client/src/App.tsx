@@ -1,5 +1,5 @@
 import { Switch, Route } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -57,10 +57,21 @@ function Router() {
 }
 
 function App() {
+  const [showBadge, setShowBadge] = useState(true);
+
   // Log deployment version for debugging
   useEffect(() => {
     console.log('🚀 DEPLOYMENT VERSION: v2025.01.25.18:00');
     console.log('🚀 Build timestamp:', new Date().toISOString());
+  }, []);
+
+  // Auto-hide badge after 4 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowBadge(false);
+    }, 4000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -68,9 +79,11 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
-        {/* Build timestamp indicator for debugging - make it very visible */}
+        {/* Build timestamp indicator for debugging - auto-hides after 4 seconds */}
         <div 
-          className="fixed bottom-2 left-2 bg-red-500 text-white px-3 py-2 rounded-lg font-bold text-sm z-[9999] shadow-lg border-2 border-white"
+          className={`fixed bottom-2 left-2 bg-red-500 text-white px-3 py-2 rounded-lg font-bold text-sm z-[9999] shadow-lg border-2 border-white transition-all duration-500 ease-in-out ${
+            showBadge ? 'transform translate-y-0 opacity-100' : 'transform translate-y-full opacity-0 pointer-events-none'
+          }`}
           style={{ fontSize: '14px' }}
         >
           🚀 {new Date().toISOString().slice(0, 19).replace('T', ' ')}
