@@ -109,8 +109,8 @@ vercel --prod
 5. Choose "Web application"
 6. Add these authorized redirect URIs:
    - `https://shelfie-vanaheim.vercel.app/api/auth/google/callback` (primary Vercel URL)
-   - `https://www.shelfie.net/api/auth/google/callback` (primary custom domain)
-   - `https://shelfie.net/api/auth/google/callback` (alternative custom domain)
+   - `https://www.shelfie.site/api/auth/google/callback` (primary custom domain)
+   - `https://shelfie.site/api/auth/google/callback` (alternative custom domain)
 7. Copy the Client ID and Client Secret to your Vercel environment variables
 
 **Required Environment Variables for Vercel:**
@@ -131,15 +131,15 @@ vercel --prod
 1. Set all environment variables in Vercel dashboard
 2. Configure Google OAuth redirect URIs:
    - `https://shelfie-vanaheim.vercel.app/api/auth/google/callback`
-   - `https://www.shelfie.net/api/auth/google/callback`
-   - `https://shelfie.net/api/auth/google/callback`
+   - `https://www.shelfie.site/api/auth/google/callback`
+   - `https://shelfie.site/api/auth/google/callback`
 3. Deploy with: `vercel --prod`
 
 **Authentication Flow:**
-- Login: `https://www.shelfie.net/api/login` (redirects to Google)
-- Callback: `https://www.shelfie.net/api/auth/google/callback` (handles Google response)
-- Logout: `https://www.shelfie.net/api/logout`
+- Login: `https://www.shelfie.site/api/login` (redirects to Google)
+- Callback: `https://www.shelfie.site/api/auth/google/callback` (handles Google response)
+- Logout: `https://www.shelfie.site/api/logout`
 
 ### Malformed Redirect URI
 - Ensure REPLIT_DOMAINS doesn't include `https://` prefix
-- Production domains: `www.shelfie.net` and `shelfie.net`
+- Production domains: `www.shelfie.site` and `shelfie.site`

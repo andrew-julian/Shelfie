@@ -6,8 +6,8 @@
 - **Webhook URL**: `https://[your-replit-domain]/api/stripe-webhook`
 - **Environment Variable**: `STRIPE_WEBHOOK_SECRET`
 
-### Production (shelfie.net)
-- **Webhook URL**: `https://www.shelfie.net/api/stripe-webhook`
+### Production (shelfie.site)
+- **Webhook URL**: `https://www.shelfie.site/api/stripe-webhook`
 - **Environment Variable**: `STRIPE_WEBHOOK_SECRET_PROD`
 
 ## Required Webhook Events
@@ -55,7 +55,7 @@ When adding the webhook destination in your Stripe dashboard, select these speci
 ### 2. Add Production Webhook
 1. Go to Stripe Dashboard → Developers → Webhooks
 2. Click "Add endpoint"
-3. **Endpoint URL**: `https://www.shelfie.net/api/stripe-webhook`
+3. **Endpoint URL**: `https://www.shelfie.site/api/stripe-webhook`
 4. **Events to send**: Select the same events as development
 5. **API Version**: Use latest (recommended)
 6. Click "Add endpoint"

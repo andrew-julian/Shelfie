@@ -63,7 +63,7 @@ Implements a **hybrid authentication system**:
 - **User Management System**: Database-connected user switcher, dynamic user loading, and session context switching.
 - **Input Forgiveness**: Automatic cleanup of whitespace and hyphens from ISBN inputs.
 - **Complete Stripe Integration**: $17/year subscription system with secure webhook processing (STRIPE_WEBHOOK_SECRET), comprehensive billing management, subscription lifecycle controls (upgrade/cancel/reset), and real-time status updates via checkout.session.completed events. Environment-specific webhook configuration for development (Replit) and production (shelfie.site) domains. (August 2025)
-- **Dual Authentication System**: Hybrid OAuth implementation using Replit OAuth for development and Google OAuth for production deployments. Supports seamless development workflow while enabling external deployment on platforms like Vercel. Production deployment configured for www.shelfie.net and shelfie.net domains under vanaheim organization. (August 2025)
+- **Dual Authentication System**: Hybrid OAuth implementation using Replit OAuth for development and Google OAuth for production deployments. Supports seamless development workflow while enabling external deployment on platforms like Vercel. Production deployment configured for www.shelfie.site and shelfie.site domains under vanaheim organization. (August 2025)
 
 ## External Dependencies
 
