@@ -225,7 +225,7 @@ export default function Landing() {
                   <CardContent className="p-0">
                     <h3 className="text-2xl md:text-3xl font-bold mb-3">Free plan</h3>
                     <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8">Perfect for smaller libraries</p>
-                    <div className="text-3xl md:text-4xl font-bold mb-6 md:mb-8">$0<span className="text-lg md:text-xl font-normal text-gray-500">/month</span></div>
+                    <div className="text-3xl md:text-4xl font-bold mb-6 md:mb-8 text-green-600">FREE</div>
                     <ul className="space-y-4 mb-8 md:mb-10">
                       <li className="flex items-center gap-3">
                         <Check className="w-5 h-5 md:w-6 md:h-6 text-green-500" />
