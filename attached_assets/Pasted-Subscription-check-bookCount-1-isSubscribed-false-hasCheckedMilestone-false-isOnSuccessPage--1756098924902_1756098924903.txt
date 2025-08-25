@@ -1,0 +1,39 @@
+Subscription check: {bookCount: 1, isSubscribed: false, hasCheckedMilestone: false, isOnSuccessPage: false, location: '/scan', …}
+index-BgDPB7Kh.js:383 Scanbot SDK script loaded, initializing...
+index-BgDPB7Kh.js:383 Using production license key for shelfie.site
+index-BgDPB7Kh.js:383 License key length: 418
+index-BgDPB7Kh.js:383 License key preview: HST5knltqsfXtEJPCS8F9mMKEbmJUVSpMeynyNqA7W/9wSjWUo...
+index-BgDPB7Kh.js:383 Attempting SDK initialization...
+index-BgDPB7Kh.js:383 ScanbotSDK available: true
+index-BgDPB7Kh.js:383 ScanbotSDK.initialize available: true
+index-BgDPB7Kh.js:383 Using enginePath: https://www.shelfie.site/scanbot-sdk/
+index-BgDPB7Kh.js:383 SDK Init result: $E {storage: HE, bridge: d}
+index-BgDPB7Kh.js:383 Scanbot SDK initialized successfully
+6331f069-e421-4283-a1ba-ed75e01c8804:1 Uncaught NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope': The script at 'https://www.shelfie.site/scanbot-sdk/ScanbotSDK.Core-simd.js?7.2.0' failed to load.
+    at 6331f069-e421-4283-a1ba-ed75e01c8804:1:1
+(anonymous) @ 6331f069-e421-4283-a1ba-ed75e01c8804:1Understand this error
+lockdown-install.js:1 SES_UNCAUGHT_EXCEPTION: null
+(anonymous) @ lockdown-install.js:1Understand this error
+index-BgDPB7Kh.js:383 Starting Scanbot scanner...
+index-BgDPB7Kh.js:383 Creating barcode scanner with config: N {version: '1.0', screen: 'BarcodeScanner', palette: o, localization: S, backgroundColor: '?sbColorSurfaceLow', …}
+index-BgDPB7Kh.js:383 Scanbot scanning error: l: Error initializing the ScanbotSDK worker. Most likely, this is caused by an incorrect enginePath parameter set during the SDK initialization. Please check your browser's developer tools -> "Network" tab to see if any JS or WASM files failed to load. Note that you need to set up your webserver to serve these files under a certain path and then adjust the enginePath parameter accordingly. Please refer to the "Initialization" section in our documentation for more information.
+    at d.<anonymous> (ScanbotSDK.ui2.min.js:31:260278)
+    at Generator.throw (<anonymous>)
+    at s (ScanbotSDK.ui2.min.js:31:259770)
+N @ index-BgDPB7Kh.js:383
+await in N
+Hw @ index-BgDPB7Kh.js:37
+Vw @ index-BgDPB7Kh.js:37
+Kw @ index-BgDPB7Kh.js:37
+ih @ index-BgDPB7Kh.js:37
+ag @ index-BgDPB7Kh.js:37
+(anonymous) @ index-BgDPB7Kh.js:37
+$d @ index-BgDPB7Kh.js:40
+Mp @ index-BgDPB7Kh.js:37
+ec @ index-BgDPB7Kh.js:37
+md @ index-BgDPB7Kh.js:37
+l1 @ index-BgDPB7Kh.js:37Understand this error
+ScanbotSDK.ui2.min.js:31 Uncaught (in promise) l: Error initializing the ScanbotSDK worker. Most likely, this is caused by an incorrect enginePath parameter set during the SDK initialization. Please check your browser's developer tools -> "Network" tab to see if any JS or WASM files failed to load. Note that you need to set up your webserver to serve these files under a certain path and then adjust the enginePath parameter accordingly. Please refer to the "Initialization" section in our documentation for more information.
+    at d.<anonymous> (ScanbotSDK.ui2.min.js:31:260278)
+    at Generator.throw (<anonymous>)
+    at s (ScanbotSDK.ui2.min.js:31:259770)
