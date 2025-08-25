@@ -2357,6 +2357,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         coverUrl: bookData.coverImage
       });
 
+      // Double-check for duplicates to prevent race conditions
+      const finalDuplicateCheck = await storage.getBookByIsbn(queueItem.isbn, queueItem.userId);
+      if (finalDuplicateCheck) {
+        console.log(`📝 Duplicate book found during final check: ${queueItem.isbn} for user ${queueItem.userId}`);
+        await storage.updateScanningQueueItem(queueItemId, { 
+          status: 'success', // Mark as success since book exists
+          completedAt: new Date()
+        });
+        return;
+      }
+
       // Add book to library
       const book = await storage.createBook({
         isbn: queueItem.isbn,
