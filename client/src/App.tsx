@@ -1,4 +1,5 @@
 import { Switch, Route } from "wouter";
+import { useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -56,17 +57,32 @@ function Router() {
 }
 
 function App() {
+  // Set deployment version in document title for debugging
+  useEffect(() => {
+    const originalTitle = document.title;
+    document.title = `${originalTitle} | v2025.01.25.18:00`;
+    return () => {
+      document.title = originalTitle;
+    };
+  }, []);
+
+  // Log deployment version for debugging
+  useEffect(() => {
+    console.log('🚀 DEPLOYMENT VERSION: v2025.01.25.18:00');
+    console.log('🚀 Build timestamp:', new Date().toISOString());
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Router />
-        {/* Deployment version indicator for debugging */}
+        {/* Deployment version indicator for debugging - make it very visible */}
         <div 
-          className="fixed bottom-2 right-2 text-xs text-gray-400 bg-gray-900/80 px-2 py-1 rounded text-[10px] font-mono pointer-events-none z-50"
-          style={{ fontSize: '10px' }}
+          className="fixed bottom-2 right-2 bg-red-500 text-white px-3 py-2 rounded-lg font-bold text-sm z-[9999] shadow-lg border-2 border-white"
+          style={{ fontSize: '14px' }}
         >
-          v2025.01.25.17:52
+          🚀 v2025.01.25.18:00
         </div>
       </TooltipProvider>
     </QueryClientProvider>
