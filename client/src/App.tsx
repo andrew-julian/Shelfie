@@ -70,7 +70,7 @@ function App() {
         <Router />
         {/* Build timestamp indicator for debugging - make it very visible */}
         <div 
-          className="fixed bottom-2 right-2 bg-red-500 text-white px-3 py-2 rounded-lg font-bold text-sm z-[9999] shadow-lg border-2 border-white"
+          className="fixed bottom-2 left-2 bg-red-500 text-white px-3 py-2 rounded-lg font-bold text-sm z-[9999] shadow-lg border-2 border-white"
           style={{ fontSize: '14px' }}
         >
           🚀 {new Date().toISOString().slice(0, 19).replace('T', ' ')}
