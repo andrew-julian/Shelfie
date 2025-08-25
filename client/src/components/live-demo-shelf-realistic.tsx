@@ -366,7 +366,7 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
         }}
       >
         <div 
-          className="relative w-full h-full"
+          className="relative mx-auto"
           style={{ 
             width: `${contentDimensions.width}px`,
             height: `${contentDimensions.height}px`,
