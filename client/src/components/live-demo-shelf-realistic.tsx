@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { calculateDemoLayout, normaliseBooks, DEFAULT_CFG, type Book as LayoutBook, type LayoutItem } from '@/layout/ShelfieLayoutEngine';
+import { calculateLayout, normaliseBooks, DEFAULT_CFG, type Book as LayoutBook, type LayoutItem } from '@/layout/ShelfieLayoutEngine';
 import { useQuery } from '@tanstack/react-query';
 import type { Book } from '../../../shared/schema';
 
@@ -180,17 +180,18 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
     const layoutBooks = books.map((book, index) => convertToLayoutBook(book, index));
     const normalizedDims = normaliseBooks(layoutBooks, DEFAULT_CFG.BASE_HEIGHT);
     
-    // Use elegant spacing for organic layout
+    // Use settings that naturally create ~4 rows with organic feel
     const demoConfig = {
       ...DEFAULT_CFG,
-      targetRowHeight: 180, 
+      targetRowHeight: 160, // Smaller target height encourages more rows
       gutterX: 12,
       gutterY: 15,
       jitterX: 8,
-      maxTiltY: 8
+      maxTiltY: 8,
+      raggedLastRow: true // Allow natural organic endings
     };
     
-    return calculateDemoLayout(layoutBooks, normalizedDims, containerWidth, demoConfig);
+    return calculateLayout(layoutBooks, normalizedDims, containerWidth, demoConfig);
   }, [books, containerWidth]);
 
   // Calculate total content dimensions
