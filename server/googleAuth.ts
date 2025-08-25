@@ -109,7 +109,13 @@ export async function setupGoogleAuth(app: Express) {
 
   app.get('/api/logout', (req, res) => {
     req.logout(() => {
-      res.redirect('/');
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Session destruction error:', err);
+        }
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        res.redirect('/');
+      });
     });
   });
 

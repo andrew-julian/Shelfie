@@ -183,13 +183,19 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/logout", (req, res) => {
     req.logout(() => {
-      if (process.env.NODE_ENV === 'development' && process.env.REPLIT_DOMAINS) {
-        // Development logout with Replit
-        res.redirect("/");
-      } else {
-        // Production logout - redirect to home
-        res.redirect("/");
-      }
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Session destruction error:', err);
+        }
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        if (process.env.NODE_ENV === 'development' && process.env.REPLIT_DOMAINS) {
+          // Development logout with Replit
+          res.redirect("/");
+        } else {
+          // Production logout - redirect to home
+          res.redirect("/");
+        }
+      });
     });
   });
 }
