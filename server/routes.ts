@@ -521,7 +521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all books
   app.get("/api/books", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const books = await storage.getAllBooks(userId);
       res.json(books);
     } catch (error) {
@@ -536,7 +536,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Clean ISBN: remove whitespace and hyphens for consistent processing
       isbn = isbn.trim().replace(/[\s\-]/g, '');
       const { region } = req.query;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       
       // Get user's preferred region, fallback to query param or default
       let amazonDomain = region as string;
@@ -833,7 +833,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add book to library
   app.post("/api/books", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const validatedData = insertBookSchema.parse(req.body);
       
       // Get user details to check subscription status and book count
@@ -889,7 +889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/books/:id", isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const updateData = req.body;
       
       // Remove fields that shouldn't be updated
@@ -915,7 +915,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { status } = req.body;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       
       if (!["want-to-read", "reading", "read"].includes(status)) {
         return res.status(400).json({ message: "Invalid status" });
@@ -938,7 +938,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { selectedCoverIndex } = req.body;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       
       if (typeof selectedCoverIndex !== 'number' || selectedCoverIndex < 0) {
         return res.status(400).json({ message: "Invalid cover index" });
@@ -970,7 +970,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { croppedImageData, originalImageUrl } = req.body;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       
       const book = await storage.getBook(id, userId);
       if (!book) {
@@ -1005,7 +1005,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/books/:id/refresh", isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       
       // Get existing book
       const existingBook = await storage.getBook(id, userId);
@@ -1332,7 +1332,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Refresh all books with progress tracking
   app.post("/api/books/refresh-all", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const allBooks = await storage.getAllBooks(userId);
       const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
       
@@ -2032,7 +2032,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get scanning queue for current user
   app.get("/api/scanning-queue", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const queue = await storage.getScanningQueue(userId);
       res.json(queue);
     } catch (error) {
@@ -2044,7 +2044,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add item to scanning queue
   app.post("/api/scanning-queue", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const { isbn } = req.body;
       
       if (!isbn) {
@@ -2130,7 +2130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Clear completed items from queue
   app.delete("/api/scanning-queue/completed", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       await storage.clearCompletedScanningQueue(userId);
       res.json({ message: "Completed items cleared" });
     } catch (error) {
