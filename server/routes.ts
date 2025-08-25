@@ -529,10 +529,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get most recent 8 books for andrew@dcr.vc for live demo
+  // Get most recent 16 books for andrew@dcr.vc for live demo
   app.get("/api/demo/recent-books", async (req: any, res) => {
     try {
-      const books = await storage.getRecentBooksForDemo('andrew@dcr.vc', 8);
+      const books = await storage.getRecentBooksForDemo('andrew@dcr.vc', 16);
       res.json(books);
     } catch (error) {
       console.error('Error fetching demo books:', error);
