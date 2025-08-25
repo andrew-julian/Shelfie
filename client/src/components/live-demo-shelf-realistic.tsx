@@ -286,15 +286,20 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
     const layoutBooks = books.map((book, index) => convertToLayoutBook(book, index));
     const normalizedDims = normaliseBooks(layoutBooks, DEFAULT_CFG.BASE_HEIGHT);
     
-    // Use settings that match the main app proportions more closely
+    // Calculate optimal items per row based on container width for consistency
+    const avgBookWidth = 140; // Average book width in pixels
+    const minBooksPerRow = Math.max(2, Math.floor(containerWidth / (avgBookWidth + 12))); // At least 2 books per row
+    
+    // Responsive configuration ensuring consistent row layouts
     const demoConfig = {
       ...DEFAULT_CFG,
-      targetRowHeight: 200, // Larger to match natural book proportions like main app
-      gutterX: 12,
+      targetRowHeight: containerWidth < 480 ? 160 : containerWidth < 768 ? 180 : 200, // Responsive height
+      gutterX: containerWidth < 480 ? 8 : 12, // Smaller gutters on mobile
       gutterY: 15,
-      jitterX: 8,
-      maxTiltY: 8,
-      raggedLastRow: true // Allow natural organic endings
+      jitterX: 4, // Reduced jitter for more consistent alignment
+      maxTiltY: 6, // Reduced tilt for cleaner look
+      raggedLastRow: false, // Force consistent row layouts
+      minBooksPerRow: minBooksPerRow // Custom property to guide row consistency
     };
     
     return calculateLayout(layoutBooks, normalizedDims, containerWidth, demoConfig);
