@@ -286,10 +286,10 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
     const layoutBooks = books.map((book, index) => convertToLayoutBook(book, index));
     const normalizedDims = normaliseBooks(layoutBooks, DEFAULT_CFG.BASE_HEIGHT);
     
-    // Use settings that naturally create ~4 rows with organic feel
+    // Use settings that match the main app proportions more closely
     const demoConfig = {
       ...DEFAULT_CFG,
-      targetRowHeight: 160, // Smaller target height encourages more rows
+      targetRowHeight: 200, // Larger to match natural book proportions like main app
       gutterX: 12,
       gutterY: 15,
       jitterX: 8,
