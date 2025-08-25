@@ -1,0 +1,65 @@
+Build me a clean, modern, conversion-focused **primary landing page** for a product called **Shelfie**. This is the single page leading into the application, so keep it focused, simple, and optimised for sign-ups.
+
+## Core tagline
+**Stop stacking. Start scanning.**
+
+### Hero section
+- Large bold headline with the tagline.  
+- Subline: *Turn every book into a beautifully organised digital library in seconds. Barcode scanning, rich metadata, and stunning 3D shelves — effortless, private, and always yours.*  
+- Bright orange CTA button: **Start scanning now →**  
+- Trust line below CTA: *Free for up to 100 books · No credit card required*  
+- Visual: mockup of a 3D bookshelf with **examples of real book covers** (e.g. popular titles like *Sapiens*, *Atomic Habits*, *Harry Potter*, etc.) rotating or displayed dynamically to show how a user’s library will look.  
+
+### How it Works (3 steps)
+1. **Scan** — Point your camera at a barcode. Works offline, syncs later. Example visual: scanning *The Midnight Library* or *Educated*.  
+2. **Auto-enrich** — Instantly fetches metadata: title, author, edition, cover, dimensions. Example visual: metadata card for *Becoming* by Michelle Obama.  
+3. **Enjoy** — Browse and share your library in stunning 3D. Example visual: a 3D shelf showing *The Hobbit*, *Pride & Prejudice*, *The Martian*.  
+
+### Why People Love Shelfie (value props grid)
+- **Lightning-fast capture** — Scan books instantly, even offline.  
+- **Beautiful 3D shelves** — Books appear as they are: tall hardbacks, slim paperbacks, everything in between. Example: show side-by-side visual of *War and Peace* vs. *The Little Prince* to highlight proportionality.  
+- **Rich metadata** — Every scan fetches details automatically.  
+- **Portable & private** — Your library, your rules. Export anytime.  
+
+### Features checklist
+- ✅ Instant capture with cover art  
+- ✅ Proportional 3D visualisation  
+- ✅ Regional covers & pricing  
+- ✅ Offline scanning queue  
+- ✅ Lists & tags for organisation  
+- ✅ Privacy by design (you control your data)  
+- ✅ Data portability (export anytime)  
+- ✅ Multi-device sync  
+
+### Pricing section
+- **Free plan** — Up to 100 books, barcode scanning, 3D visualisation, organisational features.  
+- **Pro plan** — Unlimited books, all features, just **$17/year**.  
+- Highlight the Pro plan in orange with CTA: **Upgrade to Pro →**  
+- Support text: *A whole library, for less than the price of one paperback.*  
+- Visual element: small sample shelves showing what “100 books” looks like vs. a full unlimited library.  
+
+### Conversion push
+- Headline: **Build a library you’ll actually use**  
+- Copy: *A library that looks beautiful, feels intuitive, and makes every book easy to find. No ads, no clutter, just you and your books.*  
+- Large orange CTA button: **Start scanning now and watch your library come alive →**  
+- Visual: examples of a shelf growing dynamically with familiar titles as the user scrolls.  
+
+### Privacy by Design
+- Headline: **Your books, your data.**  
+- Copy: *No dark patterns. No data resale. Export or delete your library anytime.*  
+- CTA link: *Read our privacy promise →*  
+
+### Footer
+- Shelfie logo + tagline: *The delightfully simple way to scan, organise, and love your books.*  
+- Links: Features · Pricing · Roadmap · Privacy · Terms · Contact  
+- Social icons: Twitter, Instagram, GitHub  
+
+---
+
+## Design Style
+- Clean, modern, minimal.  
+- White background with pops of orange for CTAs.  
+- Rounded corners, soft shadows, and subtle animations (hover states, scroll transitions).  
+- Hero headline oversized and bold.  
+- **Examples of book covers integrated into visuals throughout the page** (shelves, scan examples, metadata cards).  
+- Mobile-first, fully responsive.
