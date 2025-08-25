@@ -108,7 +108,7 @@ vercel --prod
 4. Go to "Credentials" → "Create Credentials" → "OAuth client ID"
 5. Choose "Web application"
 6. Add these authorized redirect URIs:
-   - `https://workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app/api/auth/google/callback`
+   - `https://workspace-jwguadndq-andrew-8095s-projects.vercel.app/api/auth/google/callback`
    - `https://your-custom-domain.com/api/auth/google/callback` (if using custom domain)
 7. Copy the Client ID and Client Secret to your Vercel environment variables
 
@@ -128,7 +128,7 @@ vercel --prod
 
 **Ready to Deploy:**
 1. Set all environment variables in Vercel dashboard
-2. Configure Google OAuth redirect URI: `https://workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app/api/auth/google/callback`
+2. Configure Google OAuth redirect URI: `https://workspace-jwguadndq-andrew-8095s-projects.vercel.app/api/auth/google/callback`
 3. Deploy with: `vercel --prod`
 
 **Authentication Flow:**
@@ -138,4 +138,4 @@ vercel --prod
 
 ### Malformed Redirect URI
 - Ensure REPLIT_DOMAINS doesn't include `https://` prefix
-- Domain should be exactly: `workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app`
+- Domain should be exactly: `workspace-jwguadndq-andrew-8095s-projects.vercel.app`
