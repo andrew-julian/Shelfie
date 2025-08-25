@@ -185,23 +185,19 @@ export function calculateDemoLayout(
     const rowBooks = rows[rowIndex];
     if (rowBooks.length === 0) continue;
     
-    // Use consistent row height for demo
-    const demoRowHeight = 160;
-    
-    // Calculate total natural width for this row
+    // Preserve natural proportions like the main layout engine
+    const basePixelScale = 0.85;
     let totalNaturalWidth = 0;
-    const bookWidths: number[] = [];
+    const physicalDimensions: Array<{ Wi: number; Hi: number; Di: number }> = [];
     
     for (const book of rowBooks) {
-      const bookDims = dims.get(book.id);
-      if (bookDims) {
-        const naturalWidth = (bookDims.w_norm * demoRowHeight) / cfg.BASE_HEIGHT;
-        bookWidths.push(naturalWidth);
-        totalNaturalWidth += naturalWidth;
-      } else {
-        bookWidths.push(120); // fallback width
-        totalNaturalWidth += 120;
-      }
+      // Use actual physical dimensions, not uniform height
+      const Wi = book.phys.width_mm * basePixelScale;
+      const Hi = book.phys.height_mm * basePixelScale;
+      const Di = book.phys.spine_mm * basePixelScale;
+      
+      physicalDimensions.push({ Wi, Hi, Di });
+      totalNaturalWidth += Wi;
     }
     
     // Calculate scale factor to fit books in container
@@ -217,12 +213,12 @@ export function calculateDemoLayout(
     
     for (let bookIndex = 0; bookIndex < rowBooks.length; bookIndex++) {
       const book = rowBooks[bookIndex];
-      const bookDims = dims.get(book.id) || { w_norm: 120, d_norm: 15 };
+      const { Wi, Hi, Di } = physicalDimensions[bookIndex];
       
-      // Calculate final dimensions
-      const w = bookWidths[bookIndex] * scale;
-      const h = demoRowHeight;
-      const d = Math.max(2, bookDims.d_norm * 0.6); // Consistent depth
+      // Apply justification scale but preserve individual heights - this is crucial!
+      const w = Wi * scale;
+      const h = Hi; // Keep natural height - no uniform scaling!
+      const d = Math.max(2, Di);
       
       // Add subtle jitter for organic feel
       const seed = hash32(book.id);
@@ -245,8 +241,9 @@ export function calculateDemoLayout(
       currentX += w + cfg.gutterX;
     }
     
-    // Move to next row
-    yCursor += demoRowHeight + cfg.gutterY;
+    // Move to next row based on the tallest book in this row
+    const maxRowHeight = Math.max(...physicalDimensions.map(dim => dim.Hi));
+    yCursor += maxRowHeight + cfg.gutterY;
   }
   
   return layoutItems;
