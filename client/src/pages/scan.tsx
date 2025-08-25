@@ -27,6 +27,24 @@ const LICENSE_KEYS = {
     "psb2NhbGhvc3R8c2hlbGZpZS5zaXRl" +
     "CjE3NTY1OTgzOTkKODM4ODYwNwo4\n",
     
+  // Production license for www.shelfie.site
+  "www.shelfie.site": 
+    "n6Joru1b0F3oD8MVj3ac/Z8WMSpSGw" +
+    "dlo/+8It/DO6ssZln+hrNmL4JT99v9" +
+    "qu/xzPg7ih/OuIh4s8apfamBcp20hP" +
+    "/OmMZ86ecC+kIUSzRwDYyBdWFRHVEK" +
+    "I25wqWLgPnr9bYdnC9e0lwS/MvL4IO" +
+    "KunRmbjLrqqw0qbu5kF85HcB6+Vwv/" +
+    "xe8DtMK/34R9H4Ch5b5fhfTX7a3vHe" +
+    "Lq25oLo0/LGT1bRlxghqoyiwlT0fVn" +
+    "k4r+ErMM3qs0B/QbYCvafG4NYZhwEA" +
+    "D/uVF0w/Jc66Ht4Qq4UBaeGtERY3sP" +
+    "+V5UU0xpsZh0k3WmJhkJbCCl2pFF35" +
+    "mDTUoQpweZeA==\nU2NhbmJvdFNESw" +
+    "psb2NhbGhvc3R8d3d3LnNoZWxmaWUu" +
+    "c2l0ZQoxNzU2NzcxMTk5CjgzODg2MD" +
+    "cKOA==\n",
+    
   // Production license for shelfie.vanaheim.com.au  
   production: 
     "Mpyhq9Yxr3GGf71QkTvpTbBG6PIXby" +
@@ -74,10 +92,22 @@ const getLicenseKey = (): string => {
   console.log('License detection - hostname:', hostname);
   console.log('License detection - full URL:', fullUrl);
   
-  // Check if we're on shelfie.site (including www subdomain and Vercel deployments)
-  if (hostname.includes('shelfie.site') || hostname.includes('shelfie') && hostname.includes('vercel.app')) {
+  // Check if we're on www.shelfie.site specifically
+  if (hostname === 'www.shelfie.site') {
+    console.log('Using production license key for www.shelfie.site');
+    return LICENSE_KEYS["www.shelfie.site"];
+  }
+  
+  // Check if we're on shelfie.site (without www)
+  if (hostname === 'shelfie.site') {
     console.log('Using production license key for shelfie.site');
     return LICENSE_KEYS["shelfie.site"];
+  }
+  
+  // Check for Vercel deployments containing shelfie
+  if (hostname.includes('shelfie') && hostname.includes('vercel.app')) {
+    console.log('Using production license key for Vercel shelfie deployment');
+    return LICENSE_KEYS["www.shelfie.site"];
   }
   
   // Check if we're in production environment
