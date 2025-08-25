@@ -101,7 +101,7 @@ export default function Landing() {
                   <div className="bg-blue-100 w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 md:mb-8">
                     <Sparkles className="w-8 h-8 md:w-10 md:h-10 text-blue-600" />
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">2. Auto-enrich</h3>
+                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">2. Add</h3>
                   <p className="text-base md:text-lg text-gray-600 leading-relaxed">Instantly fetches metadata: title, author, edition, cover, dimensions.</p>
                 </div>
                 
