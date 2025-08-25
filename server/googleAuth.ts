@@ -3,8 +3,8 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import session from 'express-session';
 import type { Express, RequestHandler } from 'express';
 import connectPg from 'connect-pg-simple';
-import { storage } from './storage';
-import type { User } from '@shared/schema';
+import { storage } from './storage.js';
+import type { User } from '../shared/schema.js';
 
 if (!process.env.GOOGLE_CLIENT_ID) {
   throw new Error('Missing required environment variable: GOOGLE_CLIENT_ID');
