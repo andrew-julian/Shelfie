@@ -36,7 +36,10 @@ The application employs a **PostgreSQL-based approach**:
 - **Deployment**: Vercel-compatible configuration with environment-specific database connections.
 
 ### Authentication and Authorization
-Currently implements a **session-based approach** using `connect-pg-simple` for PostgreSQL-backed sessions.
+Implements a **hybrid authentication system**:
+- **Development Environment**: Replit OAuth with session-based authentication using `connect-pg-simple` for PostgreSQL-backed sessions
+- **Production Environment**: Google OAuth for external deployments (Vercel) with the same session storage system
+- **Architecture**: Environment-based authentication provider selection ensures seamless development on Replit while supporting production deployment on external platforms
 
 ### Key Architectural Patterns
 - **Shared Schema Pattern**: Database models, validation schemas, and TypeScript types are defined once and shared.
@@ -60,6 +63,7 @@ Currently implements a **session-based approach** using `connect-pg-simple` for 
 - **User Management System**: Database-connected user switcher, dynamic user loading, and session context switching.
 - **Input Forgiveness**: Automatic cleanup of whitespace and hyphens from ISBN inputs.
 - **Complete Stripe Integration**: $17/year subscription system with secure webhook processing (STRIPE_WEBHOOK_SECRET), comprehensive billing management, subscription lifecycle controls (upgrade/cancel/reset), and real-time status updates via checkout.session.completed events. Environment-specific webhook configuration for development (Replit) and production (shelfie.site) domains. (August 2025)
+- **Dual Authentication System**: Hybrid OAuth implementation using Replit OAuth for development and Google OAuth for production deployments. Supports seamless development workflow while enabling external deployment on platforms like Vercel. (August 2025)
 
 ## External Dependencies
 
@@ -85,6 +89,7 @@ Currently implements a **session-based approach** using `connect-pg-simple` for 
 ### External APIs and Services
 - **Rainforest API**: For book metadata lookup by ISBN.
 - **Scanbot SDK**: Fully functional barcode scanner.
+- **Google OAuth**: Production authentication for external deployments (configured with redirect URI support).
 
 ### Development and Build Tools
 - **Vite**: Fast build tool and development server.

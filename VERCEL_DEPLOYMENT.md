@@ -112,14 +112,29 @@ vercel --prod
    - `https://your-custom-domain.com/api/auth/google/callback` (if using custom domain)
 7. Copy the Client ID and Client Secret to your Vercel environment variables
 
-**Required Environment Variables:**
+**Required Environment Variables for Vercel:**
 - `GOOGLE_CLIENT_ID` - From Google Cloud Console
 - `GOOGLE_CLIENT_SECRET` - From Google Cloud Console
 - `SESSION_SECRET` - Any secure random string
+- `DATABASE_URL` - Your database connection string
+- `STRIPE_SECRET_KEY` - Your Stripe secret key
+- `STRIPE_WEBHOOK_SECRET_PROD` - Your production webhook secret
+- `VITE_STRIPE_PUBLIC_KEY` - Your Stripe publishable key
+- `RAINFOREST_API_KEY` - Your book API key
 
 **How it Works:**
 - **Development (Replit):** Uses Replit OAuth automatically
 - **Production (Vercel):** Uses Google OAuth with your configured redirect URIs
+
+**Ready to Deploy:**
+1. Set all environment variables in Vercel dashboard
+2. Configure Google OAuth redirect URI: `https://workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app/api/auth/google/callback`
+3. Deploy with: `vercel --prod`
+
+**Authentication Flow:**
+- Login: `https://your-domain.vercel.app/api/login` (redirects to Google)
+- Callback: `https://your-domain.vercel.app/api/auth/google/callback` (handles Google response)
+- Logout: `https://your-domain.vercel.app/api/logout`
 
 ### Malformed Redirect URI
 - Ensure REPLIT_DOMAINS doesn't include `https://` prefix

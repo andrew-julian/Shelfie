@@ -1,4 +1,3 @@
-import { OAuth2Client } from 'google-auth-library';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import session from 'express-session';
@@ -56,20 +55,14 @@ export async function setupGoogleAuth(app: Express) {
   app.use(passport.session());
 
   // Determine callback URL based on environment
-  const getCallbackURL = (req: any) => {
-    if (process.env.NODE_ENV === 'production') {
-      // For production (Vercel), use the request host
-      return `https://${req.get('host')}/api/auth/google/callback`;
-    } else {
-      // For development (Replit), use the dev domain
-      return `https://${process.env.REPLIT_DEV_DOMAIN}/api/auth/google/callback`;
-    }
-  };
+  const callbackURL = process.env.NODE_ENV === 'production' 
+    ? '/api/auth/google/callback' // Vercel will handle the domain automatically
+    : `https://${process.env.REPLIT_DEV_DOMAIN}/api/auth/google/callback`;
 
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID!,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    callbackURL: '/api/auth/google/callback', // This will be dynamically set
+    callbackURL,
     scope: ['profile', 'email']
   }, async (accessToken, refreshToken, profile, done) => {
     try {
@@ -77,7 +70,7 @@ export async function setupGoogleAuth(app: Express) {
       return done(null, user);
     } catch (error) {
       console.error('Error during Google OAuth:', error);
-      return done(error, null);
+      return done(error);
     }
   }));
 
@@ -95,14 +88,9 @@ export async function setupGoogleAuth(app: Express) {
   });
 
   // Auth routes
-  app.get('/api/login', (req, res, next) => {
-    const callbackURL = getCallbackURL(req);
-    const authenticator = passport.authenticate('google', {
-      scope: ['profile', 'email'],
-      callbackURL
-    });
-    authenticator(req, res, next);
-  });
+  app.get('/api/login', passport.authenticate('google', {
+    scope: ['profile', 'email']
+  }));
 
   app.get('/api/auth/google/callback', 
     passport.authenticate('google', { failureRedirect: '/' }),
