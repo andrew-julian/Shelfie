@@ -271,7 +271,8 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
 
   useEffect(() => {
     const updateWidth = () => {
-      setContainerWidth(Math.min(800, window.innerWidth - 48)); // Max 800px with padding
+      const newWidth = Math.min(800, window.innerWidth - 48); // Max 800px with padding
+      setContainerWidth(prev => prev === newWidth ? prev : newWidth); // Only update if changed
     };
     
     updateWidth();
@@ -293,7 +294,7 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
     // Responsive configuration ensuring consistent row layouts
     const demoConfig = {
       ...DEFAULT_CFG,
-      targetRowHeight: containerWidth < 480 ? 160 : containerWidth < 768 ? 180 : 200, // Responsive height
+      targetRowHeight: 200, // Fixed height to preserve proportions at all screen widths
       gutterX: containerWidth < 480 ? 8 : 12, // Smaller gutters on mobile
       gutterY: 15,
       jitterX: 4, // Reduced jitter for more consistent alignment
