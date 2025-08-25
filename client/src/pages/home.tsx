@@ -649,8 +649,6 @@ export default function Home() {
       <Header 
           booksCount={allBooks.length}
           filteredCount={finalBooks.length}
-          onRefreshAll={() => refreshAllMutation.mutate()}
-          isRefreshing={refreshAllMutation.isPending}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           sortBy={sortBy}

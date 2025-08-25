@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, ArrowLeft, Save, User, Globe, DollarSign, Ruler } from "lucide-react";
+import { BookOpen, ArrowLeft, Save, User, Globe, DollarSign, Ruler, RefreshCw, Database } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { UserPreferences } from "@shared/schema";
@@ -77,6 +77,61 @@ export default function Settings() {
         variant: "destructive",
       });
     },
+  });
+
+  // Refresh all books mutation
+  const refreshAllMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/books/refresh-all', {
+        method: 'POST',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to refresh books');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Show progress message if available
+      if (data.inProgress) {
+        toast({
+          title: "Refresh in Progress",
+          description: data.message || "Book refresh has been started. You'll see updates as they complete.",
+        });
+        return;
+      }
+      
+      toast({
+        title: "Success",
+        description: data.message || "All books have been refreshed with latest data",
+      });
+      
+      // Invalidate books cache to show updated data
+      queryClient.invalidateQueries({ queryKey: ['/api/books'] });
+    },
+    onError: (error: Error) => {
+      // Check if it's a rate limiting error
+      if (error.message.includes('rate limit')) {
+        toast({
+          title: "Rate Limited",
+          description: "Please wait a moment before refreshing again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "Error",
+        description: "Failed to refresh books. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Fetch books count for the refresh section
+  const { data: books = [] } = useQuery({
+    queryKey: ['/api/books'],
   });
 
   const handleSave = () => {
@@ -170,6 +225,56 @@ export default function Settings() {
                   </p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Library Management Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Database className="h-5 w-5 mr-2" />
+                Library Management
+              </CardTitle>
+              <CardDescription>
+                Manage your book collection and refresh metadata
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <BookOpen className="h-6 w-6 text-blue-500" />
+                  <div>
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-books-count-settings">
+                      {books.length} books
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                      in your library
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => refreshAllMutation.mutate()}
+                  disabled={refreshAllMutation.isPending || books.length === 0}
+                  className="flex items-center gap-2"
+                  data-testid="button-refresh-all-settings"
+                >
+                  <RefreshCw className={`h-4 w-4 ${refreshAllMutation.isPending ? 'animate-spin' : ''}`} />
+                  {refreshAllMutation.isPending ? 'Refreshing...' : 'Refresh All'}
+                </Button>
+              </div>
+              
+              {books.length === 0 && (
+                <div className="text-center text-gray-500 dark:text-gray-400 py-4">
+                  No books in your library yet. Start by scanning some books!
+                </div>
+              )}
+              
+              {books.length > 0 && (
+                <div className="text-sm text-gray-600 dark:text-gray-300">
+                  This will update all book information with the latest data from Amazon. 
+                  The process may take a few minutes for large libraries.
+                </div>
+              )}
             </CardContent>
           </Card>
 

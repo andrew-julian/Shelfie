@@ -11,8 +11,6 @@ type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
 interface HeaderProps {
   booksCount: number;
   filteredCount: number;
-  onRefreshAll?: () => void;
-  isRefreshing?: boolean;
   searchTerm: string;
   onSearchChange: (term: string) => void;
   sortBy: SortOption;
@@ -26,8 +24,6 @@ interface HeaderProps {
 export default function Header({ 
   booksCount, 
   filteredCount,
-  onRefreshAll, 
-  isRefreshing = false,
   searchTerm,
   onSearchChange,
   sortBy,
@@ -63,18 +59,6 @@ export default function Header({
               {filteredCount !== booksCount ? `${filteredCount}/${booksCount}` : booksCount} books
             </span>
             <UserMenu />
-            {onRefreshAll && booksCount > 0 && (
-              <button 
-                onClick={onRefreshAll}
-                disabled={isRefreshing}
-                className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-2 text-xs lg:text-sm font-medium text-gray-600 hover:text-coral-red hover:bg-gray-50 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
-                data-testid="button-refresh-all"
-              >
-                <RefreshCw className={`w-3 lg:w-4 h-3 lg:h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                <span className="hidden lg:inline">{isRefreshing ? 'Refreshing...' : 'Refresh All'}</span>
-                <span className="lg:hidden">Refresh</span>
-              </button>
-            )}
             <div className="relative">
               <select 
                 value={sortBy}
@@ -140,21 +124,6 @@ export default function Header({
           <div className="md:hidden border-t border-gray-100 bg-white">
             <div className="px-4 py-4 space-y-4">
               <UserMenu />
-              
-              {onRefreshAll && booksCount > 0 && (
-                <button 
-                  onClick={() => {
-                    onRefreshAll();
-                    setShowMobileMenu(false);
-                  }}
-                  disabled={isRefreshing}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-coral-red border border-gray-200 rounded-lg transition-all disabled:opacity-50"
-                  data-testid="button-refresh-all-mobile"
-                >
-                  <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                  {isRefreshing ? 'Refreshing...' : 'Refresh All'}
-                </button>
-              )}
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Sort by:</label>
