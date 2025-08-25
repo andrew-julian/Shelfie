@@ -27,9 +27,8 @@ After deploying, you need to configure these environment variables in your Verce
 - `STRIPE_WEBHOOK_SECRET_PROD` - Your production Stripe webhook secret
 - `VITE_STRIPE_PUBLIC_KEY` - Your Stripe publishable key
 - `RAINFOREST_API_KEY` - Your Rainforest API key
-- `REPL_ID` - Your Replit app ID (found in your Replit project settings, NOT "Shelfie")
-- `REPLIT_DOMAINS` - Your exact Vercel domain (e.g., "workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app")
-- `ISSUER_URL` - "https://replit.com/oidc"
+- `GOOGLE_CLIENT_ID` - Your Google OAuth client ID (from Google Cloud Console)
+- `GOOGLE_CLIENT_SECRET` - Your Google OAuth client secret (from Google Cloud Console)
 
 ### How to Set Environment Variables:
 1. Go to your Vercel project dashboard
@@ -89,60 +88,38 @@ vercel --prod
 - Ensure sessions table exists
 
 ### Authentication Not Working
-- Check REPLIT_DOMAINS matches your domain exactly (without https://)
-- Verify REPL_ID is the actual app ID from Replit, not "Shelfie"
-- Verify callback URL in Replit Auth settings matches: `https://your-domain.vercel.app/api/callback`
-- Check that all auth environment variables are set correctly
-- Ensure cookies are working in production
+- **Google OAuth Issues:**
+  - Verify `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set correctly
+  - Check that your Vercel domain is added to Google Cloud Console authorized redirect URIs
+  - Ensure cookies are working in production (secure: true for HTTPS)
+  
+- **Development Issues:**
+  - Replit OAuth still works in development environment
+  - Google OAuth credentials not needed for development
 
-### Invalid Client Error (client_id=Shelfie)
-This means REPL_ID is incorrect. The OAuth URL shows `client_id=Shelfie` but it should be your actual Replit app ID.
+### Google OAuth Setup (IMPLEMENTED)
 
-**How to find your correct REPL_ID:**
-1. **Method 1 - From Replit URL:**
-   - Look at your Replit project URL: `https://replit.com/@username/project-name`
-   - Your REPL_ID might be in the format like: `@username/project-name` or a UUID
+**Solution:** The app now uses Google OAuth for production (Vercel) and Replit OAuth for development.
 
-2. **Method 2 - From Environment Variables:**
-   - In Replit, go to Tools → Secrets (or Environment Variables)
-   - Look for existing `REPL_ID` value
-   - Copy that exact value to Vercel
+**Google Cloud Console Setup:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable the Google+ API
+4. Go to "Credentials" → "Create Credentials" → "OAuth client ID"
+5. Choose "Web application"
+6. Add these authorized redirect URIs:
+   - `https://workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app/api/auth/google/callback`
+   - `https://your-custom-domain.com/api/auth/google/callback` (if using custom domain)
+7. Copy the Client ID and Client Secret to your Vercel environment variables
 
-3. **Method 3 - From Project Settings:**
-   - In Replit, check your project settings/info
-   - Look for "App ID" or "Project ID"
+**Required Environment Variables:**
+- `GOOGLE_CLIENT_ID` - From Google Cloud Console
+- `GOOGLE_CLIENT_SECRET` - From Google Cloud Console
+- `SESSION_SECRET` - Any secure random string
 
-**Important:** 
-- REPL_ID should NOT be "Shelfie"  
-- It should be a unique identifier from Replit
-- Use the exact same value that works in your Replit development environment
-
-### Invalid Redirect URI Error - IMPORTANT LIMITATION
-
-**The Real Issue:** Replit OAuth is designed to work only with Replit domains, not external deployments like Vercel.
-
-**Why This Happens:**
-- `REPLIT_DOMAINS` is automatically set by Replit for Replit-hosted apps
-- Replit's OAuth system only recognizes Replit domains as authorized
-- Your Vercel domain (`workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app`) is not recognized by Replit's OAuth
-
-**Solutions:**
-
-1. **Deploy on Replit Instead (Recommended):**
-   - Use Replit's deployment system instead of Vercel
-   - Replit OAuth will work automatically with Replit domains
-   - Run: `replit deploy` or use the deploy button in Replit
-
-2. **Switch to Different OAuth for Vercel:**
-   - Replace Replit OAuth with Google OAuth, GitHub OAuth, or Auth0
-   - These providers allow you to configure authorized redirect URIs for any domain
-   - Update your authentication system accordingly
-
-3. **Hybrid Approach:**
-   - Keep development on Replit with Replit OAuth
-   - Use a different OAuth provider for Vercel production
-
-**Current Status:** Replit OAuth cannot work on Vercel domains - this is a platform limitation, not a configuration issue.
+**How it Works:**
+- **Development (Replit):** Uses Replit OAuth automatically
+- **Production (Vercel):** Uses Google OAuth with your configured redirect URIs
 
 ### Malformed Redirect URI
 - Ensure REPLIT_DOMAINS doesn't include `https://` prefix

@@ -1,7 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
-import { setupAuth, isAuthenticated } from "./replitAuth.js";
+// Use Google Auth for production, Replit Auth for development
+import { setupGoogleAuth, isAuthenticated as googleIsAuthenticated } from "./googleAuth.js";
+import { setupAuth as setupReplitAuth, isAuthenticated as replitIsAuthenticated } from "./replitAuth.js";
+
+const isAuthenticated = process.env.NODE_ENV === 'production' ? googleIsAuthenticated : replitIsAuthenticated;
 import express from "express";
 import path from "path";
 import Stripe from "stripe";
@@ -369,8 +373,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Auth middleware
-  await setupAuth(app);
+  // Auth middleware - use Google Auth for production, Replit Auth for development
+  if (process.env.NODE_ENV === 'production') {
+    await setupGoogleAuth(app);
+    console.log('✓ Google OAuth configured for production');
+  } else {
+    await setupReplitAuth(app);
+    console.log('✓ Replit OAuth configured for development');
+  }
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
