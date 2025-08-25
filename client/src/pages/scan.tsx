@@ -103,7 +103,7 @@ const getLicenseKey = (): string => {
   // Check if we're in Vercel production deployment
   if (hostname.includes('vercel.app') && !hostname.includes('replit')) {
     console.log('Using production license key for Vercel deployment');
-    return LICENSE_KEYS["shelfie.site"];
+    return LICENSE_KEYS["www.shelfie.site"];
   }
   
   // Default to development for localhost and other environments
