@@ -1,6 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
 import { calculateLayout, normaliseBooks, DEFAULT_CFG, type Book as LayoutBook, type LayoutItem } from '@/layout/ShelfieLayoutEngine';
 import { useQuery } from '@tanstack/react-query';
 import type { Book } from '../../../shared/schema';
@@ -144,8 +142,7 @@ function LiveBookCard({
 }
 
 export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDemoShelfRealisticProps) {
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [containerWidth, setContainerWidth] = useState(400);
+  const [containerWidth, setContainerWidth] = useState(800);
   const [dominantColors, setDominantColors] = useState<Map<string, string>>(new Map());
 
   // Fetch live demo books
@@ -168,7 +165,7 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
 
   useEffect(() => {
     const updateWidth = () => {
-      setContainerWidth(Math.min(600, window.innerWidth - 48)); // Max 600px with padding
+      setContainerWidth(Math.min(800, window.innerWidth - 48)); // Max 800px with padding
     };
     
     updateWidth();
@@ -183,14 +180,14 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
     const layoutBooks = books.map((book, index) => convertToLayoutBook(book, index));
     const normalizedDims = normaliseBooks(layoutBooks, DEFAULT_CFG.BASE_HEIGHT);
     
-    // Use smaller container width for demo and tighter spacing
+    // Use elegant spacing for organic layout
     const demoConfig = {
       ...DEFAULT_CFG,
-      targetRowHeight: 160, // Smaller for demo
-      gutterX: 8,
-      gutterY: 10,
-      jitterX: 4,
-      maxTiltY: 6
+      targetRowHeight: 180, 
+      gutterX: 12,
+      gutterY: 15,
+      jitterX: 8,
+      maxTiltY: 8
     };
     
     return calculateLayout(layoutBooks, normalizedDims, containerWidth, demoConfig);
@@ -198,57 +195,23 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
 
   // Calculate total content dimensions
   const contentDimensions = useMemo(() => {
-    if (layoutItems.length === 0) return { width: containerWidth, height: 200 };
+    if (layoutItems.length === 0) return { width: containerWidth, height: 300 };
     
     const maxX = Math.max(...layoutItems.map(item => item.x + item.w));
     const maxY = Math.max(...layoutItems.map(item => item.y + item.h));
     
     return {
-      width: Math.max(maxX + 20, containerWidth),
-      height: maxY + 20
+      width: Math.max(maxX + 40, containerWidth),
+      height: maxY + 40
     };
   }, [layoutItems, containerWidth]);
 
-  const scrollLeft = useCallback(() => {
-    const newPosition = Math.max(0, scrollPosition - containerWidth * 0.7);
-    setScrollPosition(newPosition);
-  }, [scrollPosition, containerWidth]);
-
-  const scrollRight = useCallback(() => {
-    const maxScroll = Math.max(0, contentDimensions.width - containerWidth);
-    const newPosition = Math.min(maxScroll, scrollPosition + containerWidth * 0.7);
-    setScrollPosition(newPosition);
-  }, [scrollPosition, containerWidth, contentDimensions.width]);
-
-  // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        scrollLeft();
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        scrollRight();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const maxScroll = Math.max(0, contentDimensions.width - containerWidth);
-
   if (isLoading) {
     return (
-      <div className="relative overflow-hidden">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Your library reimagined</h3>
-        </div>
-        <div className="h-48 flex items-center justify-center">
-          <div className="text-gray-500 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-2"></div>
-            <p>Loading real books...</p>
-          </div>
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-gray-500 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-2"></div>
+          <p className="text-sm">Loading real books...</p>
         </div>
       </div>
     );
@@ -256,70 +219,37 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
 
   if (isError || !books.length) {
     return (
-      <div className="relative overflow-hidden">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Your library reimagined</h3>
-        </div>
-        <div className="h-48 flex items-center justify-center">
-          <div className="text-gray-500 text-center">
-            <p>Unable to load live demo books</p>
-            <p className="text-sm">Please try again later</p>
-          </div>
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-gray-500 text-center">
+          <p>Unable to load demo books</p>
+          <p className="text-sm">Please try again later</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative overflow-hidden">
-      {/* Navigation buttons */}
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Your library reimagined</h3>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={scrollLeft}
-            disabled={scrollPosition <= 0}
-            aria-label="Scroll books left"
-            data-testid="button-scroll-left"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={scrollRight}
-            disabled={scrollPosition >= maxScroll}
-            aria-label="Scroll books right"
-            data-testid="button-scroll-right"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Books container with realistic layout engine and proper perspective */}
+    <div className="relative w-full">
+      {/* Pure books display without any containers */}
       <div 
-        className="relative overflow-hidden"
+        className="relative"
         style={{ 
-          height: `${Math.min(contentDimensions.height, 280)}px`,
+          height: `${contentDimensions.height}px`,
           width: '100%',
           perspective: '1200px',
           perspectiveOrigin: 'center center'
         }}
       >
         <div 
-          className="relative transition-transform duration-300 ease-out"
+          className="relative w-full h-full"
           style={{ 
-            transform: `translateX(-${scrollPosition}px)`,
             width: `${contentDimensions.width}px`,
             height: `${contentDimensions.height}px`,
             transformStyle: 'preserve-3d'
           }}
           role="region"
           aria-live="polite"
-          aria-label="Live 3D book shelf with real user books"
+          aria-label="Live 3D book display with real user books"
         >
           {layoutItems.map((layoutItem, index) => {
             const book = books[index];
@@ -327,7 +257,7 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
             
             return (
               <LiveBookCard
-                key={layoutItem.id}
+                key={book.id}
                 book={book}
                 layoutItem={layoutItem}
                 dominantColor={dominantColor}
@@ -337,10 +267,10 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
         </div>
       </div>
 
-      {/* Enhanced hint text */}
-      <p className="text-sm text-gray-600 text-center mt-4 italic">
-        Real books from an actual Shelfie library — scroll to explore the 3D shelf
-      </p>
+      {/* Subtle hint text */}
+      <div className="text-center mt-6">
+        <p className="text-sm text-gray-500 italic">Real books from an actual Shelfie library — scroll to explore the 3D shelf</p>
+      </div>
     </div>
   );
 }
