@@ -6,13 +6,7 @@ import connectPg from 'connect-pg-simple';
 import { storage } from './storage.js';
 import type { User } from '../shared/schema.js';
 
-if (!process.env.GOOGLE_CLIENT_ID) {
-  throw new Error('Missing required environment variable: GOOGLE_CLIENT_ID');
-}
-
-if (!process.env.GOOGLE_CLIENT_SECRET) {
-  throw new Error('Missing required environment variable: GOOGLE_CLIENT_SECRET');
-}
+// Environment variables will be checked when setupGoogleAuth is called
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
@@ -49,6 +43,14 @@ async function upsertUser(profile: any): Promise<User> {
 }
 
 export async function setupGoogleAuth(app: Express) {
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    throw new Error('Missing required environment variable: GOOGLE_CLIENT_ID');
+  }
+  
+  if (!process.env.GOOGLE_CLIENT_SECRET) {
+    throw new Error('Missing required environment variable: GOOGLE_CLIENT_SECRET');
+  }
+
   app.set("trust proxy", 1);
   app.use(getSession());
   app.use(passport.initialize());
