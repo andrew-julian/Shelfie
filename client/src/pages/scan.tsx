@@ -10,24 +10,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // License keys for different environments
 const LICENSE_KEYS = {
-  // Production license for shelfie.site
-  "shelfie.site": 
-    "HST5knltqsfXtEJPCS8F9mMKEbmJUV" +
-    "SpMeynyNqA7W/9wSjWUo17lhqxig1A" +
-    "9EbAyc2Pz3nVzixwud13YUrhfnEvtA" +
-    "/7SZUWjdwrXXUJZXu5/szlV1E8EIKI" +
-    "/2v3rkcH2nIkd2hAQssKIc89rnYlnc" +
-    "cv6NfxMEu992FX6/0JzHTWApmd3qi8" +
-    "e5U14a0u7eq+7rzztGyY+1qk3gfa0j" +
-    "Omt/Eh96n+RnPE20JKgMmMgqodte6O" +
-    "f3ymJRQbp7g6I/HGhht+z0xqkv2qtj" +
-    "5ABaGcUxIzEHYLF1aHUHlS0kM4FzKq" +
-    "OvUxC9/KQP/CMrAs2t1yBXYlg/ga0h" +
-    "hpcJZ02y98KQ==\nU2NhbmJvdFNESw" +
-    "psb2NhbGhvc3R8c2hlbGZpZS5zaXRl" +
-    "CjE3NTY1OTgzOTkKODM4ODYwNwo4\n",
-    
-  // Production license for www.shelfie.site
+  // Production license for www.shelfie.site (used for both www and non-www)
   "www.shelfie.site": 
     "n6Joru1b0F3oD8MVj3ac/Z8WMSpSGw" +
     "dlo/+8It/DO6ssZln+hrNmL4JT99v9" +
@@ -92,16 +75,11 @@ const getLicenseKey = (): string => {
   console.log('License detection - hostname:', hostname);
   console.log('License detection - full URL:', fullUrl);
   
-  // Check if we're on www.shelfie.site specifically
-  if (hostname === 'www.shelfie.site') {
-    console.log('Using production license key for www.shelfie.site');
+  // Check if we're on any shelfie.site domain (with or without www)
+  // Use the www.shelfie.site license key since that's what the SDK expects
+  if (hostname === 'www.shelfie.site' || hostname === 'shelfie.site') {
+    console.log('Using production license key for www.shelfie.site (bundle ID match)');
     return LICENSE_KEYS["www.shelfie.site"];
-  }
-  
-  // Check if we're on shelfie.site (without www)
-  if (hostname === 'shelfie.site') {
-    console.log('Using production license key for shelfie.site');
-    return LICENSE_KEYS["shelfie.site"];
   }
   
   // Check for Vercel deployments containing shelfie
