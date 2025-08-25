@@ -4,8 +4,8 @@ import { log } from "./vite";
 export function startQueueProcessor() {
   log("🚀 Starting background queue processor...");
   
-  // Process queue every 30 seconds
-  const PROCESSING_INTERVAL = 30 * 1000;
+  // Process queue every 10 seconds for faster response
+  const PROCESSING_INTERVAL = 10 * 1000;
   
   setInterval(async () => {
     try {
