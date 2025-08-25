@@ -3,8 +3,7 @@ import { Camera, Sparkles, Search, Download, Check, ArrowRight, Lock, BookOpen }
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ShelfieIcon from "@/components/shelfie-icon";
-import DemoShelfRealistic from "@/components/demo-shelf-realistic";
-import { demoBooksData } from "@/lib/books-demo";
+import LiveDemoShelfRealistic from "@/components/live-demo-shelf-realistic";
 
 export default function Landing() {
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -74,7 +73,7 @@ export default function Landing() {
               </div>
               
               <div className="mt-8 md:mt-12 lg:mt-16">
-                <DemoShelfRealistic books={demoBooksData.slice(0, 10)} reducedMotion={reducedMotion} />
+                <LiveDemoShelfRealistic reducedMotion={reducedMotion} />
               </div>
             </div>
           </div>

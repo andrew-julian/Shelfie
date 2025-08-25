@@ -53,6 +53,9 @@ export interface IStorage {
   incrementUserBookCount(userId: string): Promise<User | undefined>;
   updateUserBookCount(userId: string, count: number): Promise<User | undefined>;
   getUserBookCount(userId: string): Promise<number>;
+  
+  // Demo operations  
+  getRecentBooksForDemo(email: string, limit: number): Promise<Book[]>;
 }
 
 // Database Storage Implementation
@@ -289,6 +292,28 @@ export class DatabaseStorage implements IStorage {
       .from(users)
       .where(eq(users.id, userId));
     return user?.bookCount || 0;
+  }
+  
+  async getRecentBooksForDemo(email: string, limit: number): Promise<Book[]> {
+    // Simplified query to avoid join issues
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+    
+    if (user.length === 0) {
+      return [];
+    }
+    
+    const recentBooks = await db
+      .select()
+      .from(books)
+      .where(eq(books.userId, user[0].id))
+      .orderBy(desc(books.addedAt))
+      .limit(limit);
+    
+    return recentBooks;
   }
 }
 
