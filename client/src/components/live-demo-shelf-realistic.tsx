@@ -240,11 +240,11 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
 
   if (isLoading) {
     return (
-      <div className="relative bg-white rounded-2xl p-6 shadow-lg border border-gray-200 overflow-hidden">
+      <div className="relative overflow-hidden">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-800">Your library reimagined</h3>
         </div>
-        <div className="h-48 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+        <div className="h-48 flex items-center justify-center">
           <div className="text-gray-500 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-2"></div>
             <p>Loading real books...</p>
@@ -256,11 +256,11 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
 
   if (isError || !books.length) {
     return (
-      <div className="relative bg-white rounded-2xl p-6 shadow-lg border border-gray-200 overflow-hidden">
+      <div className="relative overflow-hidden">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-800">Your library reimagined</h3>
         </div>
-        <div className="h-48 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+        <div className="h-48 flex items-center justify-center">
           <div className="text-gray-500 text-center">
             <p>Unable to load live demo books</p>
             <p className="text-sm">Please try again later</p>
@@ -271,7 +271,7 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
   }
 
   return (
-    <div className="relative bg-white rounded-2xl p-6 shadow-lg border border-gray-200 overflow-hidden">
+    <div className="relative overflow-hidden">
       {/* Navigation buttons */}
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold text-gray-800">Your library reimagined</h3>
@@ -301,7 +301,7 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
 
       {/* Books container with realistic layout engine and proper perspective */}
       <div 
-        className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 rounded-lg border border-gray-200"
+        className="relative overflow-hidden"
         style={{ 
           height: `${Math.min(contentDimensions.height, 280)}px`,
           width: '100%',
