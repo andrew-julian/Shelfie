@@ -117,6 +117,27 @@ This means REPL_ID is incorrect. The OAuth URL shows `client_id=Shelfie` but it 
 - It should be a unique identifier from Replit
 - Use the exact same value that works in your Replit development environment
 
+### Invalid Redirect URI Error
+This means your production domain isn't registered in Replit's OAuth settings.
+
+**Steps to Fix:**
+1. **In your Replit project:**
+   - Go to your project settings/configuration
+   - Find "OAuth" or "Authentication" settings
+   - Look for "Allowed Redirect URIs" or "Callback URLs"
+   
+2. **Add your production callback URL:**
+   - Add: `https://workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app/api/callback`
+   - Save the settings
+   
+3. **Alternative method:**
+   - Check if there's a `.replit` file or environment configuration
+   - Look for OAuth/auth configuration sections
+   - Add your production domain to allowed domains
+
+**Note:** The redirect URI must be exactly:
+`https://workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app/api/callback`
+
 ### Malformed Redirect URI
 - Ensure REPLIT_DOMAINS doesn't include `https://` prefix
 - Domain should be exactly: `workspace-jwg7kg4kn-andrew-8095s-projects.vercel.app`
