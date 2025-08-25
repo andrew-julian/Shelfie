@@ -2143,6 +2143,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Background queue processor - scans for pending items and processes them
+  async function processQueueBackground() {
+    try {
+      console.log("🔄 Processing scanning queue...");
+      
+      // Get all users and their pending queue items
+      const allUsers = await storage.getAllUsers();
+      let totalProcessed = 0;
+      
+      for (const user of allUsers) {
+        const userQueue = await storage.getScanningQueue(user.id);
+        const pendingItems = userQueue.filter(item => 
+          item.status === 'scanning' || item.status === 'looking-up'
+        );
+        
+        for (const item of pendingItems) {
+          console.log(`📚 Processing queue item: ${item.isbn} (${item.status})`);
+          await processScanningQueueItem(item.id);
+          totalProcessed++;
+          
+          // Add small delay to avoid overwhelming the API
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+      
+      if (totalProcessed > 0) {
+        console.log(`✅ Processed ${totalProcessed} queue items`);
+      }
+      
+    } catch (error) {
+      console.error("❌ Error in background queue processor:", error);
+    }
+  }
+
+  // API endpoint to manually trigger queue processing
+  app.post("/api/scanning-queue/process", isAuthenticated, async (req: any, res) => {
+    try {
+      await processQueueBackground();
+      res.json({ message: "Queue processing triggered" });
+    } catch (error) {
+      console.error("Error processing queue:", error);
+      res.status(500).json({ message: "Failed to process queue" });
+    }
+  });
+
   // Background processing function for scanning queue items
   async function processScanningQueueItem(queueItemId: string) {
     try {

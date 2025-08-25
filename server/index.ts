@@ -42,6 +42,12 @@ app.use((req, res, next) => {
 
 (async () => {
   const server = await registerRoutes(app);
+  
+  // Start background queue processor in development only
+  if (!process.env.VERCEL) {
+    const { startQueueProcessor } = await import('./queueProcessor');
+    startQueueProcessor();
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
