@@ -8,7 +8,8 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage.js";
 
-if (!process.env.REPLIT_DOMAINS) {
+// Only require REPLIT_DOMAINS in development environment
+if (process.env.NODE_ENV === 'development' && !process.env.REPLIT_DOMAINS) {
   throw new Error("Environment variable REPLIT_DOMAINS not provided");
 }
 
@@ -72,94 +73,111 @@ export async function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  const config = await getOidcConfig();
+  // Only setup Replit OAuth in development
+  if (process.env.NODE_ENV === 'development' && process.env.REPLIT_DOMAINS) {
+    const config = await getOidcConfig();
 
-  const verify: VerifyFunction = async (
-    tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
-    verified: passport.AuthenticateCallback
-  ) => {
-    const user = {};
-    updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
-    verified(null, user);
-  };
+    const verify: VerifyFunction = async (
+      tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
+      verified: passport.AuthenticateCallback
+    ) => {
+      const user = {};
+      updateUserSession(user, tokens);
+      await upsertUser(tokens.claims());
+      verified(null, user);
+    };
 
-  // Register strategies for all configured domains
-  const domains = process.env.REPLIT_DOMAINS!.split(",").map(d => d.trim());
-  for (const domain of domains) {
-    // Ensure domain doesn't already include protocol
-    const cleanDomain = domain.replace(/^https?:\/\//, '');
-    const callbackURL = `https://${cleanDomain}/api/callback`;
+    // Register strategies for all configured domains
+    const domains = process.env.REPLIT_DOMAINS.split(",").map(d => d.trim());
+    for (const domain of domains) {
+      // Ensure domain doesn't already include protocol
+      const cleanDomain = domain.replace(/^https?:\/\//, '');
+      const callbackURL = `https://${cleanDomain}/api/callback`;
+      
+      const strategy = new Strategy(
+        {
+          name: `replitauth:${cleanDomain}`,
+          config,
+          scope: "openid email profile offline_access",
+          callbackURL,
+        },
+        verify,
+      );
+      passport.use(strategy);
+      console.log(`Registered auth strategy for domain: ${cleanDomain}, callback: ${callbackURL}`);
+    }
     
-    const strategy = new Strategy(
+    // Also register a fallback strategy for any hostname
+    const firstDomain = process.env.REPLIT_DOMAINS.split(",")[0].trim().replace(/^https?:\/\//, '');
+    const fallbackCallbackURL = `https://${firstDomain}/api/callback`;
+    const fallbackStrategy = new Strategy(
       {
-        name: `replitauth:${cleanDomain}`,
+        name: "replitauth:fallback",
         config,
         scope: "openid email profile offline_access",
-        callbackURL,
+        callbackURL: fallbackCallbackURL,
       },
       verify,
     );
-    passport.use(strategy);
-    console.log(`Registered auth strategy for domain: ${cleanDomain}, callback: ${callbackURL}`);
+    passport.use(fallbackStrategy);
+    console.log(`Registered fallback auth strategy, callback: ${fallbackCallbackURL}`);
+    console.log("✓ Replit OAuth configured for development");
   }
-  
-  // Also register a fallback strategy for any hostname
-  const firstDomain = process.env.REPLIT_DOMAINS!.split(",")[0].trim().replace(/^https?:\/\//, '');
-  const fallbackCallbackURL = `https://${firstDomain}/api/callback`;
-  const fallbackStrategy = new Strategy(
-    {
-      name: "replitauth:fallback",
-      config,
-      scope: "openid email profile offline_access",
-      callbackURL: fallbackCallbackURL,
-    },
-    verify,
-  );
-  passport.use(fallbackStrategy);
-  console.log(`Registered fallback auth strategy, callback: ${fallbackCallbackURL}`);
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    const domains = process.env.REPLIT_DOMAINS!.split(",").map(d => d.trim().replace(/^https?:\/\//, ''));
-    const hostname = req.hostname;
-    const strategyName = domains.includes(hostname) 
-      ? `replitauth:${hostname}` 
-      : "replitauth:fallback";
-    
-    console.log(`Login attempt for hostname: ${hostname}, configured domains: ${domains.join(', ')}, using strategy: ${strategyName}`);
-    
-    passport.authenticate(strategyName, {
-      prompt: "login consent",
-      scope: ["openid", "email", "profile", "offline_access"],
-    })(req, res, next);
+    // In development, use Replit OAuth
+    if (process.env.NODE_ENV === 'development' && process.env.REPLIT_DOMAINS) {
+      const domains = process.env.REPLIT_DOMAINS.split(",").map(d => d.trim().replace(/^https?:\/\//, ''));
+      const hostname = req.hostname;
+      const strategyName = domains.includes(hostname) 
+        ? `replitauth:${hostname}` 
+        : "replitauth:fallback";
+      
+      console.log(`Login attempt for hostname: ${hostname}, configured domains: ${domains.join(', ')}, using strategy: ${strategyName}`);
+      
+      passport.authenticate(strategyName, {
+        prompt: "login consent",
+        scope: ["openid", "email", "profile", "offline_access"],
+      })(req, res, next);
+    } else {
+      // In production, redirect to Google OAuth
+      res.redirect('/api/auth/google');
+    }
   });
 
   app.get("/api/callback", (req, res, next) => {
-    const domains = process.env.REPLIT_DOMAINS!.split(",").map(d => d.trim().replace(/^https?:\/\//, ''));
-    const hostname = req.hostname;
-    const strategyName = domains.includes(hostname) 
-      ? `replitauth:${hostname}` 
-      : "replitauth:fallback";
-    
-    console.log(`Callback for hostname: ${hostname}, using strategy: ${strategyName}`);
-    
-    passport.authenticate(strategyName, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
-    })(req, res, next);
+    // Only handle Replit callback in development
+    if (process.env.NODE_ENV === 'development' && process.env.REPLIT_DOMAINS) {
+      const domains = process.env.REPLIT_DOMAINS.split(",").map(d => d.trim().replace(/^https?:\/\//, ''));
+      const hostname = req.hostname;
+      const strategyName = domains.includes(hostname) 
+        ? `replitauth:${hostname}` 
+        : "replitauth:fallback";
+      
+      console.log(`Callback for hostname: ${hostname}, using strategy: ${strategyName}`);
+      
+      passport.authenticate(strategyName, {
+        successReturnToOrRedirect: "/",
+        failureRedirect: "/api/login",
+      })(req, res, next);
+    } else {
+      // In production, this should be handled by Google OAuth routes
+      res.status(404).json({ message: "Callback not available in production" });
+    }
   });
 
   app.get("/api/logout", (req, res) => {
     req.logout(() => {
-      res.redirect(
-        client.buildEndSessionUrl(config, {
-          client_id: process.env.REPL_ID!,
-          post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
-        }).href
-      );
+      if (process.env.NODE_ENV === 'development' && process.env.REPLIT_DOMAINS) {
+        // Development logout with Replit
+        res.redirect("/");
+      } else {
+        // Production logout - redirect to home
+        res.redirect("/");
+      }
     });
   });
 }
