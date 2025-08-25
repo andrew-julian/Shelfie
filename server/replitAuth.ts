@@ -57,9 +57,9 @@ function updateUserSession(
 
 async function upsertUser(
   claims: any,
-) {
-  await storage.upsertUser({
-    id: claims["sub"],
+): Promise<any> {
+  // Use email-based identification - don't pass provider-specific ID
+  return await storage.upsertUser({
     email: claims["email"],
     firstName: claims["first_name"],
     lastName: claims["last_name"],
@@ -83,8 +83,8 @@ export async function setupAuth(app: Express) {
     ) => {
       const user = {};
       updateUserSession(user, tokens);
-      await upsertUser(tokens.claims());
-      verified(null, user);
+      const dbUser = await upsertUser(tokens.claims());
+      verified(null, dbUser);
     };
 
     // Register strategies for all configured domains
@@ -124,8 +124,20 @@ export async function setupAuth(app: Express) {
     console.log("✓ Replit OAuth configured for development");
   }
 
-  passport.serializeUser((user: Express.User, cb) => cb(null, user));
-  passport.deserializeUser((user: Express.User, cb) => cb(null, user));
+  passport.serializeUser((user: any, cb) => cb(null, user.id));
+  passport.deserializeUser(async (id: string, cb) => {
+    try {
+      const user = await storage.getUser(id);
+      if (!user) {
+        console.log(`User ${id} not found during session deserialization`);
+        return cb(null, false);
+      }
+      cb(null, user);
+    } catch (error) {
+      console.error(`Failed to deserialize user ${id}:`, error instanceof Error ? error.message : error);
+      cb(null, false);
+    }
+  });
 
   app.get("/api/login", (req, res, next) => {
     // In development, use Replit OAuth

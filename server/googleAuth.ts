@@ -31,8 +31,8 @@ export function getSession() {
 }
 
 async function upsertUser(profile: any): Promise<User> {
+  // Use email-based identification - don't pass provider-specific ID
   const userData = {
-    id: profile.id,
     email: profile.emails?.[0]?.value || null,
     firstName: profile.name?.givenName || null,
     lastName: profile.name?.familyName || null,

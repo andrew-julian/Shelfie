@@ -37,10 +37,11 @@ The application employs a **PostgreSQL-based approach**:
 - **Deployment**: Vercel-compatible configuration with environment-specific database connections.
 
 ### Authentication and Authorization
-Implements a **hybrid authentication system**:
+Implements a **hybrid authentication system** with **email-based user identification**:
 - **Development Environment**: Replit OAuth with session-based authentication using `connect-pg-simple` for PostgreSQL-backed sessions
 - **Production Environment**: Google OAuth for external deployments (Vercel) with the same session storage system
 - **Architecture**: Environment-based authentication provider selection ensures seamless development on Replit while supporting production deployment on external platforms
+- **Email-Based Identity**: Both OAuth providers create/find users by email address rather than provider-specific IDs, ensuring the same user gets consistent accounts across providers (August 2025)
 
 ### Key Architectural Patterns
 - **Shared Schema Pattern**: Database models, validation schemas, and TypeScript types are defined once and shared.
