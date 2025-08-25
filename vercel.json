@@ -20,7 +20,7 @@
       "dest": "/api/index.ts"
     },
     {
-      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot))",
+      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|wasm))",
       "dest": "/dist/public/$1"
     },
     {
