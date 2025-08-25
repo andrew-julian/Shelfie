@@ -5,23 +5,12 @@
       "src": "api/index.ts",
       "use": "@vercel/node",
       "config": {
-        "maxDuration": 30
+        "maxDuration": 30,
+        "includeFiles": ["server/**", "shared/**", "client/dist/**"]
       }
-    },
-    {
-      "src": "client/dist/**",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
-    {
-      "src": "/(api/.*)|(auth/.*)|(stripe/.*)",
-      "dest": "/api/index.ts"
-    },
-    {
-      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot))",
-      "dest": "/client/dist/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "/api/index.ts"
