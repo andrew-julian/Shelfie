@@ -50,17 +50,18 @@ export default function Landing() {
           <div className="container mx-auto px-4 py-12 md:py-16 lg:py-24">
             <div className="max-w-4xl mx-auto">
               <div className="text-center space-y-6 md:space-y-8">
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  Stop stacking.<br />Start scanning.
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight">
+                  <span className="block">Stop stacking.</span>
+                  <span className="block">Start scanning.</span>
                 </h1>
-                <p className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto px-4 sm:px-0">
                   Turn every book into a beautifully organised digital library in seconds. Barcode scanning, rich metadata, and stunning 3D shelves — effortless, private, and always yours.
                 </p>
                 <div className="pt-4">
                   <Button 
                     size="lg" 
                     asChild
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-8 md:px-10 py-4 md:py-5 text-base md:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all"
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 text-sm sm:text-base md:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all"
                     onClick={() => handleAnalyticsEvent('click_cta_primary')}
                   >
                     <a href="/api/login" data-testid="button-primary-cta">
@@ -84,8 +85,8 @@ export default function Landing() {
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-12 md:mb-16">
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6">How it works</h2>
-                <p className="text-lg md:text-xl text-gray-600">Three simple steps to build your digital library</p>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6">How it works</h2>
+                <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4 sm:px-0">Three simple steps to build your digital library</p>
               </div>
               
               <div className="space-y-12 md:space-y-0 md:grid md:grid-cols-3 md:gap-12 lg:gap-16">
@@ -122,8 +123,8 @@ export default function Landing() {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12 md:mb-16">
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6">Why People Love Shelfie</h2>
-                <p className="text-lg md:text-xl text-gray-600">Beautiful design meets powerful functionality</p>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6">Why People Love Shelfie</h2>
+                <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4 sm:px-0">Beautiful design meets powerful functionality</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
@@ -215,8 +216,8 @@ export default function Landing() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12 md:mb-16">
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6">Simple, honest pricing</h2>
-                <p className="text-lg md:text-xl text-gray-600">Choose the plan that fits your collection</p>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6">Simple, honest pricing</h2>
+                <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4 sm:px-0">Choose the plan that fits your collection</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
@@ -284,17 +285,19 @@ export default function Landing() {
         <section className="py-16 md:py-24 bg-gradient-to-br from-orange-50 via-white to-blue-50">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 md:mb-8">Build a library you'll actually use</h2>
-              <p className="text-lg md:text-xl text-gray-600 mb-8 md:mb-12 leading-relaxed max-w-3xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 md:mb-8 px-4 sm:px-0">Build a library you'll actually use</h2>
+              <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-8 md:mb-12 leading-relaxed max-w-3xl mx-auto px-4 sm:px-0">
                 A library that looks beautiful, feels intuitive, and makes every book easy to find. No ads, no clutter, just you and your books.
               </p>
               <Button 
                 size="lg" 
                 asChild
-                className="bg-orange-500 hover:bg-orange-600 text-white px-10 md:px-12 py-5 md:py-6 text-lg md:text-xl font-semibold rounded-full shadow-lg hover:shadow-xl transition-all mb-6"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 sm:px-8 md:px-10 lg:px-12 py-4 sm:py-5 md:py-6 text-base sm:text-lg md:text-xl font-semibold rounded-full shadow-lg hover:shadow-xl transition-all mb-6 text-center"
               >
-                <a href="/api/login" data-testid="button-final-cta">
-                  Start scanning now and watch your library come alive →
+                <a href="/api/login" data-testid="button-final-cta" className="block">
+                  <span className="block sm:hidden">Start scanning now →</span>
+                  <span className="hidden sm:block md:hidden">Start scanning and watch your library come alive →</span>
+                  <span className="hidden md:block">Start scanning now and watch your library come alive →</span>
                 </a>
               </Button>
               <p className="text-sm md:text-base text-gray-500">Free for up to 100 books • No credit card required</p>
