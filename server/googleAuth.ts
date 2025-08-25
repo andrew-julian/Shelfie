@@ -83,9 +83,14 @@ export async function setupGoogleAuth(app: Express) {
   passport.deserializeUser(async (id: string, done) => {
     try {
       const user = await storage.getUser(id);
+      if (!user) {
+        console.log(`User ${id} not found during session deserialization`);
+        return done(null, false); // This will log out the user automatically
+      }
       done(null, user);
     } catch (error) {
-      done(error, null);
+      console.error(`Failed to deserialize user ${id}:`, error instanceof Error ? error.message : error);
+      done(null, false); // This will log out the user automatically instead of crashing
     }
   });
 
@@ -105,6 +110,19 @@ export async function setupGoogleAuth(app: Express) {
   app.get('/api/logout', (req, res) => {
     req.logout(() => {
       res.redirect('/');
+    });
+  });
+
+  // Force logout and session cleanup endpoint
+  app.get('/api/force-logout', (req, res) => {
+    req.logout(() => {
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Session destruction error:', err);
+        }
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        res.json({ message: 'Session forcefully cleared' });
+      });
     });
   });
 }
