@@ -51,8 +51,7 @@ export default function Landing() {
             <div className="max-w-4xl mx-auto">
               <div className="text-center space-y-6 md:space-y-8">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight">
-                  <span className="block">Stop stacking.</span>
-                  <span className="block">Start scanning.</span>
+                  From barcode to bookshelf in seconds.
                 </h1>
                 <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto px-4 sm:px-0">
                   Turn every book into a beautifully organised digital library in seconds. Barcode scanning, rich metadata, and stunning 3D shelves — effortless, private, and always yours.
