@@ -28,7 +28,7 @@ After deploying, you need to configure these environment variables in your Verce
 - `VITE_STRIPE_PUBLIC_KEY` - Your Stripe publishable key
 - `RAINFOREST_API_KEY` - Your Rainforest API key
 - `REPL_ID` - Your Replit app ID
-- `REPLIT_DOMAINS` - Your production domain (e.g., "yourapp.vercel.app")
+- `REPLIT_DOMAINS` - Your Vercel domain (e.g., "yourapp.vercel.app,workspace-92txorcdz-andrew-8095s-projects.vercel.app")
 - `ISSUER_URL` - "https://replit.com/oidc"
 
 ### How to Set Environment Variables:
