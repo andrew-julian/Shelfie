@@ -72,42 +72,32 @@ const getLicenseKey = (): string => {
   const hostname = window.location.hostname;
   const fullUrl = window.location.href;
   
-  console.log('License detection - hostname:', hostname);
-  console.log('License detection - full URL:', fullUrl);
+  console.log('🔑 LICENSE DETECTION START');
+  console.log('🔑 Hostname:', hostname);
+  console.log('🔑 Full URL:', fullUrl);
+  console.log('🔑 Available license keys:', Object.keys(LICENSE_KEYS));
   
   // Check if we're on any shelfie.site domain (with or without www)
   // Use the www.shelfie.site license key since that's what the SDK expects
   if (hostname === 'www.shelfie.site' || hostname === 'shelfie.site') {
-    console.log('Using production license key for www.shelfie.site (bundle ID match)');
-    return LICENSE_KEYS["www.shelfie.site"];
-  }
-  
-  // Check for Vercel deployments containing shelfie
-  if (hostname.includes('shelfie') && hostname.includes('vercel.app')) {
-    console.log('Using production license key for Vercel shelfie deployment');
+    console.log('🔑 MATCHED: Using production license key for www.shelfie.site (bundle ID match)');
     return LICENSE_KEYS["www.shelfie.site"];
   }
   
   // Check if we're in production environment
   if (hostname.includes('bookscan.vanaheim.com.au')) {
-    console.log('Using production license key for bookscan.vanaheim.com.au');
+    console.log('🔑 MATCHED: Using production license key for bookscan.vanaheim.com.au');
     return LICENSE_KEYS.production;
   }
   
   // Check if we're in Replit environment
   if (hostname.includes('replit.dev')) {
-    console.log('Using development license key for Replit environment');
+    console.log('🔑 MATCHED: Using development license key for Replit environment');
     return LICENSE_KEYS.development;
   }
   
-  // Check if we're in Vercel production deployment
-  if (hostname.includes('vercel.app') && !hostname.includes('replit')) {
-    console.log('Using production license key for Vercel deployment');
-    return LICENSE_KEYS["www.shelfie.site"];
-  }
-  
   // Default to development for localhost and other environments
-  console.log('Using development license key for localhost/other environments - hostname:', hostname);
+  console.log('🔑 FALLBACK: Using development license key for localhost/other environments - hostname:', hostname);
   return LICENSE_KEYS.development;
 };
 
