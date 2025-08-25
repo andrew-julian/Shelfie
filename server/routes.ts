@@ -2177,13 +2177,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }
 
-  // API endpoint to manually trigger queue processing
+  // API endpoint to manually trigger queue processing (authenticated)
   app.post("/api/scanning-queue/process", isAuthenticated, async (req: any, res) => {
     try {
       await processQueueBackground();
       res.json({ message: "Queue processing triggered" });
     } catch (error) {
       console.error("Error processing queue:", error);
+      res.status(500).json({ message: "Failed to process queue" });
+    }
+  });
+
+  // Internal queue processing endpoint (no auth required for background processor)
+  app.post("/api/internal/scanning-queue/process", async (req: any, res) => {
+    try {
+      // Only allow from localhost or internal calls
+      const clientIP = req.ip || req.connection.remoteAddress;
+      if (!clientIP || (!clientIP.includes('127.0.0.1') && !clientIP.includes('localhost') && clientIP !== '::1')) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await processQueueBackground();
+      res.json({ message: "Queue processing completed" });
+    } catch (error) {
+      console.error("Error processing queue:", error);
+      res.status(500).json({ message: "Failed to process queue" });
+    }
+  });
+
+  // Vercel Cron endpoint for queue processing (runs every 5 minutes in production)
+  app.post("/api/cron/process-queue", async (req: any, res) => {
+    try {
+      // Verify this is a Vercel cron request
+      const authHeader = req.headers.authorization;
+      if (process.env.VERCEL && (!authHeader || !authHeader.startsWith('Bearer '))) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      console.log("🔄 Vercel Cron: Processing scanning queue...");
+      await processQueueBackground();
+      res.json({ message: "Cron queue processing completed" });
+    } catch (error) {
+      console.error("Error in cron queue processing:", error);
       res.status(500).json({ message: "Failed to process queue" });
     }
   });

@@ -9,8 +9,8 @@ export function startQueueProcessor() {
   
   setInterval(async () => {
     try {
-      // Make a request to our own processing endpoint
-      const response = await fetch('http://localhost:5000/api/scanning-queue/process', {
+      // Make a request to our internal processing endpoint
+      const response = await fetch('http://localhost:5000/api/internal/scanning-queue/process', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
