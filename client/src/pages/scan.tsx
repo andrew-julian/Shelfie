@@ -69,9 +69,13 @@ const LICENSE_KEYS = {
 // Function to get the appropriate license key based on environment
 const getLicenseKey = (): string => {
   const hostname = window.location.hostname;
+  const fullUrl = window.location.href;
   
-  // Check if we're on shelfie.site
-  if (hostname.includes('shelfie.site')) {
+  console.log('License detection - hostname:', hostname);
+  console.log('License detection - full URL:', fullUrl);
+  
+  // Check if we're on shelfie.site (including www subdomain and Vercel deployments)
+  if (hostname.includes('shelfie.site') || hostname.includes('shelfie') && hostname.includes('vercel.app')) {
     console.log('Using production license key for shelfie.site');
     return LICENSE_KEYS["shelfie.site"];
   }
@@ -88,8 +92,14 @@ const getLicenseKey = (): string => {
     return LICENSE_KEYS.development;
   }
   
+  // Check if we're in Vercel production deployment
+  if (hostname.includes('vercel.app') && !hostname.includes('replit')) {
+    console.log('Using production license key for Vercel deployment');
+    return LICENSE_KEYS["shelfie.site"];
+  }
+  
   // Default to development for localhost and other environments
-  console.log('Using development license key for localhost/other environments');
+  console.log('Using development license key for localhost/other environments - hostname:', hostname);
   return LICENSE_KEYS.development;
 };
 
