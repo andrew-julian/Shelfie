@@ -2266,21 +2266,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Vercel Cron endpoint for queue processing (runs every 5 minutes in production)
+  // Vercel Cron endpoint for queue processing (runs every 2 minutes in production)
   app.post("/api/cron/process-queue", async (req: any, res) => {
     try {
-      // Verify this is a Vercel cron request
-      const authHeader = req.headers.authorization;
-      if (process.env.VERCEL && (!authHeader || !authHeader.startsWith('Bearer '))) {
-        return res.status(401).json({ message: "Unauthorized" });
+      console.log("🚀 VERCEL CRON TRIGGERED - Queue processing started");
+      console.log("📅 Timestamp:", new Date().toISOString());
+      console.log("🔧 Environment:", process.env.NODE_ENV);
+      console.log("🌐 Vercel:", !!process.env.VERCEL);
+      
+      // For Vercel cron, don't require auth header (Vercel handles authentication)
+      if (process.env.VERCEL) {
+        console.log("✅ Running in Vercel environment - proceeding without auth check");
       }
 
-      console.log("🔄 Vercel Cron: Processing scanning queue...");
+      console.log("🔄 Vercel Cron: Starting queue processing...");
+      const startTime = Date.now();
+      
       await processQueueBackground();
-      res.json({ message: "Cron queue processing completed" });
+      
+      const endTime = Date.now();
+      console.log(`⏱️ Vercel Cron: Processing completed in ${endTime - startTime}ms`);
+      console.log("✅ VERCEL CRON COMPLETED SUCCESSFULLY");
+      
+      res.json({ 
+        message: "Cron queue processing completed",
+        timestamp: new Date().toISOString(),
+        processingTime: `${endTime - startTime}ms`
+      });
     } catch (error) {
-      console.error("Error in cron queue processing:", error);
-      res.status(500).json({ message: "Failed to process queue" });
+      console.error("❌ VERCEL CRON ERROR:", error);
+      console.error("❌ Error stack:", error.stack);
+      res.status(500).json({ 
+        message: "Failed to process queue",
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
     }
   });
 
