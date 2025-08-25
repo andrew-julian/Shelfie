@@ -2150,7 +2150,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get all users and their pending queue items
       const allUsers = await storage.getAllUsers();
+      console.log(`👥 Found ${allUsers.length} users to check`);
       let totalProcessed = 0;
+      let totalPending = 0;
       
       for (const user of allUsers) {
         const userQueue = await storage.getScanningQueue(user.id);
@@ -2158,18 +2160,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
           item.status === 'scanning' || item.status === 'looking-up'
         );
         
+        // Debug: Show all queue items with their actual statuses
+        if (userQueue.length > 0) {
+          console.log(`🔍 User ${user.id} queue debug:`, userQueue.map(item => ({
+            isbn: item.isbn,
+            status: item.status,
+            id: item.id
+          })));
+        }
+        
+        if (pendingItems.length > 0) {
+          console.log(`📋 User ${user.id}: ${pendingItems.length} pending items`);
+        }
+        
+        totalPending += pendingItems.length;
+        
         for (const item of pendingItems) {
-          console.log(`📚 Processing queue item: ${item.isbn} (${item.status})`);
-          await processScanningQueueItem(item.id);
-          totalProcessed++;
+          console.log(`📚 Processing: ${item.isbn} (${item.status}) - User: ${user.id}`);
+          
+          try {
+            await processScanningQueueItem(item.id);
+            totalProcessed++;
+            console.log(`✅ Completed processing: ${item.isbn}`);
+          } catch (error) {
+            console.error(`❌ Failed processing ${item.isbn}:`, error);
+          }
           
           // Add small delay to avoid overwhelming the API
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
       
-      if (totalProcessed > 0) {
-        console.log(`✅ Processed ${totalProcessed} queue items`);
+      if (totalPending > 0) {
+        console.log(`📊 Queue Summary: ${totalPending} pending items, ${totalProcessed} processed`);
+      } else {
+        console.log("✅ No pending queue items found");
       }
       
     } catch (error) {
@@ -2185,6 +2210,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error processing queue:", error);
       res.status(500).json({ message: "Failed to process queue" });
+    }
+  });
+
+  // Debug endpoint to inspect all queue items across all users
+  app.get("/api/debug/queue-status", isAuthenticated, async (req: any, res) => {
+    try {
+      const allUsers = await storage.getAllUsers();
+      const debugInfo = [];
+      
+      for (const user of allUsers) {
+        const userQueue = await storage.getScanningQueue(user.id);
+        if (userQueue.length > 0) {
+          debugInfo.push({
+            userId: user.id,
+            userEmail: user.email || 'No email',
+            queueItems: userQueue.map(item => ({
+              id: item.id,
+              isbn: item.isbn,
+              status: item.status,
+              title: item.title || 'No title',
+              createdAt: item.createdAt,
+              updatedAt: item.updatedAt
+            }))
+          });
+        }
+      }
+      
+      console.log("🐛 DEBUG: Current queue state:", JSON.stringify(debugInfo, null, 2));
+      res.json({ 
+        totalUsers: allUsers.length,
+        usersWithQueues: debugInfo.length,
+        queueData: debugInfo 
+      });
+    } catch (error) {
+      console.error("Error getting debug info:", error);
+      res.status(500).json({ message: "Failed to get debug info" });
     }
   });
 
@@ -2226,8 +2287,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Background processing function for scanning queue items
   async function processScanningQueueItem(queueItemId: string) {
     try {
+      console.log(`🔍 Starting processing for queue item: ${queueItemId}`);
+      
       // Get the queue item by finding it across all user queues
       let queueItem: any = null;
+      let itemUserId: string | null = null;
       const allUsers = await storage.getAllUsers();
       
       for (const user of allUsers) {
@@ -2235,19 +2299,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const foundItem = userQueue.find(item => item.id === queueItemId);
         if (foundItem) {
           queueItem = foundItem;
+          itemUserId = user.id;
+          console.log(`📖 Found queue item: ISBN ${foundItem.isbn}, Status: ${foundItem.status}, User: ${user.id}`);
           break;
         }
       }
       
-      if (!queueItem || queueItem.status === 'success' || queueItem.status === 'error') {
+      if (!queueItem) {
+        console.log(`⚠️ Queue item ${queueItemId} not found`);
+        return;
+      }
+      
+      if (queueItem.status === 'success' || queueItem.status === 'error') {
+        console.log(`⏭️ Queue item ${queueItemId} already processed (${queueItem.status})`);
         return; // Item already processed or doesn't exist
       }
       
+      console.log(`🔄 Updating status to 'looking-up' for ${queueItem.isbn}`);
       // Update status to looking-up
       await storage.updateScanningQueueItem(queueItemId, { status: 'looking-up' });
       
+      console.log(`🌐 Looking up book data for ISBN: ${queueItem.isbn}`);
       // Call the lookup function directly to avoid auth issues
       const bookData = await lookupBookByISBN(queueItem.isbn, queueItem.userId);
+      
+      console.log(`📊 Book lookup result: ${bookData.title ? `Found "${bookData.title}"` : 'No title found'}`);
       
       if (!bookData.title) {
         throw new Error('Book not found in our database');
