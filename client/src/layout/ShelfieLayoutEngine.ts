@@ -282,14 +282,11 @@ function processRow(
   const usable = containerWidth - totalGutterWidth;
   let scale = usable / wsum;
   
-  // Preserve natural proportions - allow shrinking but limit excessive stretching
+  // Preserve natural proportions for all rows, not just the last one
+  // Limit scaling to prevent excessive stretching that destroys proportions
+  const maxStretch = 1.05; // Very minimal stretching to preserve aspect ratios
   const originalScale = scale;
-  if (scale > 1.0) {
-    // Only limit stretching, allow unlimited shrinking for small containers
-    const maxStretch = 1.05; // Very minimal stretching to preserve aspect ratios
-    scale = Math.min(scale, maxStretch);
-  }
-  // When scale < 1.0, allow books to shrink naturally to fit container
+  scale = Math.min(scale, maxStretch);
   
   // Debug scaling for problematic books
   if (rowBooks.some(book => book.id.includes('nexus') || book.id.includes('drama') || book.id.includes('reading'))) {

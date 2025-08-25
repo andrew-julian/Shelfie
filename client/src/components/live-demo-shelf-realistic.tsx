@@ -304,10 +304,9 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
     const avgBookWidth = 140; // Average book width in pixels
     const minBooksPerRow = Math.max(2, Math.floor(containerWidth / (avgBookWidth + 12))); // At least 2 books per row
     
-    // Responsive configuration ensuring consistent row layouts
+    // Responsive configuration that preserves natural book proportions
     const demoConfig = {
       ...DEFAULT_CFG,
-      targetRowHeight: 200, // Fixed height to preserve proportions at all screen widths
       gutterX: containerWidth < 480 ? 8 : 12, // Smaller gutters on mobile
       gutterY: 15,
       jitterX: 4, // Reduced jitter for more consistent alignment
@@ -316,7 +315,7 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
       minBooksPerRow: minBooksPerRow // Custom property to guide row consistency
     };
     
-    return calculateDemoLayout(layoutBooks, normalizedDims, containerWidth, demoConfig);
+    return calculateLayout(layoutBooks, normalizedDims, containerWidth, demoConfig);
   }, [books, containerWidth]);
 
   // Calculate total content dimensions
