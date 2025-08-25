@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { calculateLayout, normaliseBooks, DEFAULT_CFG, type Book as LayoutBook, type LayoutItem } from '@/layout/ShelfieLayoutEngine';
+import { calculateLayout, calculateDemoLayout, normaliseBooks, DEFAULT_CFG, type Book as LayoutBook, type LayoutItem } from '@/layout/ShelfieLayoutEngine';
 import { useQuery } from '@tanstack/react-query';
 import type { Book } from '../../../shared/schema';
 
@@ -272,12 +272,25 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
   useEffect(() => {
     const updateWidth = () => {
       const newWidth = Math.min(800, window.innerWidth - 48); // Max 800px with padding
-      setContainerWidth(prev => prev === newWidth ? prev : newWidth); // Only update if changed
+      setContainerWidth(prev => {
+        // Only update if the difference is significant to prevent micro-adjustments
+        return Math.abs(prev - newWidth) > 1 ? newWidth : prev;
+      });
     };
     
     updateWidth();
-    window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
+    const debouncedUpdateWidth = (() => {
+      let timeoutId: NodeJS.Timeout;
+      return () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(updateWidth, 100);
+      };
+    })();
+    
+    window.addEventListener('resize', debouncedUpdateWidth);
+    return () => {
+      window.removeEventListener('resize', debouncedUpdateWidth);
+    };
   }, []);
 
   // Convert database books to layout engine format and calculate positions
@@ -303,7 +316,7 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
       minBooksPerRow: minBooksPerRow // Custom property to guide row consistency
     };
     
-    return calculateLayout(layoutBooks, normalizedDims, containerWidth, demoConfig);
+    return calculateDemoLayout(layoutBooks, normalizedDims, containerWidth, demoConfig);
   }, [books, containerWidth]);
 
   // Calculate total content dimensions
