@@ -2241,40 +2241,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         totalUsers: allUsers.length,
         usersWithQueues: debugInfo.length,
-        queueData: debugInfo,
-        currentDatabase: process.env.DATABASE_URL?.includes('ep-patient-grass') ? 'Production' : 'Development'
+        queueData: debugInfo 
       });
     } catch (error) {
       console.error("Error getting debug info:", error);
       res.status(500).json({ message: "Failed to get debug info" });
-    }
-  });
-
-  // Database switcher endpoint for debugging
-  app.post("/api/debug/switch-database", isAuthenticated, async (req: any, res) => {
-    try {
-      const { target } = req.body; // 'production' or 'development'
-      
-      const databases = {
-        production: 'postgresql://neondb_owner:npg_MYVaHo2B6OCl@ep-patient-grass-ado8taii-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
-        development: 'postgresql://neondb_owner:npg_GxAsZ4NE3RKX@ep-empty-firefly-ad7ulq49.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require'
-      };
-      
-      if (!databases[target]) {
-        return res.status(400).json({ message: "Invalid target. Use 'production' or 'development'" });
-      }
-      
-      // Note: This endpoint just provides the information for manual switching
-      // The user needs to update the DATABASE_URL secret manually for security
-      res.json({ 
-        message: `To switch to ${target} database, update DATABASE_URL secret to:`,
-        databaseUrl: databases[target],
-        currentDatabase: process.env.DATABASE_URL?.includes('ep-patient-grass') ? 'Production' : 'Development',
-        instructions: `Go to Replit Secrets and update DATABASE_URL, then restart the workflow`
-      });
-    } catch (error) {
-      console.error("Error in database switcher:", error);
-      res.status(500).json({ message: "Failed to get database info" });
     }
   });
 
