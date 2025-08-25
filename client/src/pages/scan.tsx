@@ -195,7 +195,10 @@ export default function ScanPage() {
   // Fetch scanning queue from database
   const { data: queue = [], refetch: refetchQueue } = useQuery<QueueItem[]>({
     queryKey: ['/api/scanning-queue'],
-    refetchInterval: 2000, // Poll every 2 seconds for updates
+    staleTime: 30 * 1000, // Cache for 30 seconds
+    refetchInterval: 10 * 1000, // Poll every 10 seconds (only when actively scanning)
+    refetchIntervalInBackground: false, // Don't poll when tab is not active
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
   });
 
   // Add item to queue mutation

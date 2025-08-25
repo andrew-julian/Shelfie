@@ -7,6 +7,7 @@ Shelfie is a full-stack digital library management application designed to help 
 Preferred communication style: Simple, everyday language.
 Development approach: Avoid hardcoded fixes for specific titles or content - build scalable general solutions that handle edge cases through improved logic.
 Branding: Rebranded from "BookScan" to "Shelfie" (August 2025). Subscription tier rebranded from "Shelfie Pro" to "Shelfie Unlimited" (August 2025).
+Performance optimization: Minimize API request frequency to preserve Vercel edge request limits - avoid unnecessary polling in production (August 2025).
 
 ## System Architecture
 
@@ -55,6 +56,7 @@ Implements a **hybrid authentication system**:
 - **Visual Realism**: SVG fractal noise for paper texture, layered shadows, micro-misalignment, and glossy highlights.
 - **Aesthetic Sorting**: Image analysis for color sorting to group books by lightness, warmth/coolness, and color families.
 - **Navigation & UI Optimization**: Mid-width screen responsive design, automatic book refresh, and mobile layout auto-trigger.
+- **Performance Optimization**: Optimized API polling intervals to reduce server load and preserve Vercel edge request limits (August 2025).
 
 ### Feature Specifications
 - **Barcode Scanning**: Implementation of Scanbot SDK v7.2.0 with camera access and barcode detection, including environment-based license keys and path resolution. Supports multiple production domains: shelfie.site and shelfie.vanaheim.com.au.

@@ -21,8 +21,11 @@ export function useSubscriptionCheck() {
   // Fetch user details
   const { data: userDetails, isLoading } = useQuery<UserDetails>({
     queryKey: ["/api/user/details"],
-    refetchInterval: 5000, // Check every 5 seconds for testing
-    staleTime: 0, // Always refetch to ensure accuracy
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnReconnect: true, // Only refetch when connection is restored
+    // Only refetch manually when needed (e.g., after subscription changes)
   });
 
   useEffect(() => {
