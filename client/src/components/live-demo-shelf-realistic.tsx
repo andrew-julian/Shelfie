@@ -23,48 +23,121 @@ interface LiveDemoShelfRealisticProps {
   reducedMotion?: boolean;
 }
 
-// Convert database book to layout engine format
-function convertToLayoutBook(book: Book, index: number): LayoutBook {
-  // Generate realistic, varied dimensions when database doesn't have them
-  const generateRealisticDimensions = (bookId: string) => {
-    // Use book ID for consistent but varied dimensions
-    const hash = bookId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const rng = Math.abs(Math.sin(hash));
-    
-    // Realistic book dimension ranges (in mm)
-    const heights = [178, 195, 203, 216, 234, 248, 268, 285]; // Various book heights
-    const widthRatios = [0.65, 0.68, 0.71, 0.74, 0.77, 0.82]; // Width-to-height ratios
-    const spineRatios = [0.08, 0.12, 0.15, 0.18, 0.22, 0.28]; // Spine-to-width ratios
-    
-    const heightIndex = Math.floor(rng * heights.length);
-    const height = heights[heightIndex];
-    
-    const widthRatio = widthRatios[Math.floor((rng * 1000) % widthRatios.length)];
-    const width = height * widthRatio;
-    
-    const spineRatio = spineRatios[Math.floor((rng * 10000) % spineRatios.length)];
-    const spine = width * spineRatio;
-    
-    return { width, height, spine };
-  };
+// Utility to parse book dimensions - EXACT same logic as main app
+function parseBookDimensions(book: Book): { width: number; height: number; depth: number } {
+  const defaultDimensions = { width: 140, height: 200, depth: 15 };
   
-  // Use actual dimensions if available, otherwise generate realistic ones
-  let width_mm, height_mm, spine_mm;
-  
+  // Use parsed dimensions if available (from backend intelligent parsing)
   if (book.width && book.height && book.depth) {
-    width_mm = parseFloat(book.width.toString()) * 10;
-    height_mm = parseFloat(book.height.toString()) * 10;
-    spine_mm = parseFloat(book.depth.toString()) * 10;
-  } else {
-    const realistic = generateRealisticDimensions(book.id);
-    width_mm = realistic.width;
-    height_mm = realistic.height;
-    spine_mm = realistic.spine;
+    const width = parseFloat(book.width);
+    const height = parseFloat(book.height);
+    const depth = parseFloat(book.depth);
+    
+    // Scale dimensions for visual display (22px per inch base scale)
+    const baseScale = 22;
+    
+    return {
+      width: Math.round(width * baseScale),
+      height: Math.round(height * baseScale),
+      depth: Math.max(Math.round(depth * baseScale * 1.2), 10) // More realistic depth effect
+    };
   }
+  
+  // Fallback to parsing dimensions string for backwards compatibility
+  if (!book.dimensions) return defaultDimensions;
+  
+  try {
+    // Parse various dimension formats like "8.5 x 5.5 x 1.2 inches", "21.6 x 14 x 2.8 cm", etc.
+    const matches = book.dimensions.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
+    if (!matches) return defaultDimensions;
+    
+    let [, dim1Str, dim2Str, dim3Str] = matches;
+    let dim1 = parseFloat(dim1Str);
+    let dim2 = parseFloat(dim2Str);
+    let dim3 = parseFloat(dim3Str);
+    
+    // Amazon provides dimensions in various orders. For books, we need to intelligently
+    // determine which dimension represents width, height, and depth (thickness).
+    // Books are typically: portrait orientation (height > width) and relatively thin
+    
+    const dims = [dim1, dim2, dim3];
+    dims.sort((a, b) => a - b);
+    const [smallest, middle, largest] = dims;
+    
+    // Heuristic: smallest dimension is usually depth (thickness)
+    // The two larger dimensions represent width and height
+    let width, height, depth = smallest;
+    
+    // Between the remaining two dimensions, height should be larger for portrait books
+    const remaining = dims.filter(d => d !== smallest);
+    if (remaining.length === 2) {
+      const [smaller, larger] = remaining.sort((a, b) => a - b);
+      
+      // For typical books, assume portrait orientation unless dimensions suggest otherwise
+      // Very wide books (like coffee table books) might be landscape
+      const aspectRatio = larger / smaller;
+      
+      if (aspectRatio > 1.4) {
+        // Clear portrait book
+        width = smaller;
+        height = larger;
+      } else if (aspectRatio < 1.2) {
+        // Nearly square, keep original order preference
+        width = middle;
+        height = largest;
+      } else {
+        // Ambiguous case - use the larger dimension as height for portrait assumption
+        width = smaller;
+        height = larger;
+      }
+    } else {
+      // Fallback if sorting logic fails
+      width = middle;
+      height = largest;
+    }
+    
+    // Check if units are explicitly mentioned, then convert appropriately
+    const isMetric = /cm|centimeter|millimeter/i.test(book.dimensions);
+    const isImperial = /inch|inches|in\b/i.test(book.dimensions);
+    
+    // Convert to inches if needed
+    if (isMetric || (!isImperial && (width > 15 || height > 15 || depth > 15))) {
+      width = width / 2.54; // cm to inches
+      height = height / 2.54;
+      depth = depth / 2.54;
+    }
+    
+    // More realistic scaling - typical paperback is about 4.25" x 6.87" = 120x190px
+    // So roughly 28px per inch, but adjust for better visual balance
+    const baseScale = 22;
+    
+    return {
+      width: Math.round(width * baseScale),
+      height: Math.round(height * baseScale), 
+      depth: Math.max(Math.round(depth * baseScale * 1.2), 10) // More realistic depth effect
+    };
+  } catch (error) {
+    console.warn('Failed to parse book dimensions:', book.dimensions, error);
+    return defaultDimensions;
+  }
+}
+
+// Convert database book to layout engine format - using EXACT same logic as main app
+function convertToLayoutBook(book: Book, index: number): LayoutBook {
+  // Use the exact same dimension parsing as the main app
+  const dims = parseBookDimensions(book);
+  
+  // Convert from pixels to millimeters (layout engine expects mm)
+  // The main app uses 22px per inch, so: px / 22 * 25.4 = mm
+  const pxToMm = 25.4 / 22;
   
   return {
     id: book.id,
-    phys: { width_mm, height_mm, spine_mm }
+    phys: { 
+      width_mm: dims.width * pxToMm,
+      height_mm: dims.height * pxToMm,
+      spine_mm: dims.depth * pxToMm
+    }
   };
 }
 
