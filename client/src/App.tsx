@@ -57,15 +57,6 @@ function Router() {
 }
 
 function App() {
-  // Set deployment version in document title for debugging
-  useEffect(() => {
-    const originalTitle = document.title;
-    document.title = `${originalTitle} | v2025.01.25.18:00`;
-    return () => {
-      document.title = originalTitle;
-    };
-  }, []);
-
   // Log deployment version for debugging
   useEffect(() => {
     console.log('🚀 DEPLOYMENT VERSION: v2025.01.25.18:00');
