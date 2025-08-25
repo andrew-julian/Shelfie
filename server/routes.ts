@@ -399,8 +399,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all users for user switcher
-  app.get('/api/auth/users', isAuthenticated, async (req: any, res) => {
+  // Get all users for user switcher - accessible without auth in development
+  app.get('/api/auth/users', process.env.NODE_ENV === 'production' ? isAuthenticated : (req: any, res: any, next: any) => next(), async (req: any, res) => {
     try {
       const users = await storage.getAllUsers();
       res.json(users);
