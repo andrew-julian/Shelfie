@@ -1,0 +1,69 @@
+Setting up container measurement effect
+index-aQgLcyA2.js:377 Container ref not available, using smart fallback dimensions
+index-aQgLcyA2.js:377 Container ref not available, using smart fallback dimensions
+index-aQgLcyA2.js:333 Subscription check: {bookCount: 1, isSubscribed: false, hasCheckedMilestone: false, isOnSuccessPage: false, location: '/', …}
+index-aQgLcyA2.js:377 Layout calculation: {booksCount: 1, containerMeasured: true, containerWidth: 1200, effectiveWidth: 1200, screenWidth: 1729}
+index-aQgLcyA2.js:377 Container size updated: {width: 1184, height: 600, rectWidth: 1184, parentWidth: 1280, windowWidth: 1729}
+index-aQgLcyA2.js:377 Layout calculation: {booksCount: 1, containerMeasured: true, containerWidth: 1184, effectiveWidth: 1184, screenWidth: 1729}
+index-aQgLcyA2.js:377 Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
+n.onload @ index-aQgLcyA2.js:377Understand this warning
+index-aQgLcyA2.js:333 Subscription check: {bookCount: 1, isSubscribed: false, hasCheckedMilestone: false, isOnSuccessPage: false, location: '/scan', …}
+index-aQgLcyA2.js:383 Scanbot SDK script loaded, initializing...
+index-aQgLcyA2.js:383 Using production license key for shelfie.site
+index-aQgLcyA2.js:383 License key length: 418
+index-aQgLcyA2.js:383 License key preview: HST5knltqsfXtEJPCS8F9mMKEbmJUVSpMeynyNqA7W/9wSjWUo...
+index-aQgLcyA2.js:383 Attempting SDK initialization...
+index-aQgLcyA2.js:383 ScanbotSDK available: true
+index-aQgLcyA2.js:383 ScanbotSDK.initialize available: true
+index-aQgLcyA2.js:383 Using enginePath: https://www.shelfie.site/scanbot-sdk/bin/barcode-scanner/
+index-aQgLcyA2.js:383 Full URL being used: https://www.shelfie.site/scanbot-sdk/bin/barcode-scanner/
+index-aQgLcyA2.js:383 Engine path accessibility test: SUCCESS
+index-aQgLcyA2.js:383 SDK Init result: $E {storage: HE, bridge: d}
+index-aQgLcyA2.js:383 Scanbot SDK initialized successfully
+index-aQgLcyA2.js:383 Starting Scanbot scanner...
+index-aQgLcyA2.js:383 Creating barcode scanner with config: N {version: '1.0', screen: 'BarcodeScanner', palette: o, localization: S, backgroundColor: '?sbColorSurfaceLow', …}
+ScanbotSDK.Core-simd.js?7.2.0:1 ScanbotSDK: ERROR - Your ScanbotSDK license (localhost; shelfie.site) doesn't match the application bundle ID (www.shelfie.site).
+ScanbotSDK.ui2.min.js:31 Uncaught (in promise) c: WASM not initialized successfully. This can be due to an invalid license or problems loading the WASM file. Please check the console for more information.
+    at d.<anonymous> (ScanbotSDK.ui2.min.js:31:261076)
+    at Generator.next (<anonymous>)
+    at a (ScanbotSDK.ui2.min.js:31:259719)
+(anonymous) @ ScanbotSDK.ui2.min.js:31
+a @ ScanbotSDK.ui2.min.js:31
+Promise.then
+c @ ScanbotSDK.ui2.min.js:31
+(anonymous) @ ScanbotSDK.ui2.min.js:31
+s @ ScanbotSDK.ui2.min.js:31
+(anonymous) @ ScanbotSDK.ui2.min.js:31
+d @ ScanbotSDK.ui2.min.js:31
+(anonymous) @ ScanbotSDK.ui2.min.js:187
+(anonymous) @ ScanbotSDK.ui2.min.js:187
+GE @ ScanbotSDK.ui2.min.js:187
+initialize @ ScanbotSDK.ui2.min.js:187
+E.onload @ index-aQgLcyA2.js:383
+script
+(anonymous) @ index-aQgLcyA2.js:383
+(anonymous) @ index-aQgLcyA2.js:383
+ml @ index-aQgLcyA2.js:40
+vs @ index-aQgLcyA2.js:40
+Sb @ index-aQgLcyA2.js:40
+vr @ index-aQgLcyA2.js:40
+Lh @ index-aQgLcyA2.js:40
+dr @ index-aQgLcyA2.js:38
+(anonymous) @ index-aQgLcyA2.js:40Understand this error
+index-aQgLcyA2.js:383 Scanbot scanning error: LicenseError: Application ID mismatch: your ScanbotSDK license is not permitted to run with this app.
+    at BE.<anonymous> (ScanbotSDK.ui2.min.js:187:45825)
+    at Generator.next (<anonymous>)
+    at a (ScanbotSDK.ui2.min.js:187:44259)
+N @ index-aQgLcyA2.js:383
+await in N
+Hw @ index-aQgLcyA2.js:37
+Vw @ index-aQgLcyA2.js:37
+Kw @ index-aQgLcyA2.js:37
+ih @ index-aQgLcyA2.js:37
+ag @ index-aQgLcyA2.js:37
+(anonymous) @ index-aQgLcyA2.js:37
+$d @ index-aQgLcyA2.js:40
+Mp @ index-aQgLcyA2.js:37
+ec @ index-aQgLcyA2.js:37
+md @ index-aQgLcyA2.js:37
+l1 @ index-aQgLcyA2.js:37Understand this error
