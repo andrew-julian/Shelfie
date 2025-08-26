@@ -144,12 +144,21 @@ export default function Home() {
         case 'date-added':
           return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
         case 'categories':
-          // Get primary category (first category) for each book
+          // Get meaningful category (skip generic "Books" category)
           const getCategoryForSort = (book: Book) => {
             if (!book.categories || book.categories.length === 0) {
               return 'Uncategorized';
             }
-            return book.categories[0] || 'Uncategorized';
+            
+            // Skip "Books" category and find the first meaningful category
+            for (const category of book.categories) {
+              if (category && category.toLowerCase() !== 'books') {
+                return category;
+              }
+            }
+            
+            // If all categories are "Books" or empty, return Uncategorized
+            return 'Uncategorized';
           };
           
           const categoryA = getCategoryForSort(a);
