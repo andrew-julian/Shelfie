@@ -34,7 +34,9 @@ import {
   MessageSquare,
   BarChart3,
   Quote,
-  CheckCircle
+  CheckCircle,
+  Database,
+  Loader2
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { CoverEditorModal } from "./cover-editor-modal";
@@ -77,7 +79,10 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
   const [currentCoverImage, setCurrentCoverImage] = useState(book?.coverImage || '');
   const [showCropper, setShowCropper] = useState(false);
   const [showCoverEditor, setShowCoverEditor] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'details'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'details' | 'api-data'>('overview');
+  const [googleBooksData, setGoogleBooksData] = useState<any>(null);
+  const [isLoadingApiData, setIsLoadingApiData] = useState(false);
+  const [apiDataError, setApiDataError] = useState<string | null>(null);
   
   // Update local state when book prop changes (modal opens with new book)
   useEffect(() => {
@@ -274,6 +279,59 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
     uploadCroppedImageMutation.mutate(croppedImageData);
   };
 
+  const fetchGoogleBooksData = async () => {
+    if (!book?.isbn) {
+      setApiDataError('No ISBN available for this book');
+      return;
+    }
+
+    setIsLoadingApiData(true);
+    setApiDataError(null);
+
+    try {
+      // Try multiple search strategies for better book matching
+      const searchQueries = [
+        `isbn:${book.isbn}`,
+        book.isbn,
+        `isbn:${book.isbn.replace(/-/g, '')}`,
+        book.isbn.replace(/-/g, ''),
+        `intitle:${encodeURIComponent(book.title)}${book.author ? `+inauthor:${encodeURIComponent(book.author)}` : ''}`
+      ];
+
+      let bookData = null;
+      
+      for (const query of searchQueries) {
+        try {
+          const response = await fetch(
+            `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.items && data.items.length > 0) {
+              bookData = data.items[0];
+              break;
+            }
+          }
+        } catch (err) {
+          console.warn(`Search failed for query: ${query}`, err);
+          continue;
+        }
+      }
+
+      if (bookData) {
+        setGoogleBooksData(bookData);
+      } else {
+        setApiDataError('Book not found in Google Books API');
+      }
+    } catch (error) {
+      console.error('Error fetching Google Books data:', error);
+      setApiDataError('Failed to fetch data from Google Books API');
+    } finally {
+      setIsLoadingApiData(false);
+    }
+  };
+
   const renderStarRating = (rating: number, size: "sm" | "lg" = "sm") => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -448,7 +506,8 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                   {[
                     { id: 'overview', label: 'Overview', icon: Eye },
                     { id: 'reviews', label: 'Reviews', icon: Star },
-                    { id: 'details', label: 'Details', icon: BookOpen }
+                    { id: 'details', label: 'Details', icon: BookOpen },
+                    { id: 'api-data', label: 'API Data', icon: Database }
                   ].map(({ id, label, icon: Icon }) => (
                     <button
                       key={id}
@@ -876,6 +935,283 @@ export default function EnhancedBookDetailsModal({ book, isOpen, onClose, onUpda
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+
+              {activeTab === 'api-data' && (
+                <div className="space-y-6">
+                  {/* Fetch API Data Section */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Database className="w-5 h-5" />
+                        Google Books API Data
+                      </h3>
+                      <Button
+                        onClick={fetchGoogleBooksData}
+                        disabled={isLoadingApiData}
+                        className="ml-auto"
+                        variant="outline"
+                        size="sm"
+                        data-testid="fetch-api-data-button"
+                      >
+                        {isLoadingApiData ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Fetching...
+                          </>
+                        ) : (
+                          <>
+                            <Database className="w-4 h-4 mr-2" />
+                            Fetch API Data
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    {!googleBooksData && !apiDataError && !isLoadingApiData && (
+                      <div className="text-center py-8 bg-gray-50 rounded-lg">
+                        <Database className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                        <p className="text-gray-600 mb-2">No Google Books API data loaded</p>
+                        <p className="text-sm text-gray-500">Click "Fetch API Data" to retrieve comprehensive book information from Google Books</p>
+                      </div>
+                    )}
+
+                    {apiDataError && (
+                      <div className="text-center py-8 bg-red-50 rounded-lg">
+                        <p className="text-red-600 mb-2">⚠️ Error Loading Data</p>
+                        <p className="text-sm text-red-500">{apiDataError}</p>
+                      </div>
+                    )}
+
+                    {googleBooksData && (
+                      <div className="space-y-6">
+                        {/* Volume Info */}
+                        {googleBooksData.volumeInfo && (
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                              <BookOpen className="w-4 h-4" />
+                              Volume Information
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {googleBooksData.volumeInfo.title && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Title</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.volumeInfo.title}</span>
+                                </div>
+                              )}
+                              {googleBooksData.volumeInfo.subtitle && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Subtitle</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.volumeInfo.subtitle}</span>
+                                </div>
+                              )}
+                              {googleBooksData.volumeInfo.authors && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Authors</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.volumeInfo.authors.join(', ')}</span>
+                                </div>
+                              )}
+                              {googleBooksData.volumeInfo.publisher && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Publisher</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.volumeInfo.publisher}</span>
+                                </div>
+                              )}
+                              {googleBooksData.volumeInfo.publishedDate && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Published Date</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.volumeInfo.publishedDate}</span>
+                                </div>
+                              )}
+                              {googleBooksData.volumeInfo.pageCount && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Page Count</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.volumeInfo.pageCount}</span>
+                                </div>
+                              )}
+                              {googleBooksData.volumeInfo.language && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Language</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.volumeInfo.language.toUpperCase()}</span>
+                                </div>
+                              )}
+                              {googleBooksData.volumeInfo.averageRating && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Average Rating</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.volumeInfo.averageRating}/5</span>
+                                </div>
+                              )}
+                              {googleBooksData.volumeInfo.ratingsCount && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Ratings Count</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.volumeInfo.ratingsCount.toLocaleString()}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Categories */}
+                        {googleBooksData.volumeInfo?.categories && googleBooksData.volumeInfo.categories.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                              <Tag className="w-4 h-4" />
+                              Categories
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                              {googleBooksData.volumeInfo.categories.map((category: string, index: number) => (
+                                <Badge key={index} variant="secondary" className="text-xs">
+                                  {category}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Industry Identifiers (ISBNs) */}
+                        {googleBooksData.volumeInfo?.industryIdentifiers && googleBooksData.volumeInfo.industryIdentifiers.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                              <BarChart3 className="w-4 h-4" />
+                              Industry Identifiers
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {googleBooksData.volumeInfo.industryIdentifiers.map((identifier: any, index: number) => (
+                                <div key={index} className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">{identifier.type}</span>
+                                  <span className="font-medium text-right ml-4">{identifier.identifier}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Sale Info */}
+                        {googleBooksData.saleInfo && (
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                              <DollarSign className="w-4 h-4" />
+                              Sale Information
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {googleBooksData.saleInfo.saleability && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Saleability</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.saleInfo.saleability}</span>
+                                </div>
+                              )}
+                              {googleBooksData.saleInfo.listPrice && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">List Price</span>
+                                  <span className="font-medium text-right ml-4">
+                                    {googleBooksData.saleInfo.listPrice.amount} {googleBooksData.saleInfo.listPrice.currencyCode}
+                                  </span>
+                                </div>
+                              )}
+                              {googleBooksData.saleInfo.retailPrice && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Retail Price</span>
+                                  <span className="font-medium text-right ml-4">
+                                    {googleBooksData.saleInfo.retailPrice.amount} {googleBooksData.saleInfo.retailPrice.currencyCode}
+                                  </span>
+                                </div>
+                              )}
+                              {googleBooksData.saleInfo.buyLink && (
+                                <div className="md:col-span-2">
+                                  <a
+                                    href={googleBooksData.saleInfo.buyLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
+                                  >
+                                    <ExternalLink className="w-4 h-4" />
+                                    <span className="font-medium text-blue-700">Purchase on Google Books</span>
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Access Info */}
+                        {googleBooksData.accessInfo && (
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                              <Eye className="w-4 h-4" />
+                              Access Information
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {googleBooksData.accessInfo.viewability && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Viewability</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.accessInfo.viewability}</span>
+                                </div>
+                              )}
+                              {googleBooksData.accessInfo.embeddable !== undefined && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Embeddable</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.accessInfo.embeddable ? 'Yes' : 'No'}</span>
+                                </div>
+                              )}
+                              {googleBooksData.accessInfo.publicDomain !== undefined && (
+                                <div className="flex justify-between p-3 bg-gray-50 rounded">
+                                  <span className="text-gray-600">Public Domain</span>
+                                  <span className="font-medium text-right ml-4">{googleBooksData.accessInfo.publicDomain ? 'Yes' : 'No'}</span>
+                                </div>
+                              )}
+                              {googleBooksData.accessInfo.webReaderLink && (
+                                <div className="md:col-span-2">
+                                  <a
+                                    href={googleBooksData.accessInfo.webReaderLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-2 p-3 bg-green-50 border border-green-200 rounded hover:bg-green-100 transition-colors"
+                                  >
+                                    <BookOpen className="w-4 h-4" />
+                                    <span className="font-medium text-green-700">Read on Google Books</span>
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Search Info */}
+                        {googleBooksData.searchInfo && (
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                              <FileText className="w-4 h-4" />
+                              Search Snippet
+                            </h4>
+                            <div className="p-4 bg-gray-50 rounded-lg">
+                              <p className="text-gray-700 text-sm leading-relaxed">
+                                {googleBooksData.searchInfo.textSnippet}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Raw API Response */}
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            <Database className="w-4 h-4" />
+                            Raw API Response
+                          </h4>
+                          <details className="bg-gray-50 rounded-lg">
+                            <summary className="p-3 cursor-pointer font-medium text-gray-700 hover:bg-gray-100 rounded-lg">
+                              View Full JSON Response
+                            </summary>
+                            <div className="p-3 border-t border-gray-200">
+                              <pre className="text-xs text-gray-600 whitespace-pre-wrap break-words max-h-96 overflow-y-auto">
+                                {JSON.stringify(googleBooksData, null, 2)}
+                              </pre>
+                            </div>
+                          </details>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
                 </div>
