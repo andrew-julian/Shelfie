@@ -134,7 +134,7 @@ export function GoogleBooksViewer({ book, isOpen, onClose }: GoogleBooksViewerPr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-full h-[80vh] p-0">
+      <DialogContent className="max-w-3xl w-[90vw] h-[75vh] max-h-[600px] p-0 m-4">
         <DialogHeader className="p-4 pb-2 border-b">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg font-semibold truncate pr-4">
