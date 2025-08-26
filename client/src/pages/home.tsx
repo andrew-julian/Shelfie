@@ -23,7 +23,7 @@ import VirtualizedBookGrid from '@/components/virtualized-book-grid';
 import { usePerformanceTelemetry } from '@/hooks/usePerformanceTelemetry';
 import { useLocation, Link } from "wouter";
 
-type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
+type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light' | 'categories';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
 
 // Function to sort books by overall visual color profile
@@ -143,6 +143,25 @@ export default function Home() {
           return (statusOrder[a.status as keyof typeof statusOrder] || 3) - (statusOrder[b.status as keyof typeof statusOrder] || 3);
         case 'date-added':
           return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
+        case 'categories':
+          // Get primary category (first category) for each book
+          const getCategoryForSort = (book: Book) => {
+            if (!book.categories || book.categories.length === 0) {
+              return 'Uncategorized';
+            }
+            return book.categories[0] || 'Uncategorized';
+          };
+          
+          const categoryA = getCategoryForSort(a);
+          const categoryB = getCategoryForSort(b);
+          
+          // First sort by category, then by title within each category
+          const categoryCompare = categoryA.localeCompare(categoryB);
+          if (categoryCompare !== 0) {
+            return categoryCompare;
+          }
+          // If same category, sort by title
+          return a.title.localeCompare(b.title);
         default:
           return 0;
       }

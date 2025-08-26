@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import ShelfieIcon from "@/components/shelfie-icon";
 
-type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light';
+type SortOption = 'title-asc' | 'title-desc' | 'author-asc' | 'author-desc' | 'status' | 'date-added' | 'color-light-to-dark' | 'color-dark-to-light' | 'categories';
 type FilterStatus = 'all' | 'want-to-read' | 'reading' | 'read';
 
 interface HeaderProps {
@@ -72,6 +72,7 @@ export default function Header({
                 <option value="author-desc">Author Z-A</option>
                 <option value="status">Status</option>
                 <option value="date-added">Date Added</option>
+                <option value="categories">Categories</option>
                 <option value="color-light-to-dark">Color: Light→Dark</option>
                 <option value="color-dark-to-light">Color: Dark→Light</option>
               </select>
@@ -142,6 +143,7 @@ export default function Header({
                   <option value="author-desc">Author Z-A</option>
                   <option value="status">Status</option>
                   <option value="date-added">Date Added</option>
+                  <option value="categories">Categories</option>
                   <option value="color-light-to-dark">Colour Sort (Light to Dark)</option>
                   <option value="color-dark-to-light">Colour Sort (Dark to Light)</option>
                 </select>
