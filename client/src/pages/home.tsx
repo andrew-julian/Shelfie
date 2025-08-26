@@ -144,16 +144,21 @@ export default function Home() {
         case 'date-added':
           return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
         case 'categories':
+          console.log('📚 Categories sorting triggered');
           // Get primary category (first category) for each book
           const getCategoryForSort = (book: Book) => {
             if (!book.categories || book.categories.length === 0) {
+              console.log(`📚 Book "${book.title}" has no categories`);
               return 'Uncategorized';
             }
+            console.log(`📚 Book "${book.title}" categories:`, book.categories);
             return book.categories[0] || 'Uncategorized';
           };
           
           const categoryA = getCategoryForSort(a);
           const categoryB = getCategoryForSort(b);
+          
+          console.log(`📚 Comparing "${a.title}" (${categoryA}) vs "${b.title}" (${categoryB})`);
           
           // First sort by category, then by title within each category
           const categoryCompare = categoryA.localeCompare(categoryB);
