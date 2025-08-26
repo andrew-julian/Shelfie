@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Book } from "@shared/schema";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Eye } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { getCachedDominantColor } from "@/utils/color-extractor";
@@ -140,6 +140,7 @@ interface BookCardProps {
   book: Book;
   onSelect: (book: Book) => void;
   onUpdate: () => void;
+  onPreview?: (book: Book) => void;
   customDimensions?: {
     width: number;
     height: number;
@@ -153,7 +154,7 @@ const statusConfig = {
   'read': { label: 'Read', icon: '✅', color: 'bg-green-500' },
 };
 
-export default function BookCard({ book, onSelect, onUpdate, customDimensions }: BookCardProps) {
+export default function BookCard({ book, onSelect, onUpdate, onPreview, customDimensions }: BookCardProps) {
   const { toast } = useToast();
   
   // Use custom dimensions if provided, otherwise calculate responsive dimensions
@@ -173,6 +174,7 @@ export default function BookCard({ book, onSelect, onUpdate, customDimensions }:
   
   // State to track if user is scrolling vs intentionally interacting
   const [isScrolling, setIsScrolling] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [touchStartPos, setTouchStartPos] = useState<{x: number, y: number} | null>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -265,6 +267,13 @@ export default function BookCard({ book, onSelect, onUpdate, customDimensions }:
     }, 150);
   };
 
+  const handlePreviewClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onPreview) {
+      onPreview(book);
+    }
+  };
+
   // Clean up timeout on unmount
   useEffect(() => {
     return () => {
@@ -277,7 +286,11 @@ export default function BookCard({ book, onSelect, onUpdate, customDimensions }:
 
 
   return (
-    <div className="group relative">
+    <div 
+      className="group relative"
+      onMouseEnter={() => !isScrolling && setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div 
         className={`book-3d cursor-pointer ${isScrolling ? 'no-hover' : ''}`}
         onClick={() => onSelect(book)}
@@ -316,6 +329,20 @@ export default function BookCard({ book, onSelect, onUpdate, customDimensions }:
             </div>
           )}
         </div>
+        
+        {/* Preview overlay - only show on hover and if onPreview is provided */}
+        {isHovered && onPreview && (
+          <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
+            <button
+              onClick={handlePreviewClick}
+              className="bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              data-testid="button-preview-book"
+              aria-label={`Preview ${book.title}`}
+            >
+              <Eye className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

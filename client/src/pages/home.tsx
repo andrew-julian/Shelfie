@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/header";
 import BookCard from "@/components/book-card";
 import EnhancedBookDetailsModal from "@/components/enhanced-book-details-modal";
+import { GoogleBooksViewer } from "@/components/google-books-viewer";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -55,6 +56,7 @@ async function sortBooksByColor(books: Book[], reverse: boolean = false): Promis
 
 export default function Home() {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [previewBook, setPreviewBook] = useState<Book | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('date-added');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
@@ -644,6 +646,10 @@ export default function Home() {
     refetch(); // Refresh books list after update
   };
 
+  const handleBookPreview = (book: Book) => {
+    setPreviewBook(book);
+  };
+
   return (
     <div className="min-h-screen w-full overflow-x-hidden relative">
       <Header 
@@ -715,6 +721,7 @@ export default function Home() {
               books={finalBooks}
               onBookSelect={handleBookSelect}
               onBookUpdate={handleBookUpdate}
+              onBookPreview={handleBookPreview}
               chunkSize={200}
               bufferSize={2}
             />
@@ -754,6 +761,7 @@ export default function Home() {
                       book={book}
                       onSelect={handleBookSelect}
                       onUpdate={handleBookUpdate}
+                      onPreview={handleBookPreview}
                       customDimensions={{
                         width: item.w,
                         height: item.h,
@@ -806,6 +814,15 @@ export default function Home() {
         onClose={() => setSelectedBook(null)}
         onUpdate={handleBookUpdate}
       />
+
+      {/* Google Books Preview Modal */}
+      {previewBook && (
+        <GoogleBooksViewer
+          book={previewBook}
+          isOpen={!!previewBook}
+          onClose={() => setPreviewBook(null)}
+        />
+      )}
     </div>
   );
 }

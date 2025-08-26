@@ -8,6 +8,7 @@ interface VirtualizedBookGridProps {
   books: Book[];
   onBookSelect: (book: Book) => void;
   onBookUpdate: () => void;
+  onBookPreview?: (book: Book) => void;
   chunkSize?: number;
   bufferSize?: number;
 }
@@ -25,6 +26,7 @@ export default function VirtualizedBookGrid({
   books,
   onBookSelect,
   onBookUpdate,
+  onBookPreview,
   chunkSize = 200,
   bufferSize = 4
 }: VirtualizedBookGridProps) {
@@ -253,6 +255,7 @@ export default function VirtualizedBookGrid({
                   book={book}
                   onSelect={onBookSelect}
                   onUpdate={onBookUpdate}
+                  onPreview={onBookPreview}
                   customDimensions={{
                     width: item.w,
                     height: item.h,
