@@ -11,6 +11,7 @@ interface VirtualizedBookGridProps {
   onBookPreview?: (book: Book) => void;
   chunkSize?: number;
   bufferSize?: number;
+  sortBy?: string;
 }
 
 interface ChunkData {
@@ -28,13 +29,57 @@ export default function VirtualizedBookGrid({
   onBookUpdate,
   onBookPreview,
   chunkSize = 200,
-  bufferSize = 4
+  bufferSize = 4,
+  sortBy
 }: VirtualizedBookGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [viewportTop, setViewportTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(800);
   const [visibleChunks, setVisibleChunks] = useState(new Set<number>());
   const [focusedItemId, setFocusedItemId] = useState<string | null>(null);
+
+  // Category grouping logic for when sortBy is 'categories'
+  const categoryGroups = useMemo(() => {
+    if (sortBy !== 'categories') return [];
+    
+    const groups: { category: string; startY: number; books: Book[] }[] = [];
+    let currentCategory = '';
+    let currentBooks: Book[] = [];
+    let startY = 0;
+
+    layoutItems.forEach((item) => {
+      const book = books.find(b => b.id === item.id);
+      if (!book) return;
+
+      // Get meaningful category (skip generic "Books" category)
+      let category = 'Uncategorized';
+      if (book.categories && book.categories.length > 0) {
+        for (const cat of book.categories) {
+          if (cat && cat.toLowerCase() !== 'books') {
+            category = cat;
+            break;
+          }
+        }
+      }
+
+      if (category !== currentCategory) {
+        if (currentBooks.length > 0) {
+          groups.push({ category: currentCategory, startY, books: currentBooks });
+        }
+        currentCategory = category;
+        currentBooks = [book];
+        startY = item.y;
+      } else {
+        currentBooks.push(book);
+      }
+    });
+
+    if (currentBooks.length > 0) {
+      groups.push({ category: currentCategory, startY, books: currentBooks });
+    }
+
+    return groups;
+  }, [sortBy, books, layoutItems]);
 
   // Organize layout items into chunks
   const chunks = useMemo(() => {
@@ -289,6 +334,27 @@ export default function VirtualizedBookGrid({
         }}
       >
         {renderChunks()}
+        {/* Category headers overlay when sorting by categories */}
+        {sortBy === 'categories' && categoryGroups.map((group, index) => (
+          <div
+            key={`category-header-${index}`}
+            className="absolute z-50 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-4 py-2 shadow-sm"
+            style={{
+              top: Math.max(0, group.startY - 40),
+              height: '40px'
+            }}
+          >
+            <div className="flex items-center h-full">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                {group.category}
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">
+                  ({group.books.length} book{group.books.length !== 1 ? 's' : ''})
+                </span>
+              </h3>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

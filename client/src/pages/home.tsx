@@ -750,6 +750,7 @@ export default function Home() {
               onBookSelect={handleBookSelect}
               onBookUpdate={handleBookUpdate}
               onBookPreview={handleBookPreview}
+              sortBy={sortBy}
               chunkSize={200}
               bufferSize={2}
             />
