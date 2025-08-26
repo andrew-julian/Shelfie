@@ -767,6 +767,66 @@ export default function Home() {
               } as React.CSSProperties}
               data-testid="books-layout"
             >
+              {/* Category headers when sorting by categories */}
+              {sortBy === 'categories' && (() => {
+                const categoryGroups: { category: string; startY: number; books: Book[] }[] = [];
+                let currentCategory = '';
+                let currentBooks: Book[] = [];
+                let startY = 0;
+
+                newLayoutItems.forEach((item) => {
+                  const book = finalBooks.find(b => b.id === item.id);
+                  if (!book) return;
+
+                  // Get meaningful category (skip generic "Books" category)
+                  let category = 'Uncategorized';
+                  if (book.categories && book.categories.length > 0) {
+                    for (const cat of book.categories) {
+                      if (cat && cat.toLowerCase() !== 'books') {
+                        category = cat;
+                        break;
+                      }
+                    }
+                  }
+
+                  if (category !== currentCategory) {
+                    if (currentBooks.length > 0) {
+                      categoryGroups.push({ category: currentCategory, startY, books: currentBooks });
+                    }
+                    currentCategory = category;
+                    currentBooks = [book];
+                    startY = item.y;
+                  } else {
+                    currentBooks.push(book);
+                  }
+                });
+
+                if (currentBooks.length > 0) {
+                  categoryGroups.push({ category: currentCategory, startY, books: currentBooks });
+                }
+
+                return categoryGroups.map((group, index) => (
+                  <div
+                    key={`category-header-${index}`}
+                    className="absolute z-50 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-4 py-2 shadow-sm"
+                    style={{
+                      top: Math.max(0, group.startY - 40),
+                      height: '40px'
+                    }}
+                  >
+                    <div className="flex items-center h-full">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                        {group.category}
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">
+                          ({group.books.length} book{group.books.length !== 1 ? 's' : ''})
+                        </span>
+                      </h3>
+                    </div>
+                  </div>
+                ));
+              })()}
+              
               {newLayoutItems.map((item) => {
                 const book = finalBooks.find(b => b.id === item.id);
                 if (!book) return null;

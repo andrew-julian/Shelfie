@@ -32,8 +32,6 @@ export default function VirtualizedBookGrid({
   bufferSize = 4,
   sortBy
 }: VirtualizedBookGridProps) {
-  console.log('🎯 VirtualizedBookGrid render:', { sortBy, propsReceived: Object.keys(arguments[0]) });
-  
   const containerRef = useRef<HTMLDivElement>(null);
   const [viewportTop, setViewportTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(800);
@@ -42,19 +40,14 @@ export default function VirtualizedBookGrid({
 
   // Category grouping logic for when sortBy is 'categories'
   const categoryGroups = useMemo(() => {
-    console.log('🏷️ Category grouping check:', { sortBy, booksCount: books.length, layoutItemsCount: layoutItems.length });
-    
-    if (sortBy !== 'categories') {
-      console.log('🏷️ Not sorting by categories, skipping groups');
-      return [];
-    }
+    if (sortBy !== 'categories') return [];
     
     const groups: { category: string; startY: number; books: Book[] }[] = [];
     let currentCategory = '';
     let currentBooks: Book[] = [];
     let startY = 0;
 
-    layoutItems.forEach((item, index) => {
+    layoutItems.forEach((item) => {
       const book = books.find(b => b.id === item.id);
       if (!book) return;
 
@@ -69,12 +62,9 @@ export default function VirtualizedBookGrid({
         }
       }
 
-      console.log(`🏷️ Book "${book.title}" -> Category: "${category}"`);
-
       if (category !== currentCategory) {
         if (currentBooks.length > 0) {
           groups.push({ category: currentCategory, startY, books: currentBooks });
-          console.log(`🏷️ Added group: "${currentCategory}" with ${currentBooks.length} books at Y=${startY}`);
         }
         currentCategory = category;
         currentBooks = [book];
@@ -86,10 +76,8 @@ export default function VirtualizedBookGrid({
 
     if (currentBooks.length > 0) {
       groups.push({ category: currentCategory, startY, books: currentBooks });
-      console.log(`🏷️ Added final group: "${currentCategory}" with ${currentBooks.length} books at Y=${startY}`);
     }
 
-    console.log(`🏷️ Final groups:`, groups);
     return groups;
   }, [sortBy, books, layoutItems]);
 
