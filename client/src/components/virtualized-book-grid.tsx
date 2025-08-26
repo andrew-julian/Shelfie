@@ -32,6 +32,8 @@ export default function VirtualizedBookGrid({
   bufferSize = 4,
   sortBy
 }: VirtualizedBookGridProps) {
+  console.log('🎯 VirtualizedBookGrid render:', { sortBy, propsReceived: Object.keys(arguments[0]) });
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const [viewportTop, setViewportTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(800);
