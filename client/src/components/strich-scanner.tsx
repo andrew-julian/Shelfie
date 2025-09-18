@@ -141,9 +141,7 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
           });
           
           onScan(cleanBarcode);
-          
-          // Close the scanner dialog after successful scan (original behavior)
-          onClose();
+          // Keep scanner open for continuous scanning (like Scanbot)
         }
       };
 
