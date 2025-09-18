@@ -89,6 +89,15 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
       const licenseKey = getStrichLicenseKey();
 
       await StrichSDK.initialize(licenseKey);
+      
+      // Try to use HTML5 audio implementation which may behave differently with silent mode
+      // than Web Audio API - similar to how YouTube videos work
+      try {
+        StrichSDK.setAudioImpl('html5');
+        console.log('🔊 STRICH: Using HTML5 audio implementation for potential silent mode bypass');
+      } catch (error) {
+        console.log('🔊 STRICH: HTML5 audio implementation not available, using default');
+      }
 
       // Create scanner configuration - STRICH needs selector but also support element  
       const config = {
