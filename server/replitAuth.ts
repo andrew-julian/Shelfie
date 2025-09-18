@@ -152,7 +152,7 @@ export async function setupAuth(app: Express) {
       console.log(`Login attempt for hostname: ${hostname}, configured domains: ${domains.join(', ')}, using strategy: ${strategyName}`);
       
       passport.authenticate(strategyName, {
-        prompt: "login consent select_account",
+        prompt: "login consent",
         scope: ["openid", "email", "profile", "offline_access"],
       })(req, res, next);
     } else {
