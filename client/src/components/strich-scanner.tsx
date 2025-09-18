@@ -76,21 +76,24 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
   };
 
   const initializeScanner = async () => {
-    if (!scannerRef.current) return;
-    
     setIsInitializing(true);
     setError(null);
     setPermissionDenied(false);
 
     try {
+      if (!scannerRef.current) {
+        throw new Error('Scanner container element not found');
+      }
+
       // Initialize STRICH SDK with environment-based license key
       const licenseKey = getStrichLicenseKey();
 
       await StrichSDK.initialize(licenseKey);
 
-      // Create scanner configuration using a CSS selector
+      // Create scanner configuration - STRICH needs selector but also support element  
       const config = {
-        selector: '#strich-scanner-container', // Use the ID selector to target our container
+        selector: '#strich-scanner-container', // Required by TypeScript interface
+        element: scannerRef.current, // Actual element reference for reliable targeting
         engine: {
           // Look for common barcode types found on books  
           symbologies: ['ean13', 'ean8', 'code128', 'upca', 'upce'] as any,
@@ -231,22 +234,33 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
             </div>
           )}
 
-          {!isInitializing && !error && (
-            <div>
-              <div 
-                id="strich-scanner-container"
-                ref={scannerRef}
-                className="relative w-full h-64 bg-black rounded-lg overflow-hidden"
-                data-testid="strich-scanner-container"
-              />
-              
+          <div className="relative">
+            {/* Always render scanner container for DOM element availability */}
+            <div 
+              id="strich-scanner-container"
+              ref={scannerRef}
+              className="relative w-full h-64 bg-black rounded-lg overflow-hidden"
+              data-testid="strich-scanner-container"
+            />
+            
+            {/* Loading overlay */}
+            {isInitializing && (
+              <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center rounded-lg">
+                <div className="flex items-center space-x-3 text-white">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                  <span>Initializing scanner...</span>
+                </div>
+              </div>
+            )}
+            
+            {!error && !isInitializing && (
               <div className="mt-4 text-center">
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   Position a barcode in the camera view to scan
                 </p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Footer */}
