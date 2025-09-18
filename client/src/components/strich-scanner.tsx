@@ -141,7 +141,7 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
             navigator.vibrate([100, 50, 100]); // Short double vibration pattern
           }
           
-          // 2. Visual flash feedback
+          // 2. Enhanced visual flash feedback
           const flashDiv = document.createElement('div');
           flashDiv.style.cssText = `
             position: fixed;
@@ -149,21 +149,39 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(34, 197, 94, 0.3);
+            background: rgba(34, 197, 94, 0.7);
             z-index: 9999;
             pointer-events: none;
-            animation: scanFlash 0.3s ease-out;
+            animation: scanFlash 0.5s ease-out;
+            box-shadow: inset 0 0 100px rgba(34, 197, 94, 0.8);
           `;
           
-          // Add flash animation if not already added
+          // Add enhanced flash animation if not already added
           if (!document.querySelector('#scan-flash-style')) {
             const style = document.createElement('style');
             style.id = 'scan-flash-style';
             style.textContent = `
               @keyframes scanFlash {
-                0% { opacity: 0; }
-                50% { opacity: 1; }
-                100% { opacity: 0; }
+                0% { 
+                  opacity: 0; 
+                  transform: scale(0.8);
+                  filter: brightness(1);
+                }
+                30% { 
+                  opacity: 0.9; 
+                  transform: scale(1.02);
+                  filter: brightness(1.3);
+                }
+                70% { 
+                  opacity: 0.7; 
+                  transform: scale(1);
+                  filter: brightness(1.1);
+                }
+                100% { 
+                  opacity: 0; 
+                  transform: scale(0.98);
+                  filter: brightness(1);
+                }
               }
             `;
             document.head.appendChild(style);
@@ -174,7 +192,7 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
             if (flashDiv.parentNode) {
               flashDiv.parentNode.removeChild(flashDiv);
             }
-          }, 300);
+          }, 500);
           
           // 3. Enhanced toast notification
           toast({
