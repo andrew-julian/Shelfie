@@ -33,8 +33,8 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
     const height = parseFloat(book.height);
     const depth = parseFloat(book.depth);
     
-    // Scale dimensions for visual display (22px per inch base scale)
-    const baseScale = 22;
+    // Scale dimensions for visual display (reduced from 22 to prevent overlapping)
+    const baseScale = 1.5;
     
     return {
       width: Math.round(width * baseScale),
