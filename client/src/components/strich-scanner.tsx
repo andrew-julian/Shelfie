@@ -31,6 +31,41 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
     };
   }, [isOpen]);
 
+  // Function to get the appropriate STRICH license key based on environment
+  const getStrichLicenseKey = (): string => {
+    const hostname = window.location.hostname;
+    const fullUrl = window.location.href;
+    
+    console.log('🔑 STRICH LICENSE DETECTION START');
+    console.log('🔑 Hostname:', hostname);
+    console.log('🔑 Full URL:', fullUrl);
+    
+    // Check if we're on Replit preview domain - use development license key
+    if (hostname.includes('replit.dev') || hostname.includes('72b7e87f-cee3-46f6-8a9a-935ead819261-00-2pbuxyzxmmug2.riker.replit.dev')) {
+      console.log('🔑 STRICH: Using development license key for Replit environment');
+      return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MmE5Yjk0Ni02ZTZmLTQ1MzItYThlMC00ZDZlN2U3MTVkMjgiLCJpc3MiOiJzdHJpY2guaW8iLCJhdWQiOlsiaHR0cHM6Ly83MmI3ZTg3Zi1jZWUzLTQ2ZjYtOGE5YS05MzVlYWQ4MTkyNjEtMDAtMnBidXh5enhtbXVnMi5yaWtlci5yZXBsaXQuZGV2LyJdLCJpYXQiOjE3NTgxNTYxOTksIm5iZiI6MTc1ODE1NjE5OSwiY2FwYWJpbGl0aWVzIjp7fSwidmVyc2lvbiI6MX0.neYkpAEWx9xOovvfxcEV5HZKbUGIeAIT41zx_4T_c_I";
+    }
+    
+    // Check if we're on production shelfie.site domain - use environment variable
+    if (hostname === 'www.shelfie.site' || hostname === 'shelfie.site') {
+      console.log('🔑 STRICH: Using production license key from environment for shelfie.site');
+      const productionKey = import.meta.env.VITE_STRICH_LICENSE_KEY;
+      if (productionKey) {
+        return productionKey;
+      }
+    }
+    
+    // For localhost/development or other domains, try environment variable first
+    const envKey = import.meta.env.VITE_STRICH_LICENSE_KEY;
+    if (envKey) {
+      console.log('🔑 STRICH: Using license key from environment variable');
+      return envKey;
+    }
+    
+    // If no environment key is set and not on Replit, throw error
+    throw new Error('STRICH license key not configured. Please set VITE_STRICH_LICENSE_KEY environment variable.');
+  };
+
   const initializeScanner = async () => {
     if (!scannerRef.current) return;
     
@@ -39,12 +74,10 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
     setPermissionDenied(false);
 
     try {
-      // Initialize STRICH SDK  
-      const licenseKey = import.meta.env.VITE_STRICH_LICENSE_KEY;
-      
-      if (!licenseKey) {
-        throw new Error('STRICH license key not configured. Please set VITE_STRICH_LICENSE_KEY environment variable.');
-      }
+      // Initialize STRICH SDK with environment-based license key
+      const licenseKey = getStrichLicenseKey();
+      console.log('STRICH license key length:', licenseKey.length);
+      console.log('STRICH license key preview:', licenseKey.substring(0, 50) + '...');
 
       await StrichSDK.initialize(licenseKey);
 
