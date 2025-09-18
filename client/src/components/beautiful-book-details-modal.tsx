@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -369,7 +369,14 @@ export default function BeautifulBookDetailsModal({ book, isOpen, onClose, onUpd
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl w-[95vw] h-[90vh] p-0 overflow-hidden border-0 shadow-2xl bg-transparent">
+      <DialogContent 
+        className="max-w-6xl w-[95vw] h-[90vh] p-0 overflow-hidden border-0 shadow-2xl bg-transparent"
+        aria-describedby="book-details-description"
+      >
+        <DialogTitle className="sr-only">Book Details</DialogTitle>
+        <DialogDescription id="book-details-description" className="sr-only">
+          Detailed view of book information including cover, description, and metadata
+        </DialogDescription>
         {/* Glassmorphism Background with Animated Bookshelf */}
         <div className={`absolute inset-0 bg-gradient-to-br ${moodBg} backdrop-blur-3xl`}>
           {/* Animated bookshelf backdrop */}

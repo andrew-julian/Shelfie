@@ -596,18 +596,23 @@ export default function Home() {
           
           const newHeight = Math.max(rect.height, 600);
           
-          // Force a layout update by re-setting container dimensions
-          setContainerDimensions({ width: newWidth, height: newHeight });
+          // Only update if dimensions are significantly different to prevent infinite loops
+          if (Math.abs(newWidth - containerDimensions.width) > 10 || Math.abs(newHeight - containerDimensions.height) > 10) {
+            setContainerDimensions({ width: newWidth, height: newHeight });
+          }
         }
       };
 
-      // Trigger layout refresh with small delays to ensure DOM is ready
-      const refreshTimeouts = [100, 300, 500]; // Multiple attempts like on mobile scroll
-      refreshTimeouts.forEach(delay => {
-        setTimeout(forceLayoutRefresh, delay);
-      });
+      // Only run this once when books are first loaded
+      if (!isContainerMeasured) {
+        // Trigger layout refresh with small delays to ensure DOM is ready
+        const refreshTimeouts = [100, 300, 500]; // Multiple attempts like on mobile scroll
+        refreshTimeouts.forEach(delay => {
+          setTimeout(forceLayoutRefresh, delay);
+        });
+      }
     }
-  }, [finalBooks.length, isContainerMeasured, containerDimensions.width]);
+  }, [finalBooks.length, isContainerMeasured]); // Removed containerDimensions.width to prevent infinite loop
 
   // Update layout items state when new layout is calculated
   useEffect(() => {
