@@ -313,10 +313,10 @@ function processRow(
     const book = rowBooks[i];
     const { Wi, Hi, Di } = physicalDimensions[i];
     
-    // Apply justification scale but preserve individual heights
+    // Apply justification scale to BOTH width and height to preserve aspect ratio
     const w = Wi * scale;
-    const h = Hi; // Keep natural height - no uniform scaling!
-    const d = Math.max(2, Di);
+    const h = Hi * scale; // Scale height proportionally to maintain aspect ratio!
+    const d = Math.max(2, Di * scale);
     
     nominalItems.push({ id: book.id, w, h, d, x });
     x += w + cfg.gutterX;
