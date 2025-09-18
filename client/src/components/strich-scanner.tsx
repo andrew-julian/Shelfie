@@ -34,15 +34,15 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
   // Function to get the appropriate STRICH license key based on environment
   const getStrichLicenseKey = (): string => {
     const hostname = window.location.hostname;
-    const fullUrl = window.location.href;
+    const origin = window.location.origin;
     
     console.log('🔑 STRICH LICENSE DETECTION START');
     console.log('🔑 Hostname:', hostname);
-    console.log('🔑 Full URL:', fullUrl);
+    console.log('🔑 Origin:', origin);
     
-    // Check if we're on Replit preview domain - use development license key
-    if (hostname.includes('replit.dev') || hostname.includes('72b7e87f-cee3-46f6-8a9a-935ead819261-00-2pbuxyzxmmug2.riker.replit.dev')) {
-      console.log('🔑 STRICH: Using development license key for Replit environment');
+    // Check for the exact Replit preview domain first (license key is bound to specific origin)
+    if (hostname === '72b7e87f-cee3-46f6-8a9a-935ead819261-00-2pbuxyzxmmug2.riker.replit.dev') {
+      console.log('🔑 STRICH: Using development license key for specific Replit preview');
       return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MmE5Yjk0Ni02ZTZmLTQ1MzItYThlMC00ZDZlN2U3MTVkMjgiLCJpc3MiOiJzdHJpY2guaW8iLCJhdWQiOlsiaHR0cHM6Ly83MmI3ZTg3Zi1jZWUzLTQ2ZjYtOGE5YS05MzVlYWQ4MTkyNjEtMDAtMnBidXh5enhtbXVnMi5yaWtlci5yZXBsaXQuZGV2LyJdLCJpYXQiOjE3NTgxNTYxOTksIm5iZiI6MTc1ODE1NjE5OSwiY2FwYWJpbGl0aWVzIjp7fSwidmVyc2lvbiI6MX0.neYkpAEWx9xOovvfxcEV5HZKbUGIeAIT41zx_4T_c_I";
     }
     
@@ -55,14 +55,23 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
       }
     }
     
-    // For localhost/development or other domains, try environment variable first
+    // For other Replit domains or localhost/development, try environment variable
+    if (hostname.includes('replit.dev') || hostname === 'localhost') {
+      console.log('🔑 STRICH: Using environment license key for development/other Replit domains');
+      const envKey = import.meta.env.VITE_STRICH_LICENSE_KEY;
+      if (envKey) {
+        return envKey;
+      }
+    }
+    
+    // Final fallback: try environment variable for any other domain
     const envKey = import.meta.env.VITE_STRICH_LICENSE_KEY;
     if (envKey) {
       console.log('🔑 STRICH: Using license key from environment variable');
       return envKey;
     }
     
-    // If no environment key is set and not on Replit, throw error
+    // If no environment key is set, throw error
     throw new Error('STRICH license key not configured. Please set VITE_STRICH_LICENSE_KEY environment variable.');
   };
 
@@ -76,8 +85,6 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
     try {
       // Initialize STRICH SDK with environment-based license key
       const licenseKey = getStrichLicenseKey();
-      console.log('STRICH license key length:', licenseKey.length);
-      console.log('STRICH license key preview:', licenseKey.substring(0, 50) + '...');
 
       await StrichSDK.initialize(licenseKey);
 
