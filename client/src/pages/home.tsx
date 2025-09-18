@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/header";
 import BookCard from "@/components/book-card";
-import EnhancedBookDetailsModal from "@/components/enhanced-book-details-modal";
+import BeautifulBookDetailsModal from "@/components/beautiful-book-details-modal";
 import { GoogleBooksViewer } from "@/components/google-books-viewer";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -897,7 +897,7 @@ export default function Home() {
 
 
       {/* Book Details Modal */}
-      <EnhancedBookDetailsModal
+      <BeautifulBookDetailsModal
         book={selectedBook}
         isOpen={!!selectedBook}
         onClose={() => setSelectedBook(null)}

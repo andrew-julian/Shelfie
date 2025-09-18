@@ -48,7 +48,10 @@ async function lookupBookByISBN(isbn: string, userId: string) {
   }
 
   // Call Rainforest API
-  const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
+  const apiKey = process.env.RAINFOREST_API_KEY;
+  if (!apiKey) {
+    throw new Error('RAINFOREST_API_KEY environment variable is required');
+  }
   const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${isbn}&amazon_domain=${amazonDomain}`;
   
   const response = await fetch(rainforestUrl);
@@ -562,7 +565,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Call Rainforest API
-      const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
+      const apiKey = process.env.RAINFOREST_API_KEY;
+  if (!apiKey) {
+    throw new Error('RAINFOREST_API_KEY environment variable is required');
+  }
       const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${isbn}&amazon_domain=${amazonDomain}`;
       
       const response = await fetch(rainforestUrl);
@@ -1021,7 +1027,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Call Rainforest API with fresh lookup using the book's stored region
-      const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
+      const apiKey = process.env.RAINFOREST_API_KEY;
+  if (!apiKey) {
+    throw new Error('RAINFOREST_API_KEY environment variable is required');
+  }
       const amazonDomain = existingBook.amazonDomain || "amazon.com.au"; // Use stored region or default to Australia
       const rainforestUrl = `https://api.rainforestapi.com/request?api_key=${apiKey}&type=product&gtin=${existingBook.isbn}&amazon_domain=${amazonDomain}`;
       
@@ -1341,7 +1350,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = getUserId(req);
       const allBooks = await storage.getAllBooks(userId);
-      const apiKey = process.env.RAINFOREST_API_KEY || "92575A16923F492BA4F7A0CA68E40AA7";
+      const apiKey = process.env.RAINFOREST_API_KEY;
+  if (!apiKey) {
+    throw new Error('RAINFOREST_API_KEY environment variable is required');
+  }
       
       // Redirect to progress page immediately
       res.json({ 
