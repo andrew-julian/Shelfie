@@ -127,7 +127,7 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
           });
           
           onScan(cleanBarcode);
-          handleClose();
+          // Keep scanner open for continuous scanning (like Scanbot)
         }
       };
 
