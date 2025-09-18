@@ -41,7 +41,10 @@ async function lookupBookByISBN(isbn: string, userId: string) {
   // Check if book already exists for this user
   const existingBook = await storage.getBookByIsbn(isbn, userId);
   if (existingBook) {
-    throw new Error("Book already exists in your library");
+    // Create a custom error that includes the existing book details
+    const duplicateError = new Error("Book already exists in your library");
+    (duplicateError as any).existingBook = existingBook;
+    throw duplicateError;
   }
 
   // Call Rainforest API
@@ -2375,7 +2378,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (finalDuplicateCheck) {
         console.log(`📝 Duplicate book found during final check: ${queueItem.isbn} for user ${queueItem.userId}`);
         await storage.updateScanningQueueItem(queueItemId, { 
-          status: 'success', // Mark as success since book exists
+          status: 'error',
+          error: 'Book already exists in your library',
+          title: finalDuplicateCheck.title,
+          author: finalDuplicateCheck.author,
+          coverUrl: finalDuplicateCheck.coverImage,
           completedAt: new Date()
         });
         return;
@@ -2425,11 +2432,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error(`Error processing queue item ${queueItemId}:`, error);
-      await storage.updateScanningQueueItem(queueItemId, { 
-        status: 'error', 
-        error: (error as Error).message || 'Unknown error',
-        completedAt: new Date()
-      });
+      
+      // Special handling for duplicate book errors - include existing book details
+      if ((error as Error).message === 'Book already exists in your library' && (error as any).existingBook) {
+        const existingBook = (error as any).existingBook;
+        await storage.updateScanningQueueItem(queueItemId, { 
+          status: 'error', 
+          error: (error as Error).message,
+          title: existingBook.title,
+          author: existingBook.author,
+          coverUrl: existingBook.coverImage,
+          completedAt: new Date()
+        });
+      } else {
+        await storage.updateScanningQueueItem(queueItemId, { 
+          status: 'error', 
+          error: (error as Error).message || 'Unknown error',
+          completedAt: new Date()
+        });
+      }
     }
   }
 
