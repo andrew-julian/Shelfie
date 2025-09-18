@@ -599,11 +599,21 @@ export default function ScanPage() {
                     <Button 
                       onClick={startScanner} 
                       className="primary-button text-lg px-8 py-4 h-auto" 
-                      disabled={!isSDKLoaded}
+                      disabled={
+                        preferencesLoading || 
+                        (scannerType === 'scanbot' && !isSDKLoaded)
+                      }
                       data-testid="button-start-scanner"
                     >
                       <Camera className="w-6 h-6 mr-3" />
-                      {isSDKLoaded ? 'Start Scanning' : 'Loading Scanner...'}
+                      {preferencesLoading 
+                        ? 'Loading Preferences...'
+                        : scannerType === 'strich' 
+                          ? 'Start Scanning' 
+                          : isSDKLoaded 
+                            ? 'Start Scanning' 
+                            : 'Loading Scanner...'
+                      }
                     </Button>
                     {queue.length > 0 && (
                       <div className="text-sm text-gray-400">
