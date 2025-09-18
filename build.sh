@@ -12,13 +12,9 @@ cd client
 npm run build
 cd ..
 
-# Copy client build to server public directory
-echo "Copying client build to server..."
-mkdir -p server/public
-cp -r client/dist/* server/public/
-
-# Install production dependencies
-echo "Installing production dependencies..."
-npm ci --omit=dev
+# Create dist directory and copy client build
+echo "Copying client build to dist directory..."
+mkdir -p dist
+cp -r client/dist/* dist/
 
 echo "Build complete!"
