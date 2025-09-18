@@ -90,9 +90,8 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
       depth = depth / 2.54;
     }
     
-    // More realistic scaling - typical paperback is about 4.25" x 6.87" = 120x190px
-    // So roughly 28px per inch, but adjust for better visual balance
-    const baseScale = 22;
+    // Match the layout engine scale to prevent overlap issues
+    const baseScale = 0.85;
     
     return {
       width: Math.round(width * baseScale),

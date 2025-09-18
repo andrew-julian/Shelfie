@@ -300,8 +300,8 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
     const layoutBooks = books.map((book, index) => convertToLayoutBook(book, index));
     const normalizedDims = normaliseBooks(layoutBooks, DEFAULT_CFG.BASE_HEIGHT);
     
-    // Calculate optimal items per row based on container width for consistency
-    const avgBookWidth = 140; // Average book width in pixels
+    // Calculate optimal items per row based on container width for consistency  
+    const avgBookWidth = 25; // Average book width in pixels (adjusted for 0.85 scale)
     const minBooksPerRow = Math.max(2, Math.floor(containerWidth / (avgBookWidth + 12))); // At least 2 books per row
     
     // Responsive configuration that preserves natural book proportions
