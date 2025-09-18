@@ -97,7 +97,8 @@ export async function setupGoogleAuth(app: Express) {
 
   // Auth routes
   app.get('/api/login', passport.authenticate('google', {
-    scope: ['profile', 'email']
+    scope: ['profile', 'email'],
+    prompt: 'consent select_account'
   }));
 
   app.get('/api/auth/google/callback', 
