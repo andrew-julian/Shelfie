@@ -141,7 +141,24 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
           });
           
           onScan(cleanBarcode);
-          // Keep scanner open for continuous scanning (like Scanbot)
+          
+          // Try to trigger the original beep by calling close then immediately reopening
+          // This might restore the silent-mode audio pathway that was working before
+          if (barcodeReaderRef.current) {
+            try {
+              // Close the reader to trigger any cleanup audio
+              barcodeReaderRef.current.destroy();
+              console.log('🔊 STRICH: Triggered close for beep, reopening scanner...');
+              
+              // Immediately reinitialize for continuous scanning
+              setTimeout(() => {
+                initializeScanner();
+              }, 100); // Small delay to ensure cleanup completes
+              
+            } catch (error) {
+              console.log('🔊 STRICH: Error during close/reopen:', error);
+            }
+          }
         }
       };
 
