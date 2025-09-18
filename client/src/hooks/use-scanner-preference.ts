@@ -12,16 +12,15 @@ export function useScannerPreference() {
 
   const updatePreferenceMutation = useMutation({
     mutationFn: async (scannerType: ScannerType) => {
-      const response = await fetch('/api/user/preferences', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scannerType }),
-      });
-      if (!response.ok) throw new Error('Failed to update preference');
+      const response = await apiRequest('PATCH', '/api/user/preferences', { scannerType });
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user/preferences'] });
+    },
+    onError: (error) => {
+      console.error('Failed to update scanner preference:', error);
+      // You can add a toast here if needed
     },
   });
 

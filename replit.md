@@ -60,7 +60,7 @@ Implements a **hybrid authentication system** with **email-based user identifica
 - **Performance Optimization**: Optimized API polling intervals to reduce server load and preserve Vercel edge request limits (August 2025).
 
 ### Feature Specifications
-- **Barcode Scanning**: Implementation of Scanbot SDK v7.2.0 with camera access and barcode detection, including environment-based license keys and path resolution. Supports multiple production domains: shelfie.site and shelfie.vanaheim.com.au.
+- **Dual Barcode Scanning System**: Dual scanner implementation with both Scanbot SDK v7.2.0 and STRICH SDK as alternatives. User-configurable scanner preference with persistent database storage. Includes environment-based license keys, camera access, and barcode detection. Supports multiple production domains: shelfie.site and shelfie.vanaheim.com.au. (September 2025)
 - **Persistent Scanning Queue System**: Database-driven queue (PostgreSQL `scanningQueue` table) with background processing, real-time updates, and error recovery.
 - **Progress Control System**: Server-Sent Events for live progress tracking during refresh operations, with interactive controls (pause, resume, stop), visual indicators, and estimated time remaining.
 - **User Management System**: Database-connected user switcher, dynamic user loading, and session context switching.
@@ -91,7 +91,8 @@ Implements a **hybrid authentication system** with **email-based user identifica
 
 ### External APIs and Services
 - **Rainforest API**: For book metadata lookup by ISBN.
-- **Scanbot SDK**: Fully functional barcode scanner.
+- **Scanbot SDK**: Primary barcode scanner with advanced features.
+- **STRICH SDK**: Alternative barcode scanner with lightweight implementation.
 - **Google OAuth**: Production authentication for external deployments (configured with redirect URI support).
 
 ### Development and Build Tools

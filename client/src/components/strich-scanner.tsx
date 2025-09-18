@@ -43,7 +43,7 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
       const licenseKey = import.meta.env.VITE_STRICH_LICENSE_KEY;
       
       if (!licenseKey) {
-        throw new Error('STRICH license key not found');
+        throw new Error('STRICH license key not configured. Please set VITE_STRICH_LICENSE_KEY environment variable.');
       }
 
       await StrichSDK.initialize(licenseKey);

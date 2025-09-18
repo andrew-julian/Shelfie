@@ -2,10 +2,12 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Search, ArrowLeft, Loader2 } from "lucide-react";
+import { Camera, Search, ArrowLeft, Loader2, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useScannerPreference } from "@/hooks/use-scanner-preference";
+import StrichScanner from "@/components/strich-scanner";
 
 
 // License keys for different environments
@@ -196,9 +198,11 @@ export default function ScanPage() {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [manualIsbn, setManualIsbn] = useState("");
   const [scanCount, setScanCount] = useState(0);
+  const [showStrichScanner, setShowStrichScanner] = useState(false);
   const scannerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { scannerType, updateScannerType, isLoading: preferencesLoading } = useScannerPreference();
 
   // Fetch scanning queue from database
   const { data: queue = [], refetch: refetchQueue } = useQuery<QueueItem[]>({
@@ -282,6 +286,17 @@ export default function ScanPage() {
 
   // Scanner functions
   const startScanner = async () => {
+    // Wait for preferences to load to avoid starting the wrong scanner
+    if (preferencesLoading) {
+      return;
+    }
+    
+    if (scannerType === 'strich') {
+      setShowStrichScanner(true);
+      return;
+    }
+    
+    // Continue with existing Scanbot logic
     if (!window.ScanbotSDK) {
       toast({
         title: "Scanner Error",
@@ -413,8 +428,27 @@ export default function ScanPage() {
     }
   };
 
-  // Load Scanbot SDK
+  const handleStrichScan = (barcode: string) => {
+    addToQueue(barcode);
+  };
+
+  const toggleScannerType = () => {
+    const newScannerType = scannerType === 'scanbot' ? 'strich' : 'scanbot';
+    updateScannerType(newScannerType);
+    toast({
+      title: "Scanner Changed",
+      description: `Switched to ${newScannerType === 'scanbot' ? 'Scanbot' : 'STRICH'} scanner`,
+      duration: 2000,
+    });
+  };
+
+  // Load Scanbot SDK only when needed
   useEffect(() => {
+    // Only load Scanbot SDK if user prefers it and preferences are loaded
+    if (preferencesLoading || scannerType !== 'scanbot') {
+      return;
+    }
+
     const loadScanbotSDK = async () => {
       try {
         const script = document.createElement('script');
@@ -463,26 +497,41 @@ export default function ScanPage() {
             console.error('Error message:', (error as any)?.message);
             console.error('Error stack:', (error as any)?.stack);
             
-            // Show user-friendly error
+            // Show user-friendly error and immediately switch to STRICH
             toast({
-              title: "Scanner Initialization Failed",
-              description: "Camera scanner could not start. You can still add books manually using ISBN.",
+              title: "Scanbot Scanner Failed",
+              description: "Switching to STRICH scanner for better reliability.",
               variant: "destructive",
-              duration: 5000,
+              duration: 3000,
             });
+            
+            // Immediately open STRICH scanner and update preference in background
+            setShowStrichScanner(true);
+            updateScannerType('strich');
           }
         };
         script.onerror = () => {
           console.error('Failed to load Scanbot SDK script');
+          // Immediately open STRICH scanner and update preference
+          setShowStrichScanner(true);
+          updateScannerType('strich');
+          toast({
+            title: "Scanner Fallback",
+            description: "Switched to STRICH scanner due to loading issues",
+            duration: 3000,
+          });
         };
         document.head.appendChild(script);
       } catch (error) {
         console.error('Error loading Scanbot SDK:', error);
+        // Immediately open STRICH scanner and update preference
+        setShowStrichScanner(true);
+        updateScannerType('strich');
       }
     };
 
     loadScanbotSDK();
-  }, []);
+  }, [scannerType, preferencesLoading, updateScannerType, toast]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -514,6 +563,29 @@ export default function ScanPage() {
           {/* Scanner Section */}
           <div className="space-y-4">
             <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm">
+              {/* Scanner Type Selector */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <h3 className="text-sm font-medium text-gray-700">Scanner:</h3>
+                  <div className="flex items-center space-x-2">
+                    <span className={`text-xs px-2 py-1 rounded-full ${scannerType === 'scanbot' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'}`}>
+                      {scannerType === 'scanbot' ? 'Scanbot' : 'STRICH'}
+                    </span>
+                  </div>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleScannerType}
+                  disabled={preferencesLoading}
+                  className="text-xs"
+                  data-testid="button-toggle-scanner"
+                >
+                  <Settings className="w-3 h-3 mr-1" />
+                  Switch to {scannerType === 'scanbot' ? 'STRICH' : 'Scanbot'}
+                </Button>
+              </div>
               
               {/* Camera Preview Area */}
               <div className="relative bg-gray-900 rounded-lg overflow-hidden mb-4 sm:mb-6" style={{ aspectRatio: '4/3' }}>
@@ -636,6 +708,13 @@ export default function ScanPage() {
           </div>
         </div>
       </div>
+
+      {/* STRICH Scanner Modal */}
+      <StrichScanner
+        isOpen={showStrichScanner}
+        onClose={() => setShowStrichScanner(false)}
+        onScan={handleStrichScan}
+      />
     </div>
   );
 }
