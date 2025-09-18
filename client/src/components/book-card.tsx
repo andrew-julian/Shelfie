@@ -301,8 +301,8 @@ export default function BookCard({ book, onSelect, onUpdate, onPreview, customDi
         style={{
           '--book-thickness': `${bookDimensions.depth * 0.4}px`,
           '--cover-color': coverColor,
-          width: `${bookDimensions.width}px`,
-          height: `${bookDimensions.height}px`
+          width: '100%',  // Let parent container control width
+          height: '100%'  // Let parent container control height
         } as React.CSSProperties}
       >
         <div className="book-3d__inner">
@@ -312,16 +312,16 @@ export default function BookCard({ book, onSelect, onUpdate, onPreview, customDi
               src={book.coverImage} 
               alt={`${book.title} book cover`}
               style={{
-                width: `${bookDimensions.width}px`,
-                height: `${bookDimensions.height}px`
+                width: '100%',  // Respect parent dimensions
+                height: '100%'  // Respect parent dimensions
               }}
             />
           ) : (
             <div 
               className="book-3d__placeholder"
               style={{
-                width: `${bookDimensions.width}px`,
-                height: `${bookDimensions.height}px`
+                width: '100%',  // Respect parent dimensions
+                height: '100%'  // Respect parent dimensions
               }}
             >
               <BookOpen className="w-10 h-10 mb-2" />
