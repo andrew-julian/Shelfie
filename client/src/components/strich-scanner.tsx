@@ -134,9 +134,52 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
           // Clean up the barcode (remove hyphens and extra spaces)
           const cleanBarcode = barcode.replace(/[-\s]/g, '').trim();
           
+          // Provide multiple types of feedback for successful scan
+          
+          // 1. Vibration feedback (if supported)
+          if (navigator.vibrate) {
+            navigator.vibrate([100, 50, 100]); // Short double vibration pattern
+          }
+          
+          // 2. Visual flash feedback
+          const flashDiv = document.createElement('div');
+          flashDiv.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(34, 197, 94, 0.3);
+            z-index: 9999;
+            pointer-events: none;
+            animation: scanFlash 0.3s ease-out;
+          `;
+          
+          // Add flash animation if not already added
+          if (!document.querySelector('#scan-flash-style')) {
+            const style = document.createElement('style');
+            style.id = 'scan-flash-style';
+            style.textContent = `
+              @keyframes scanFlash {
+                0% { opacity: 0; }
+                50% { opacity: 1; }
+                100% { opacity: 0; }
+              }
+            `;
+            document.head.appendChild(style);
+          }
+          
+          document.body.appendChild(flashDiv);
+          setTimeout(() => {
+            if (flashDiv.parentNode) {
+              flashDiv.parentNode.removeChild(flashDiv);
+            }
+          }, 300);
+          
+          // 3. Enhanced toast notification
           toast({
-            title: "Barcode Detected",
-            description: `Scanned: ${cleanBarcode}`,
+            title: "✅ Barcode Scanned Successfully",
+            description: `${cleanBarcode}`,
             duration: 2000,
           });
           
