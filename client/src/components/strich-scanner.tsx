@@ -88,9 +88,9 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
 
       await StrichSDK.initialize(licenseKey);
 
-      // Create scanner configuration
+      // Create scanner configuration - use the DOM element directly instead of selector
       const config = {
-        selector: '#strich-scanner-container',
+        element: scannerRef.current, // Use the actual DOM element instead of selector
         engine: {
           // Look for common barcode types found on books  
           symbologies: ['ean13', 'ean8', 'code128', 'upca', 'upce'] as any,
