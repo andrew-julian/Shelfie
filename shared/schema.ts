@@ -94,6 +94,7 @@ export const userPreferences = pgTable("user_preferences", {
   amazonDomain: varchar("amazon_domain", { length: 50 }).notNull().default("amazon.com.au"),
   currency: varchar("currency", { length: 3 }).default("AUD"),
   measurementUnit: varchar("measurement_unit", { length: 10 }).default("metric"), // metric or imperial
+  scannerType: varchar("scanner_type", { length: 20 }).default("scanbot"), // scanbot or strich
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
