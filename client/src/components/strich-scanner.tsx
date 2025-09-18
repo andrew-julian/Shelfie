@@ -19,6 +19,30 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
   const barcodeReaderRef = useRef<BarcodeReader | null>(null);
   const { toast } = useToast();
 
+  // Create a beep sound for successful scans
+  const playBeep = () => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800; // High frequency beep
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    } catch (error) {
+      // Fallback if Web Audio API is not available
+      console.log('Web Audio API not available for beep sound');
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       initializeScanner();
@@ -119,6 +143,9 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
           
           // Clean up the barcode (remove hyphens and extra spaces)
           const cleanBarcode = barcode.replace(/[-\s]/g, '').trim();
+          
+          // Play satisfying beep sound
+          playBeep();
           
           toast({
             title: "Barcode Detected",
