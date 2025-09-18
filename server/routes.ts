@@ -486,7 +486,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userId,
           amazonDomain: "amazon.com.au",
           currency: "AUD",
-          measurementUnit: "metric"
+          measurementUnit: "metric",
+          scannerType: "scanbot"
         });
       }
       
@@ -500,12 +501,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/user/preferences', isAuthenticated, async (req: any, res) => {
     try {
       const userId = getUserId(req);
-      const { amazonDomain, currency, measurementUnit } = req.body;
+      const { amazonDomain, currency, measurementUnit, scannerType } = req.body;
       
       const updatedPreferences = await storage.updateUserPreferences(userId, {
         amazonDomain,
         currency,
-        measurementUnit
+        measurementUnit,
+        scannerType
       });
       
       if (!updatedPreferences) {
