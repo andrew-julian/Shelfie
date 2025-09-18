@@ -122,7 +122,12 @@ const QueueItemCard = ({ item, onRetry, onRemove }: {
   onRetry: () => void;
   onRemove: () => void;
 }) => {
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string, error?: string | null) => {
+    // Special handling for "already exists" errors
+    if (status === 'error' && error === 'Book already exists in your library') {
+      return 'text-amber-600 bg-amber-50';
+    }
+    
     switch (status) {
       case 'success': return 'text-green-600 bg-green-50';
       case 'error': return 'text-red-600 bg-red-50';
@@ -133,7 +138,12 @@ const QueueItemCard = ({ item, onRetry, onRemove }: {
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: string, error?: string | null) => {
+    // Special handling for "already exists" errors
+    if (status === 'error' && error === 'Book already exists in your library') {
+      return 'Skipped';
+    }
+    
     switch (status) {
       case 'scanning': return 'Scanned';
       case 'looking-up': return 'Looking up...';
@@ -149,8 +159,8 @@ const QueueItemCard = ({ item, onRetry, onRemove }: {
       <div className="flex-1 min-w-0 space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-mono text-sm text-gray-600 break-all">{item.isbn}</span>
-          <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${getStatusColor(item.status)}`}>
-            {getStatusText(item.status)}
+          <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${getStatusColor(item.status, item.error)}`}>
+            {getStatusText(item.status, item.error)}
           </span>
           {['looking-up', 'adding'].includes(item.status) && (
             <Loader2 className="w-3 h-3 animate-spin text-blue-500 flex-shrink-0" />
@@ -162,13 +172,16 @@ const QueueItemCard = ({ item, onRetry, onRemove }: {
         {item.author && (
           <p className="text-xs text-gray-600 break-words">{item.author}</p>
         )}
-        {item.error && (
+        {item.error && item.error !== 'Book already exists in your library' && (
           <p className="text-xs text-red-600 break-words">{item.error}</p>
+        )}
+        {item.error === 'Book already exists in your library' && (
+          <p className="text-xs text-amber-600 break-words">Already in your library</p>
         )}
       </div>
       
       <div className="flex flex-col items-center space-y-1 flex-shrink-0">
-        {item.status === 'error' && item.retryCount < 3 && (
+        {item.status === 'error' && item.retryCount < 3 && item.error !== 'Book already exists in your library' && (
           <Button
             variant="ghost"
             size="sm"
