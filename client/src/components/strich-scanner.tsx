@@ -141,7 +141,7 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
             navigator.vibrate([100, 50, 100]); // Short double vibration pattern
           }
           
-          // 2. Enhanced visual flash feedback
+          // 2. Enhanced visual flash feedback with checkmark
           const flashDiv = document.createElement('div');
           flashDiv.style.cssText = `
             position: fixed;
@@ -154,7 +154,20 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
             pointer-events: none;
             animation: scanFlash 0.5s ease-out;
             box-shadow: inset 0 0 100px rgba(34, 197, 94, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
           `;
+          
+          // Add big checkmark emoji in the center
+          const checkmark = document.createElement('div');
+          checkmark.textContent = '✅';
+          checkmark.style.cssText = `
+            font-size: 120px;
+            animation: checkmarkBounce 0.5s ease-out;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+          `;
+          flashDiv.appendChild(checkmark);
           
           // Add enhanced flash animation if not already added
           if (!document.querySelector('#scan-flash-style')) {
@@ -181,6 +194,25 @@ export default function StrichScanner({ isOpen, onClose, onScan }: StrichScanner
                   opacity: 0; 
                   transform: scale(0.98);
                   filter: brightness(1);
+                }
+              }
+              
+              @keyframes checkmarkBounce {
+                0% { 
+                  transform: scale(0) rotate(-10deg);
+                  opacity: 0;
+                }
+                50% { 
+                  transform: scale(1.3) rotate(5deg);
+                  opacity: 1;
+                }
+                70% { 
+                  transform: scale(1.1) rotate(-2deg);
+                  opacity: 1;
+                }
+                100% { 
+                  transform: scale(1) rotate(0deg);
+                  opacity: 0.8;
                 }
               }
             `;
