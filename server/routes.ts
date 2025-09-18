@@ -448,20 +448,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expires_at: userClaims.exp,
       };
 
-      // Also update the passport session user
-      if (req.session.passport) {
-        req.session.passport.user = req.user;
-      } else {
-        req.session.passport = { user: req.user };
-      }
-
-      console.log(`Updated session user:`, req.session.passport.user.claims);
-
-      // Force session save to persist the user switch
-      req.session.save((err: any) => {
+      // Use passport's login method to properly switch user
+      req.login(targetUser, (err: any) => {
         if (err) {
-          console.error("Session save error:", err);
-          return res.status(500).json({ message: "Failed to save session" });
+          console.error("Login error during user switch:", err);
+          return res.status(500).json({ message: "Failed to switch user session" });
         }
         
         console.log(`User successfully switched to ${targetUser.id} (${targetUser.firstName} - ${targetUser.email})`);
