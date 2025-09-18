@@ -266,7 +266,7 @@ function processRow(
   
   // Calculate natural dimensions preserving true physical proportions
   // Use a scale factor instead of forcing uniform height
-  const basePixelScale = 1.5; // Match landing page scale to prevent inconsistencies
+  const basePixelScale = 0.85; // Increased scale to better utilize horizontal space
   let wsum = 0;
   const physicalDimensions = rowBooks.map(book => {
     // Preserve true proportions by scaling mm directly to pixels
