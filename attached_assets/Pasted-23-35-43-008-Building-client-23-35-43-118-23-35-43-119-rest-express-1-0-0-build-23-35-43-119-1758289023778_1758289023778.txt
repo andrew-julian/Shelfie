@@ -1,0 +1,60 @@
+23:35:43.008 
+Building client...
+23:35:43.118 
+23:35:43.119 
+> rest-express@1.0.0 build
+23:35:43.119 
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+23:35:43.119 
+23:35:43.359 
+vite v5.4.19 building for production...
+23:35:43.412 
+transforming...
+23:35:43.422 
+✓ 2 modules transformed.
+23:35:43.427 
+x Build failed in 46ms
+23:35:43.428 
+error during build:
+23:35:43.428 
+[vite]: Rollup failed to resolve import "/src/main.tsx" from "/vercel/path0/client/index.html".
+23:35:43.428 
+This is most likely unintended because it can break your application at runtime.
+23:35:43.428 
+If you do want to externalize this module explicitly add it to
+23:35:43.428 
+`build.rollupOptions.external`
+23:35:43.428 
+    at viteWarn (file:///vercel/path0/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65839:17)
+23:35:43.428 
+    at onwarn (file:///vercel/path0/node_modules/@vitejs/plugin-react/dist/index.mjs:280:9)
+23:35:43.428 
+    at onRollupWarning (file:///vercel/path0/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65869:5)
+23:35:43.428 
+    at onwarn (file:///vercel/path0/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65534:7)
+23:35:43.429 
+    at file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:19452:13
+23:35:43.429 
+    at Object.logger [as onLog] (file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:21178:9)
+23:35:43.429 
+    at ModuleLoader.handleInvalidResolvedId (file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:20067:26)
+23:35:43.429 
+    at file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:20025:26
+23:35:43.438 
+Build complete! Files built to dist/public/
+23:35:43.687 
+Using TypeScript 5.6.3 (local user-provided)
+23:35:50.582 
+Build Completed in /vercel/output [21s]
+23:35:50.838 
+Deploying outputs...
+23:35:58.061 
+Deployment completed
+23:35:58.949 
+Creating build cache...
+23:36:18.619 
+Created build cache: 19.669s
+23:36:18.619 
+Uploading build cache [147.33 MB]
+23:36:20.633 
+Build cache uploaded: 2.013s
