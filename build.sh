@@ -10,8 +10,6 @@ npm install
 echo "Building client..."
 vite build
 
-# Build the backend (server)
-echo "Building server..."
-esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
-
-echo "Build complete! Files built to dist/public/"
+# For production, we don't need to build the server as Vercel handles serverless functions
+# Just ensure the client build is complete
+echo "Client build complete! Files built to dist/public/"
