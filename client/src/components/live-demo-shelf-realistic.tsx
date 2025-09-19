@@ -107,14 +107,21 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
       depth = depth / 2.54;
     }
     
-    // More realistic scaling - typical paperback is about 4.25" x 6.87" = 120x190px
-    // So roughly 28px per inch, but adjust for better visual balance
-    const baseScale = 22;
+    // Convert directly from inches/cm to mm, no px scaling needed
+    // This matches the approach used in the main layout engine
+    
+    // Convert inches to mm directly (matching layout engine approach)
+    const widthMm = width * 25.4;
+    const heightMm = height * 25.4;
+    const depthMm = depth * 25.4;
+    
+    // Apply minimal scaling for display - this will be handled by the layout engine
+    const displayScale = 0.5; // Smaller scale to match layout engine output
     
     return {
-      width: Math.round(width * baseScale),
-      height: Math.round(height * baseScale), 
-      depth: Math.max(Math.round(depth * baseScale * 1.2), 10) // More realistic depth effect
+      width: Math.round(widthMm * displayScale),
+      height: Math.round(heightMm * displayScale), 
+      depth: Math.max(Math.round(depthMm * displayScale), 10)
     };
   } catch (error) {
     console.warn('Failed to parse book dimensions:', book.dimensions, error);
@@ -403,10 +410,10 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
     const maxY = Math.max(...layoutItems.map(item => item.y + item.h));
     
     return {
-      width: Math.max(maxX + 40, containerWidth),
+      width: maxX + 40, // Remove containerWidth dependency to prevent circular dependency
       height: maxY + 40
     };
-  }, [layoutItems, containerWidth]);
+  }, [layoutItems]); // Remove containerWidth dependency
 
   if (isLoading) {
     return (

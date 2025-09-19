@@ -362,55 +362,8 @@ export default function Home() {
     }
   };
 
-  // Legacy parseBookDimensions function for display scaling (no longer used)
-  const parseBookDimensions = (book: Book): { width: number; height: number; depth: number } => {
-    const defaultDimensions = { width: 140, height: 200, depth: 15 };
-    
-    if (!book.dimensions) return defaultDimensions;
-    
-    try {
-      const matches = book.dimensions.match(/([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)/i);
-      if (!matches) return defaultDimensions;
-      
-      let [, dim1Str, dim2Str, dim3Str] = matches;
-      let dim1 = parseFloat(dim1Str);
-      let dim2 = parseFloat(dim2Str);
-      let dim3 = parseFloat(dim3Str);
-      
-      const dims = [dim1, dim2, dim3];
-      dims.sort((a, b) => a - b);
-      const [smallest, middle, largest] = dims;
-      
-      let width, height, depth = smallest;
-      const remaining = dims.filter(d => d !== smallest);
-      if (remaining.length === 2) {
-        const [smaller, larger] = remaining.sort((a, b) => a - b);
-        const aspectRatio = larger / smaller;
-        
-        if (aspectRatio > 1.4) {
-          width = smaller;
-          height = larger;
-        } else {
-          width = middle;
-          height = largest;
-        }
-      } else {
-        width = middle;
-        height = largest;
-      }
-      
-      // Scale dimensions for visual display
-      const baseScale = 22;
-      return {
-        width: Math.round(width * baseScale),
-        height: Math.round(height * baseScale),
-        depth: Math.max(Math.round(depth * baseScale * 1.2), 10)
-      };
-    } catch (error) {
-      console.warn('Failed to parse book dimensions:', book.dimensions, error);
-      return defaultDimensions;
-    }
-  };
+  // Legacy parseBookDimensions function removed - no longer used anywhere in the codebase
+  // All dimension handling now goes through the layout engine which uses direct mm conversion
 
   // Memoized book normalization
   const normalizedDimensions = useMemo(() => {
