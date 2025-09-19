@@ -2314,10 +2314,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("❌ VERCEL CRON ERROR:", error);
-      console.error("❌ Error stack:", error.stack);
+      console.error("❌ Error stack:", (error as Error).stack);
       res.status(500).json({ 
         message: "Failed to process queue",
-        error: error.message,
+        error: (error as Error).message,
         timestamp: new Date().toISOString()
       });
     }
@@ -2375,21 +2375,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         author: bookData.author,
         coverUrl: bookData.coverImage
       });
-
-      // Double-check for duplicates to prevent race conditions
-      const finalDuplicateCheck = await storage.getBookByIsbn(queueItem.isbn, queueItem.userId);
-      if (finalDuplicateCheck) {
-        console.log(`📝 Duplicate book found during final check: ${queueItem.isbn} for user ${queueItem.userId}`);
-        await storage.updateScanningQueueItem(queueItemId, { 
-          status: 'error',
-          error: 'Book already exists in your library',
-          title: finalDuplicateCheck.title,
-          author: finalDuplicateCheck.author,
-          coverUrl: finalDuplicateCheck.coverImage,
-          completedAt: new Date()
-        });
-        return;
-      }
 
       // Add book to library
       const book = await storage.createBook({

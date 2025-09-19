@@ -191,13 +191,10 @@ export default function Home() {
   const [isContainerMeasured, setIsContainerMeasured] = useState(false);
   
   // Container-based responsive configuration
-  const [responsiveConfig, setResponsiveConfig] = useState<EngineConfig>({
-    ...DEFAULT_CFG,
-    raggedLastRow: true
-  });
+  // Removed responsiveConfig useState - now using currentConfig directly
 
-  // Update config when container size or tidy mode changes
-  useEffect(() => {
+  // Update config when container size changes (with stable comparison)
+  const currentConfig = useMemo(() => {
     const width = containerDimensions.width;
     let baseConfig = { ...DEFAULT_CFG };
     
@@ -228,11 +225,14 @@ export default function Home() {
       };
     }
     
-    setResponsiveConfig({
+    return {
       ...baseConfig,
       raggedLastRow: true // Always use ragged rows to preserve proportions
-    });
+    };
   }, [containerDimensions.width]);
+
+  // Use currentConfig directly instead of maintaining separate responsiveConfig state
+  const responsiveConfig = currentConfig;
 
   useEffect(() => {
     if ((sortBy === 'color-light-to-dark' || sortBy === 'color-dark-to-light') && books.length > 0) {
@@ -413,7 +413,7 @@ export default function Home() {
       finalBooks.length,
       'Shelfie Layout Engine'
     );
-  }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig.targetRowHeight, responsiveConfig.gutterX, responsiveConfig.gutterY, responsiveConfig.raggedLastRow, measureLayout, isContainerMeasured]);
+  }, [finalBooks, normalizedDimensions, containerDimensions.width, responsiveConfig, isContainerMeasured]);
 
   // Legacy dimension calculation (no longer used with new layout engine)
   // Kept for reference but replaced by the headless layout engine
@@ -496,18 +496,26 @@ export default function Home() {
     setTimeout(attemptMeasurement, 100);
     setTimeout(attemptMeasurement, 300);
     
-    // Use ResizeObserver for better performance
+    // Use ResizeObserver for better performance with debouncing
+    let resizeTimeout: NodeJS.Timeout;
     const resizeObserver = new ResizeObserver((entries) => {
-      console.log('ResizeObserver update:', { width: entries[0].contentRect.width, height: entries[0].contentRect.height });
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        const newWidth = Math.max(width || 1200, 300); // Ensure minimum width
-        const newHeight = Math.max(height, 600);
-        
-        console.log('ResizeObserver update:', { width: newWidth, height: newHeight });
-        setContainerDimensions({ width: newWidth, height: newHeight });
-        setIsContainerMeasured(true);
-      }
+      // Clear previous timeout to debounce rapid changes
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      
+      resizeTimeout = setTimeout(() => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          const newWidth = Math.max(width || 1200, 300); // Ensure minimum width
+          const newHeight = Math.max(height, 600);
+          
+          // Only update if dimensions changed significantly to prevent thrashing
+          if (Math.abs(newWidth - containerDimensions.width) > 10 || Math.abs(newHeight - containerDimensions.height) > 10) {
+            console.log('ResizeObserver update:', { width: newWidth, height: newHeight });
+            setContainerDimensions({ width: newWidth, height: newHeight });
+            setIsContainerMeasured(true);
+          }
+        }
+      }, 50); // 50ms debounce
     });
 
     // Set up observer with a slight delay to ensure DOM is ready
@@ -524,48 +532,12 @@ export default function Home() {
     window.addEventListener('resize', updateContainerSize);
     
     return () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout);
       resizeObserver.disconnect();
       window.removeEventListener('resize', updateContainerSize);
     };
   }, []); // Only run once on mount
 
-  // Force layout refresh when books are loaded and container is measured (simulating scroll trigger)
-  useEffect(() => {
-    if (finalBooks.length > 0 && isContainerMeasured && containerDimensions.width > 0) {
-      // Trigger the same measurement update that happens during scroll
-      const forceLayoutRefresh = () => {
-        if (containerRef.current) {
-          const rect = containerRef.current.getBoundingClientRect();
-          const parentElement = containerRef.current.parentElement;
-          const parentRect = parentElement?.getBoundingClientRect();
-          
-          let newWidth = rect.width;
-          if (!newWidth && parentRect) {
-            newWidth = parentRect.width - 48;
-          }
-          if (!newWidth) {
-            newWidth = window.innerWidth - 100;
-          }
-          
-          const newHeight = Math.max(rect.height, 600);
-          
-          // Only update if dimensions are significantly different to prevent infinite loops
-          if (Math.abs(newWidth - containerDimensions.width) > 10 || Math.abs(newHeight - containerDimensions.height) > 10) {
-            setContainerDimensions({ width: newWidth, height: newHeight });
-          }
-        }
-      };
-
-      // Only run this once when books are first loaded
-      if (!isContainerMeasured) {
-        // Trigger layout refresh with small delays to ensure DOM is ready
-        const refreshTimeouts = [100, 300, 500]; // Multiple attempts like on mobile scroll
-        refreshTimeouts.forEach(delay => {
-          setTimeout(forceLayoutRefresh, delay);
-        });
-      }
-    }
-  }, [finalBooks.length, isContainerMeasured]); // Removed containerDimensions.width to prevent infinite loop
 
   // Update layout items state when new layout is calculated
   useEffect(() => {
