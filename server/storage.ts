@@ -191,6 +191,30 @@ export class DatabaseStorage implements IStorage {
   
   // Scanning queue operations
   async addToScanningQueue(item: InsertScanningQueueItem): Promise<ScanningQueueItem> {
+    // Check if book already exists in user's library
+    const existingBook = await this.getBookByIsbn(item.isbn, item.userId);
+    if (existingBook) {
+      const duplicateError = new Error("Book already exists in your library");
+      (duplicateError as any).existingBook = existingBook;
+      throw duplicateError;
+    }
+    
+    // Check if ISBN is already in the scanning queue for this user
+    const existingQueueItem = await db
+      .select()
+      .from(scanningQueue)
+      .where(and(
+        eq(scanningQueue.isbn, item.isbn),
+        eq(scanningQueue.userId, item.userId)
+      ))
+      .limit(1);
+      
+    if (existingQueueItem.length > 0) {
+      const duplicateError = new Error("Book is already in your scanning queue");
+      (duplicateError as any).existingQueueItem = existingQueueItem[0];
+      throw duplicateError;
+    }
+
     const [queueItem] = await db
       .insert(scanningQueue)
       .values(item)
