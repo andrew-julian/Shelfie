@@ -131,7 +131,8 @@ export function calculateLayout(
       
       // Add adaptive spacing for large books (coffee table books)
       const isLargeBookRow = actualRowHeight > 180; // Books taller than 180px need extra space
-      const adaptiveGutter = isLargeBookRow ? cfg.gutterY + 12 : cfg.gutterY; // +12px for large books
+      const extraSpacing = isLargeBookRow ? Math.max(20, Math.floor(actualRowHeight * 0.15)) : 0; // Dynamic spacing based on book height
+      const adaptiveGutter = cfg.gutterY + extraSpacing; // Minimum +20px for large books, more for very large books
       
       yCursor += actualRowHeight + adaptiveGutter;
       rowIndex++;
@@ -306,12 +307,12 @@ function processRow(
   }
   
   // Calculate safe vertical jitter that prevents overlaps
-  // For large books (coffee table books), use minimal jitter
+  // For large books (coffee table books), eliminate jitter completely
   const maxBookHeight = Math.max(...physicalDimensions.map(dim => dim.Hi * scale));
   const isLargeBookRow = maxBookHeight > 180; // Books taller than 180px are considered large
   
-  // Reduce jitter for large books to prevent overlaps
-  const baseJitter = isLargeBookRow ? 2 : 4; // Large books get 2px max, normal books get 4px max
+  // Eliminate jitter completely for large books to prevent overlaps
+  const baseJitter = isLargeBookRow ? 0 : 3; // Large books get NO jitter, normal books get 3px max (reduced from 4px)
   const jy = Math.sin(rowIndex * 1.3) * baseJitter;
   
   // Position books in row
