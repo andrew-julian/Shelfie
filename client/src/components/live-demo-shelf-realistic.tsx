@@ -1,23 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { calculateLayout, calculateDemoLayout, normaliseBooks, DEFAULT_CFG, type Book as LayoutBook, type LayoutItem } from '@/layout/ShelfieLayoutEngine';
 import { useQuery } from '@tanstack/react-query';
+import { getCachedDominantColor } from '@/utils/color-extractor';
 import type { Book } from '../../../shared/schema';
-
-// Simple fallback color extraction - no external dependencies needed
-function getBookColor(coverUrl?: string): string {
-  // Extract color from common color names or return fallback
-  if (!coverUrl) return '#4a5568';
-  
-  // Basic hue extraction from URL patterns
-  if (coverUrl.includes('blue')) return '#3182ce';
-  if (coverUrl.includes('red')) return '#e53e3e';
-  if (coverUrl.includes('green')) return '#38a169';
-  if (coverUrl.includes('orange')) return '#dd6b20';
-  if (coverUrl.includes('purple')) return '#805ad5';
-  
-  // Fallback color
-  return '#4a5568';
-}
 
 interface LiveDemoShelfRealisticProps {
   reducedMotion?: boolean;
@@ -341,16 +326,32 @@ export default function LiveDemoShelfRealistic({ reducedMotion = false }: LiveDe
     refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
   });
 
-  // Extract colors from book covers (simplified for demo)
+  // Extract colors from book covers using real edge color sampling
   useEffect(() => {
-    const colorMap = new Map<string, string>();
+    const extractColors = async () => {
+      const colorMap = new Map<string, string>();
+      
+      // Process books sequentially to avoid overwhelming the browser
+      for (const book of books) {
+        if (book.coverImage) {
+          try {
+            const color = await getCachedDominantColor(book.coverImage);
+            colorMap.set(book.id, color);
+          } catch (error) {
+            console.warn(`Failed to extract color for book ${book.title}:`, error);
+            colorMap.set(book.id, '#4a5568'); // Fallback color
+          }
+        } else {
+          colorMap.set(book.id, '#4a5568'); // Default for books without covers
+        }
+      }
+      
+      setDominantColors(colorMap);
+    };
     
-    for (const book of books) {
-      const color = getBookColor(book.coverImage || undefined);
-      colorMap.set(book.id, color);
+    if (books.length > 0) {
+      extractColors();
     }
-    
-    setDominantColors(colorMap);
   }, [books]);
 
   useEffect(() => {
