@@ -128,7 +128,12 @@ export function calculateLayout(
       // Calculate row height based on actual rendered heights after justification scaling
       const rowStartIndex = layoutItems.length - currentRow.length;
       const actualRowHeight = Math.max(...layoutItems.slice(rowStartIndex).map(item => item.h));
-      yCursor += actualRowHeight + cfg.gutterY;
+      
+      // Add adaptive spacing for large books (coffee table books)
+      const isLargeBookRow = actualRowHeight > 180; // Books taller than 180px need extra space
+      const adaptiveGutter = isLargeBookRow ? cfg.gutterY + 12 : cfg.gutterY; // +12px for large books
+      
+      yCursor += actualRowHeight + adaptiveGutter;
       rowIndex++;
       currentRow = [book];
       currentRowNaturalWidth = naturalWidth;
@@ -300,8 +305,14 @@ function processRow(
     });
   }
   
-  // Row waviness
-  const jy = Math.sin(rowIndex * 1.3) * 4;
+  // Calculate safe vertical jitter that prevents overlaps
+  // For large books (coffee table books), use minimal jitter
+  const maxBookHeight = Math.max(...physicalDimensions.map(dim => dim.Hi * scale));
+  const isLargeBookRow = maxBookHeight > 180; // Books taller than 180px are considered large
+  
+  // Reduce jitter for large books to prevent overlaps
+  const baseJitter = isLargeBookRow ? 2 : 4; // Large books get 2px max, normal books get 4px max
+  const jy = Math.sin(rowIndex * 1.3) * baseJitter;
   
   // Position books in row
   let currentX = 0;
