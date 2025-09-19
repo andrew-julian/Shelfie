@@ -102,7 +102,7 @@ export default function Home() {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [location, isLoading, isAuthenticated, refetch]);
+  }, [location, isLoading, isAuthenticated]); // Remove refetch from deps to prevent infinite loop
 
   // Filter and sort books based on current state
   const books = useMemo(() => {
