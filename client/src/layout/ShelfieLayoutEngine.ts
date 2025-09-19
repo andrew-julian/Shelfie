@@ -125,8 +125,9 @@ export function calculateLayout(
       // Process current row
       processRow(currentRow, dims, containerWidth, cfg, yCursor, rowIndex, layoutItems);
       
-      // Start new row using actual tallest book height in the row
-      const actualRowHeight = Math.max(...currentRow.map(book => book.phys.height_mm * 0.85));
+      // Calculate row height based on actual rendered heights after justification scaling
+      const rowStartIndex = layoutItems.length - currentRow.length;
+      const actualRowHeight = Math.max(...layoutItems.slice(rowStartIndex).map(item => item.h));
       yCursor += actualRowHeight + cfg.gutterY;
       rowIndex++;
       currentRow = [book];
