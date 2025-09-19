@@ -38,7 +38,7 @@ export default function Landing() {
               <a href="#privacy" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Privacy</a>
             </nav>
             <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white text-xs md:text-sm px-3 md:px-4 py-1.5 md:py-2">
-              <a href="/api/login" data-testid="button-get-app">Start scanning now →</a>
+              <a href="/api/login" data-testid="button-get-app">Start My Free Library →</a>
             </Button>
           </div>
         </div>
@@ -51,10 +51,10 @@ export default function Landing() {
             <div className="max-w-4xl mx-auto">
               <div className="text-center space-y-6 md:space-y-8">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight">
-                  From barcode to bookshelf in seconds.
+                  Bring Your Library to Life in Seconds.
                 </h1>
                 <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto px-4 sm:px-0">
-                  Turn every book into a beautifully organised digital library in seconds. Barcode scanning, rich metadata, and stunning 3D shelves — effortless, private, and always yours.
+                  Transform your shelves into a private, beautifully organised digital library. Scan a book, and instantly get rich details, gorgeous 3D shelves, and your collection always at your fingertips.
                 </p>
                 <div className="pt-4">
                   <Button 
@@ -64,7 +64,7 @@ export default function Landing() {
                     onClick={() => handleAnalyticsEvent('click_cta_primary')}
                   >
                     <a href="/api/login" data-testid="button-primary-cta">
-                      Start scanning now →
+                      Start My Free Library →
                     </a>
                   </Button>
                 </div>
@@ -93,24 +93,24 @@ export default function Landing() {
                   <div className="bg-orange-100 w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 md:mb-8">
                     <Camera className="w-8 h-8 md:w-10 md:h-10 text-orange-600" />
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">1. Scan</h3>
-                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">Point your camera at a book barcode.</p>
+                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">1. Scan it</h3>
+                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">Point your phone at any book barcode.</p>
                 </div>
                 
                 <div className="text-center">
                   <div className="bg-blue-100 w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 md:mb-8">
                     <Sparkles className="w-8 h-8 md:w-10 md:h-10 text-blue-600" />
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">2. Add</h3>
-                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">Instantly fetches metadata: title, author, edition, cover, dimensions.</p>
+                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">2. See it come alive</h3>
+                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">Instantly fetch cover, edition, and rich details.</p>
                 </div>
                 
                 <div className="text-center">
                   <div className="bg-green-100 w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 md:mb-8">
                     <BookOpen className="w-8 h-8 md:w-10 md:h-10 text-green-600" />
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">3. Enjoy</h3>
-                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">Browse and share your library in stunning 3D.</p>
+                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">3. Enjoy your library</h3>
+                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">Browse your books in stunning 3D and always know what you own.</p>
                 </div>
               </div>
             </div>
@@ -132,8 +132,8 @@ export default function Landing() {
                     <div className="bg-orange-100 w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center mb-6">
                       <Zap className="w-7 h-7 md:w-8 md:h-8 text-orange-600" />
                     </div>
-                    <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">Lightning-fast capture</h3>
-                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">Scan books instantly, even offline.</p>
+                    <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">Scan instantly, never lose track again</h3>
+                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">Lightning-fast capture means you'll never forget a book again.</p>
                   </CardContent>
                 </Card>
 
@@ -142,8 +142,8 @@ export default function Landing() {
                     <div className="bg-blue-100 w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center mb-6">
                       <Eye className="w-7 h-7 md:w-8 md:h-8 text-blue-600" />
                     </div>
-                    <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">Beautiful 3D shelves</h3>
-                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">Books appear as they are: tall hardbacks, slim paperbacks, everything in between.</p>
+                    <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">See your collection exactly as it looks</h3>
+                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">Beautiful 3D shelves show your books exactly as they appear on your shelf.</p>
                   </CardContent>
                 </Card>
 
@@ -152,8 +152,8 @@ export default function Landing() {
                     <div className="bg-green-100 w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center mb-6">
                       <Database className="w-7 h-7 md:w-8 md:h-8 text-green-600" />
                     </div>
-                    <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">Rich metadata</h3>
-                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">Every scan fetches details automatically.</p>
+                    <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">Every detail fetched automatically</h3>
+                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">Rich metadata — author, edition, cover, and more — appears instantly.</p>
                   </CardContent>
                 </Card>
 
@@ -162,19 +162,19 @@ export default function Landing() {
                     <div className="bg-purple-100 w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center mb-6">
                       <Shield className="w-7 h-7 md:w-8 md:h-8 text-purple-600" />
                     </div>
-                    <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">Portable & private</h3>
-                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">Your library, your rules. Export anytime.</p>
+                    <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">Your library, always with you</h3>
+                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">100% private, export anytime. Your books, your rules.</p>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Features Checklist */}
               <div className="mt-16 md:mt-20 bg-gray-50 rounded-3xl p-8 md:p-12">
-                <h3 className="text-xl md:text-2xl font-bold text-center mb-8 md:mb-12 text-gray-900">Everything you need for your personal library</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-center mb-8 md:mb-12 text-gray-900">All the Tools to Organise and Enjoy Your Books</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
                   <div className="flex items-start gap-4">
                     <Check className="w-5 h-5 md:w-6 md:h-6 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm md:text-base text-gray-700"><strong>Instant capture</strong> with cover art</span>
+                    <span className="text-sm md:text-base text-gray-700"><strong>Snap and capture instantly</strong> (with full cover art)</span>
                   </div>
                   <div className="flex items-start gap-4">
                     <Check className="w-5 h-5 md:w-6 md:h-6 text-green-500 mt-0.5 flex-shrink-0" />
@@ -182,7 +182,7 @@ export default function Landing() {
                   </div>
                   <div className="flex items-start gap-4">
                     <Check className="w-5 h-5 md:w-6 md:h-6 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm md:text-base text-gray-700"><strong>Regional covers & pricing</strong></span>
+                    <span className="text-sm md:text-base text-gray-700"><strong>See editions and covers</strong> from your region</span>
                   </div>
                   <div className="flex items-start gap-4">
                     <Check className="w-5 h-5 md:w-6 md:h-6 text-green-500 mt-0.5 flex-shrink-0" />
@@ -194,7 +194,7 @@ export default function Landing() {
                   </div>
                   <div className="flex items-start gap-4">
                     <Check className="w-5 h-5 md:w-6 md:h-6 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm md:text-base text-gray-700"><strong>Privacy by design</strong> (you control your data)</span>
+                    <span className="text-sm md:text-base text-gray-700"><strong>Your library, your rules.</strong> No reselling, no tracking.</span>
                   </div>
                   <div className="flex items-start gap-4">
                     <Check className="w-5 h-5 md:w-6 md:h-6 text-green-500 mt-0.5 flex-shrink-0" />
@@ -215,7 +215,7 @@ export default function Landing() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12 md:mb-16">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6">Simple, honest pricing</h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6">A Whole Library, For Less Than One Paperback</h2>
                 <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4 sm:px-0">Choose the plan that fits your collection</p>
               </div>
 
@@ -224,7 +224,7 @@ export default function Landing() {
                 <Card className="p-8 md:p-10 border-2 border-gray-200 rounded-3xl">
                   <CardContent className="p-0">
                     <h3 className="text-2xl md:text-3xl font-bold mb-3">Free plan</h3>
-                    <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8">Perfect for smaller libraries</p>
+                    <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8">Start free with up to 100 books — no credit card needed</p>
                     <div className="text-3xl md:text-4xl font-bold mb-6 md:mb-8 text-green-600">FREE</div>
                     <ul className="space-y-4 mb-8 md:mb-10">
                       <li className="flex items-center gap-3">
@@ -257,9 +257,9 @@ export default function Landing() {
                   </div>
                   <CardContent className="p-0">
                     <h3 className="text-2xl md:text-3xl font-bold mb-3">Unlimited plan</h3>
-                    <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8">Unlimited books, all features</p>
+                    <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8">Every feature. Unlimited books.</p>
                     <div className="text-3xl md:text-4xl font-bold mb-2">$17<span className="text-lg md:text-xl font-normal text-gray-500">/year</span></div>
-                    <p className="text-sm md:text-base text-gray-500 mb-6 md:mb-8 italic">A whole library, for less than the price of one paperback.</p>
+                    <p className="text-sm md:text-base text-orange-600 font-medium mb-6 md:mb-8">Less than $1.50 a month</p>
                     <ul className="space-y-4 mb-8 md:mb-10">
                       <li className="flex items-center gap-3">
                         <Check className="w-5 h-5 md:w-6 md:h-6 text-green-500" />
@@ -284,7 +284,7 @@ export default function Landing() {
         <section className="py-16 md:py-24 bg-gradient-to-br from-orange-50 via-white to-blue-50">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 md:mb-8 px-4 sm:px-0">Build a library you'll actually use</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 md:mb-8 px-4 sm:px-0">A Library That Looks as Beautiful as the Books You Love</h2>
               <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-8 md:mb-12 leading-relaxed max-w-3xl mx-auto px-4 sm:px-0">
                 A library that looks beautiful, feels intuitive, and makes every book easy to find. No ads, no clutter, just you and your books.
               </p>
@@ -294,9 +294,9 @@ export default function Landing() {
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 sm:px-8 md:px-10 lg:px-12 py-4 sm:py-5 md:py-6 text-base sm:text-lg md:text-xl font-semibold rounded-full shadow-lg hover:shadow-xl transition-all mb-6 text-center"
               >
                 <a href="/api/login" data-testid="button-final-cta" className="block">
-                  <span className="block sm:hidden">Start scanning now →</span>
-                  <span className="hidden sm:block md:hidden">Start scanning and watch your library come alive →</span>
-                  <span className="hidden md:block">Start scanning now and watch your library come alive →</span>
+                  <span className="block sm:hidden">Build My Shelf →</span>
+                  <span className="hidden sm:block md:hidden">Build My Shelf and watch it come alive →</span>
+                  <span className="hidden md:block">Build My Shelf and watch it come alive →</span>
                 </a>
               </Button>
               <p className="text-sm md:text-base text-gray-500">Free for up to 100 books • No credit card required</p>
@@ -308,7 +308,7 @@ export default function Landing() {
         <section id="privacy" className="py-16 md:py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6">Your books, your data.</h3>
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6">Your books, your data. Always private, always yours.</h3>
               <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8 leading-relaxed">
                 No dark patterns. No data resale. Export or delete your library anytime.
               </p>
