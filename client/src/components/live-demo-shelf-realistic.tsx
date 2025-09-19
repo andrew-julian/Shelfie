@@ -122,23 +122,100 @@ function parseBookDimensions(book: Book): { width: number; height: number; depth
   }
 }
 
-// Convert database book to layout engine format - using EXACT same logic as main app
+// Convert database book to layout engine format with direct unit conversion
 function convertToLayoutBook(book: Book, index: number): LayoutBook {
-  // Use the exact same dimension parsing as the main app
-  const dims = parseBookDimensions(book);
+  const defaultDimensions = { width_mm: 127, height_mm: 203, spine_mm: 15 }; // Default paperback in mm
   
-  // Convert from pixels to millimeters (layout engine expects mm)
-  // The main app uses 22px per inch, so: px / 22 * 25.4 = mm
-  const pxToMm = 25.4 / 22;
+  // Use parsed dimensions if available (from backend intelligent parsing)
+  if (book.width && book.height && book.depth) {
+    const width = parseFloat(book.width);
+    const height = parseFloat(book.height);
+    const depth = parseFloat(book.depth);
+    
+    // Direct conversion: if dimensions are in inches, convert to mm
+    // Assume numeric dimensions from backend are in inches
+    const widthMm = width * 25.4;
+    const heightMm = height * 25.4;
+    const depthMm = depth * 25.4;
+    
+    return {
+      id: book.id,
+      phys: { 
+        width_mm: widthMm,
+        height_mm: heightMm,
+        spine_mm: Math.max(depthMm, 10) // Minimum thickness
+      }
+    };
+  }
   
-  return {
-    id: book.id,
-    phys: { 
-      width_mm: dims.width * pxToMm,
-      height_mm: dims.height * pxToMm,
-      spine_mm: dims.depth * pxToMm
+  // Fallback to parsing dimensions string for backwards compatibility
+  if (!book.dimensions) return { id: book.id, phys: defaultDimensions };
+  
+  try {
+    // Parse various dimension formats like "8.5 x 5.5 x 1.2 inches", "21.6 x 14 x 2.8 cm", etc.
+    const matches = book.dimensions.match(/(\d+\.?\d*)\s*x\s*(\d+\.?\d*)\s*x\s*(\d+\.?\d*)/i);
+    if (!matches) return { id: book.id, phys: defaultDimensions };
+    
+    let [, dim1Str, dim2Str, dim3Str] = matches;
+    let dim1 = parseFloat(dim1Str);
+    let dim2 = parseFloat(dim2Str);
+    let dim3 = parseFloat(dim3Str);
+    
+    // Determine which dimension represents width, height, and depth
+    const dims = [dim1, dim2, dim3];
+    dims.sort((a, b) => a - b);
+    const [smallest, middle, largest] = dims;
+    
+    let width, height, depth = smallest; // smallest is usually depth
+    
+    // Between remaining dims, height should be larger for portrait books
+    const remaining = dims.filter(d => d !== smallest);
+    if (remaining.length === 2) {
+      const [smaller, larger] = remaining.sort((a, b) => a - b);
+      const aspectRatio = larger / smaller;
+      
+      if (aspectRatio > 1.4) {
+        width = smaller;
+        height = larger;
+      } else {
+        width = smaller;
+        height = larger;
+      }
+    } else {
+      width = middle;
+      height = largest;
     }
-  };
+    
+    // Detect units and convert to mm
+    const isMetric = /cm|centimeter|millimeter/i.test(book.dimensions);
+    const isImperial = /inch|inches|in\b/i.test(book.dimensions);
+    
+    let widthMm, heightMm, depthMm;
+    
+    if (isMetric || (!isImperial && (width > 15 || height > 15 || depth > 15))) {
+      // Dimensions are in cm, convert to mm
+      widthMm = width * 10;
+      heightMm = height * 10;
+      depthMm = depth * 10;
+    } else {
+      // Dimensions are in inches, convert to mm
+      widthMm = width * 25.4;
+      heightMm = height * 25.4;
+      depthMm = depth * 25.4;
+    }
+    
+    return {
+      id: book.id,
+      phys: { 
+        width_mm: widthMm,
+        height_mm: heightMm,
+        spine_mm: Math.max(depthMm, 10)
+      }
+    };
+  } catch (error) {
+    console.warn('Failed to parse book dimensions:', book.dimensions, error);
+    return { id: book.id, phys: defaultDimensions };
+  }
 }
 
 // Individual book component using the actual app's book-3d styling

@@ -304,7 +304,7 @@ export default function VirtualizedBookGrid({
                   customDimensions={{
                     width: item.w,
                     height: item.h,
-                    depth: item.d
+                    depth: Math.max(item.d, 10)
                   }}
                 />
               </div>
