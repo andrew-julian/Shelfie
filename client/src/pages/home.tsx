@@ -3,12 +3,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/header";
 import BookCard from "@/components/book-card";
 import BeautifulBookDetailsModal from "@/components/beautiful-book-details-modal";
-import { GoogleBooksViewer } from "@/components/google-books-viewer";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Book } from "@shared/schema";
-import { BookOpen, Camera, Book as BookIcon, Eye, CheckCircle } from "lucide-react";
+import { BookOpen, Camera, Book as BookIcon, CheckCircle, Eye } from "lucide-react";
 import { analyzeImageColors, sortBooksByOverallColor } from "@/utils/color-sort";
 import { calculateDynamicLayout, BookPosition, LayoutConfig } from "@/utils/dynamic-layout";
 import { 
@@ -56,7 +55,6 @@ async function sortBooksByColor(books: Book[], reverse: boolean = false): Promis
 
 export default function Home() {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-  const [previewBook, setPreviewBook] = useState<Book | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('date-added');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
@@ -604,9 +602,6 @@ export default function Home() {
     refetch(); // Refresh books list after update
   };
 
-  const handleBookPreview = (book: Book) => {
-    setPreviewBook(book);
-  };
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden relative">
@@ -647,7 +642,7 @@ export default function Home() {
               </div>
               <div className="w-px h-4 sm:h-6 bg-gray-200" />
               <div className="flex items-center gap-1 sm:gap-2 text-gray-700">
-                <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-sky-blue" />
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-sky-blue" />
                 <span className="font-semibold text-base sm:text-lg">{finalBooks.filter(b => b.status === 'reading').length}</span>
                 <span className="text-xs sm:text-sm text-gray-500">reading</span>
               </div>
@@ -679,7 +674,6 @@ export default function Home() {
               books={finalBooks}
               onBookSelect={handleBookSelect}
               onBookUpdate={handleBookUpdate}
-              onBookPreview={handleBookPreview}
               sortBy={sortBy}
               chunkSize={200}
               bufferSize={2}
@@ -780,7 +774,6 @@ export default function Home() {
                       book={book}
                       onSelect={handleBookSelect}
                       onUpdate={handleBookUpdate}
-                      onPreview={handleBookPreview}
                       customDimensions={{
                         width: item.w,
                         height: item.h,
@@ -834,14 +827,6 @@ export default function Home() {
         onUpdate={handleBookUpdate}
       />
 
-      {/* Google Books Preview Modal */}
-      {previewBook && (
-        <GoogleBooksViewer
-          book={previewBook}
-          isOpen={!!previewBook}
-          onClose={() => setPreviewBook(null)}
-        />
-      )}
     </div>
   );
 }

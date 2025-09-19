@@ -300,7 +300,6 @@ export default function VirtualizedBookGrid({
                   book={book}
                   onSelect={onBookSelect}
                   onUpdate={onBookUpdate}
-                  onPreview={onBookPreview}
                   customDimensions={{
                     width: item.w,
                     height: item.h,

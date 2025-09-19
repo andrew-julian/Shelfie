@@ -39,10 +39,12 @@ import {
   Save,
   Edit3,
   Sparkles,
-  BookmarkPlus
+  BookmarkPlus,
+  Eye
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { GoogleBooksViewer } from "@/components/google-books-viewer";
 
 interface BeautifulBookDetailsModalProps {
   book: Book | null;
@@ -125,6 +127,7 @@ export default function BeautifulBookDetailsModal({ book, isOpen, onClose, onUpd
   const [animateStars, setAnimateStars] = useState(false);
   const [coverCarouselIndex, setCoverCarouselIndex] = useState(0);
   const [showBookshelfAnimation, setShowBookshelfAnimation] = useState(false);
+  const [showGoogleBooksPreview, setShowGoogleBooksPreview] = useState(false);
   
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
@@ -368,6 +371,7 @@ export default function BeautifulBookDetailsModal({ book, isOpen, onClose, onUpd
   };
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className="max-w-6xl w-[95vw] h-[90vh] p-0 overflow-hidden border-0 shadow-2xl bg-transparent"
@@ -755,6 +759,16 @@ export default function BeautifulBookDetailsModal({ book, isOpen, onClose, onUpd
                         <Trash2 className="w-4 h-4" />
                         {deleteBookMutation.isPending ? 'Deleting...' : 'Delete Book'}
                       </button>
+
+                      {/* Google Books Preview Button */}
+                      <button
+                        onClick={() => setShowGoogleBooksPreview(true)}
+                        className="flex items-center gap-2 px-4 py-2 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-all duration-200"
+                        data-testid="preview-google-books-button"
+                      >
+                        <Eye className="w-4 h-4" />
+                        Preview Book
+                      </button>
                     </div>
                   </div>
                 </ScrollArea>
@@ -764,6 +778,16 @@ export default function BeautifulBookDetailsModal({ book, isOpen, onClose, onUpd
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Google Books Preview Modal */}
+    {book && (
+      <GoogleBooksViewer
+        book={book}
+        isOpen={showGoogleBooksPreview}
+        onClose={() => setShowGoogleBooksPreview(false)}
+      />
+    )}
+    </>
   );
 }
 

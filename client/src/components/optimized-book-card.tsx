@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Book } from "@shared/schema";
-import { BookOpen, Eye } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { usePerformanceTelemetry } from "@/hooks/usePerformanceTelemetry";
 
@@ -9,7 +9,6 @@ interface OptimizedBookCardProps {
   book: Book;
   onSelect: (book: Book) => void;
   onUpdate: () => void;
-  onPreview?: (book: Book) => void;
   customDimensions?: {
     width: number;
     height: number;
@@ -27,7 +26,6 @@ export default function OptimizedBookCard({
   book,
   onSelect,
   onUpdate,
-  onPreview,
   customDimensions,
   position
 }: OptimizedBookCardProps) {
@@ -108,13 +106,6 @@ export default function OptimizedBookCard({
     setIsHovered(false);
   }, []);
 
-  const handlePreviewClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onPreview) {
-      onPreview(book);
-    }
-  }, [book, onPreview]);
 
   const dimensions = customDimensions || {
     width: 140,
@@ -167,30 +158,6 @@ export default function OptimizedBookCard({
           </div>
         )}
 
-        {/* Overlay for additional info and preview button on hover */}
-        {isHovered && (
-          <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col justify-between p-2 opacity-0 hover:opacity-100 transition-opacity duration-300">
-            {/* Preview button at the top center */}
-            {onPreview && (
-              <div className="flex justify-center">
-                <button
-                  onClick={handlePreviewClick}
-                  className="bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                  data-testid="button-preview-book-optimized"
-                  aria-label={`Preview ${book.title}`}
-                >
-                  <Eye className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-            
-            {/* Book info at the bottom */}
-            <div className="text-white text-xs">
-              <p className="font-semibold truncate">{book.title}</p>
-              {book.author && <p className="truncate opacity-80">{book.author}</p>}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Book Spine (3D effect) */}
