@@ -14,8 +14,8 @@ fi
 echo "Building application..."
 npm run build
 
-# Deploy to Vercel using token authentication
+# Deploy to Vercel using token authentication with skip-domain flag
 echo "Deploying to Vercel..."
-vercel --prod --token=$VERCEL_TOKEN --yes
+vercel --prod --token=$VERCEL_TOKEN --yes --skip-domain
 
 echo "Deployment complete!"
