@@ -15,7 +15,7 @@ export default defineConfig({
     },
   },
   publicDir: path.resolve(import.meta.dirname, "client", "public"),
-  console.log("Vite root:", process.cwd(), __dirname)
+  console.log("Vite root check:", process.cwd(), __dirname)
   //publicDir: "client/public",
   build: {
     //outDir: path.resolve(import.meta.dirname, "dist", "public"),
