@@ -1,6 +1,6 @@
 {
-  "buildCommand": "bash build.sh",
-  "outputDirectory": "dist/public",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "crons": [
     {
       "path": "/api/cron/process-queue",
