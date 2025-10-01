@@ -18,7 +18,12 @@ export default defineConfig({
   publicDir: "client/public",
   build: {
     //outDir: path.resolve(import.meta.dirname, "dist", "public"),
-    outDir: "dist",
+    //outDir: "dist",
+    //emptyOutDir: true,
+    rollupOptions: {
+      input: path.resolve(__dirname, "client/index.html"),
+    },
+    outDir: path.resolve(__dirname, "client/dist"),
     emptyOutDir: true,
   },
   server: {
