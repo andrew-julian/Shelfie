@@ -14,8 +14,9 @@ export default defineConfig({
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
-  //publicDir: path.resolve(import.meta.dirname, "client", "public"),
-  publicDir: "client/public",
+  publicDir: path.resolve(import.meta.dirname, "client", "public"),
+  console.log("Vite root:", process.cwd(), __dirname)
+  //publicDir: "client/public",
   build: {
     //outDir: path.resolve(import.meta.dirname, "dist", "public"),
     //outDir: "dist",
