@@ -20,6 +20,7 @@ export default defineConfig({
     //outDir: path.resolve(import.meta.dirname, "dist", "public"),
     //outDir: "dist",
     //emptyOutDir: true,
+    // change to commit dist instead of client/dist
     rollupOptions: {
       input: path.resolve(import.meta.dirname, "client/index.html"),
     },
