@@ -1,12 +1,23 @@
-// vite.config.ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+
+// Forced committed to the repo to ensure it's available for the build
 
 export default defineConfig({
-  //root: path.resolve(import.meta.dirname, "client"),
-  root: "client",
-  plugins: [react()],
+  plugins: [
+    react(),
+    runtimeErrorOverlay(),
+    ...(process.env.NODE_ENV !== "production" &&
+    process.env.REPL_ID !== undefined
+      ? [
+          await import("@replit/vite-plugin-cartographer").then((m) =>
+            m.cartographer(),
+          ),
+        ]
+      : []),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
@@ -14,18 +25,9 @@ export default defineConfig({
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
-  publicDir: path.resolve(import.meta.dirname, "client", "public"),
-  console.log("Vite root check:", process.cwd(), __dirname)
-  //publicDir: "client/public",
+  root: path.resolve(import.meta.dirname, "client"),
   build: {
-    //outDir: path.resolve(import.meta.dirname, "dist", "public"),
-    //outDir: "dist",
-    //emptyOutDir: true,
-    // change to commit dist instead of client/dist
-    rollupOptions: {
-      input: path.resolve(import.meta.dirname, "client/index.html"),
-    },
-    outDir: path.resolve(import.meta.dirname, "dist", "public"),
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
   server: {
@@ -34,5 +36,4 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
-  appType: "spa",
 });
