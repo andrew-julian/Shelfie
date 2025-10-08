@@ -1,27 +1,24 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
-// Use Google Auth for production, Replit Auth for development
-import { setupGoogleAuth, isAuthenticated as googleIsAuthenticated } from "./googleAuth.js";
-import { setupAuth as setupReplitAuth, isAuthenticated as replitIsAuthenticated } from "./replitAuth.js";
-
-const isAuthenticated = process.env.NODE_ENV === 'production' ? googleIsAuthenticated : replitIsAuthenticated;
+// Use Google Auth for all environments
+import { setupGoogleAuth, isAuthenticated } from "./googleAuth.js";
 import express from "express";
 import path from "path";
 import Stripe from "stripe";
 import { insertBookSchema } from "../shared/schema.js";
 import { z } from "zod";
 
-// Helper function to get user ID from request (works with both auth systems)
+// Helper function to get user ID from request
 function getUserId(req: any): string {
-  return req.user?.claims?.sub || req.user?.id;
+  return req.user?.id;
 }
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-07-30.basil",
+  apiVersion: "2025-08-27.basil",
 });
 
 // Standalone lookup function for background processing
@@ -384,14 +381,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Auth middleware - use Google Auth for production, Replit Auth for development
-  if (process.env.NODE_ENV === 'production') {
-    await setupGoogleAuth(app);
-    console.log('✓ Google OAuth configured for production');
-  } else {
-    await setupReplitAuth(app);
-    console.log('✓ Replit OAuth configured for development');
-  }
+  // Auth middleware - use Google Auth for all environments with iframe bypass for Replit preview
+  await setupGoogleAuth(app);
+  console.log('✓ Google OAuth configured (with iframe bypass in development)');
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {

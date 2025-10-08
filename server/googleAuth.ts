@@ -167,9 +167,37 @@ export async function setupGoogleAuth(app: Express) {
   });
 }
 
-export const isAuthenticated: RequestHandler = (req, res, next) => {
+// Middleware with development bypass for Replit preview
+// In development, auto-create a dev user for unauthenticated requests
+// This allows the app to work in Replit preview (where Google OAuth fails in iframes)
+// Production always requires proper Google OAuth
+export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  // If authenticated normally via Google OAuth, allow
   if (req.isAuthenticated()) {
     return next();
   }
+  
+  // Development mode: create a dev user for preview/testing
+  // This is safe because:
+  // - Development database is isolated from production
+  // - Only accessible on Replit workspace (not public internet)
+  // - Vercel/production deployment uses NODE_ENV=production
+  if (process.env.NODE_ENV === 'development') {
+    try {
+      const devUser = await storage.upsertUser({
+        email: 'dev@shelfie.local',
+        firstName: 'Dev',
+        lastName: 'User',
+        profileImageUrl: null,
+      });
+      
+      // Attach user to request
+      (req as any).user = devUser;
+      return next();
+    } catch (error) {
+      console.error('Failed to create dev user:', error);
+    }
+  }
+  
   res.status(401).json({ message: 'Unauthorized' });
 };
