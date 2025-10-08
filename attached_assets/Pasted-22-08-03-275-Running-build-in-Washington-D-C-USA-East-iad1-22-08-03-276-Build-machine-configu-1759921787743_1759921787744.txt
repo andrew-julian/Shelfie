@@ -1,0 +1,54 @@
+22:08:03.275 Running build in Washington, D.C., USA (East) – iad1
+22:08:03.276 Build machine configuration: 4 cores, 8 GB
+22:08:03.296 Cloning github.com/andrew-julian/Shelfie (Branch: main, Commit: b2b6e3c)
+22:08:03.304 Skipping build cache, deployment was triggered without cache.
+22:08:11.288 Cloning completed: 7.992s
+22:08:11.662 Running "vercel build"
+22:08:12.156 Vercel CLI 48.2.4
+22:08:12.764 Warning: Due to "engines": { "node": "20.x" } in your `package.json` file, the Node.js Version defined in your Project Settings ("22.x") will not apply, Node.js Version "20.x" will be used instead. Learn More: http://vercel.link/node-version
+22:08:12.771 Running "install" command: `npm ci`...
+22:08:17.791 npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+22:08:26.228 
+22:08:26.229 added 636 packages, and audited 637 packages in 13s
+22:08:26.229 
+22:08:26.229 89 packages are looking for funding
+22:08:26.229   run `npm fund` for details
+22:08:26.236 
+22:08:26.237 2 moderate severity vulnerabilities
+22:08:26.237 
+22:08:26.237 To address all issues (including breaking changes), run:
+22:08:26.237   npm audit fix --force
+22:08:26.237 
+22:08:26.237 Run `npm audit` for details.
+22:08:26.484 
+22:08:26.484 > rest-express@1.0.0 build
+22:08:26.484 > npm run build:client && npm run build:server
+22:08:26.484 
+22:08:26.619 
+22:08:26.619 > rest-express@1.0.0 build:client
+22:08:26.619 > vite build
+22:08:26.620 
+22:08:26.863 [36mvite v5.4.20 [32mbuilding for production...[36m[39m
+22:08:26.921 transforming...
+22:08:31.785 [32m✓[39m 1746 modules transformed.
+22:08:32.206 rendering chunks...
+22:08:32.222 computing gzip size...
+22:08:32.262 [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m    3.97 kB[22m[1m[22m[2m │ gzip:   1.25 kB[22m
+22:08:32.263 [2m../dist/public/[22m[2massets/[22m[35mindex-C-C-NgDv.css  [39m[1m[2m  110.78 kB[22m[1m[22m[2m │ gzip:  18.19 kB[22m
+22:08:32.263 [2m../dist/public/[22m[2massets/[22m[36mindex-DhvuRrbq.js   [39m[1m[33m1,209.07 kB[39m[22m[2m │ gzip: 427.53 kB[22m
+22:08:32.263 [33m
+22:08:32.263 (!) Some chunks are larger than 500 kB after minification. Consider:
+22:08:32.263 - Using dynamic import() to code-split the application
+22:08:32.263 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+22:08:32.263 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+22:08:32.264 [32m✓ built in 5.37s[39m
+22:08:32.448 
+22:08:32.448 > rest-express@1.0.0 build:server
+22:08:32.448 > esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outfile=dist/index.js
+22:08:32.449 
+22:08:32.468 
+22:08:32.468   dist/index.js  111.6kb
+22:08:32.468 
+22:08:32.469 ⚡ Done in 12ms
+22:08:32.488 Error: No Output Directory named "public" found after the Build completed. Configure the Output Directory in your Project Settings. Alternatively, configure vercel.json#outputDirectory.
+22:08:32.489 Learn More: https://vercel.link/missing-public-directory
