@@ -102,7 +102,7 @@
     "ws": "^8.18.0",
     "zod": "^3.24.2",
     "zod-validation-error": "^3.4.0",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.20"
   },
   "devDependencies": {
     "@replit/vite-plugin-cartographer": "^0.2.8",
