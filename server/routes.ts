@@ -898,6 +898,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get single book by ID
+  app.get("/api/books/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = getUserId(req);
+      
+      const book = await storage.getBook(id, userId);
+      
+      if (!book) {
+        return res.status(404).json({ message: "Book not found" });
+      }
+
+      res.json(book);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch book" });
+    }
+  });
+
   // Update book data
   app.patch("/api/books/:id", isAuthenticated, async (req: any, res) => {
     try {
