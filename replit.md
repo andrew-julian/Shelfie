@@ -40,11 +40,11 @@ The application employs a **PostgreSQL-based approach**:
 - **Deployment**: Vercel-compatible configuration with environment-specific database connections.
 
 ### Authentication and Authorization
-Implements a **hybrid authentication system** with **email-based user identification**:
-- **Development Environment**: Replit OAuth with session-based authentication using `connect-pg-simple` for PostgreSQL-backed sessions
-- **Production Environment**: Google OAuth for external deployments (Vercel) with the same session storage system
-- **Architecture**: Environment-based authentication provider selection ensures seamless development on Replit while supporting production deployment on external platforms
-- **Email-Based Identity**: Both OAuth providers create/find users by email address rather than provider-specific IDs, ensuring the same user gets consistent accounts across providers (August 2025)
+Implements a **simplified Google OAuth authentication system**:
+- **Production Environment**: Google OAuth for authentication with session-based storage using `connect-pg-simple` for PostgreSQL-backed sessions
+- **Development Environment**: Automatic bypass that creates a development user (`dev@shelfie.local`) for any unauthenticated request. This is safe because the development database is isolated from production and only accessible within the Replit workspace
+- **Architecture**: Single authentication provider (Google OAuth) with NODE_ENV-based development bypass for Replit preview functionality
+- **Security Model**: Production (Vercel) always requires Google OAuth. Development allows unrestricted access to facilitate preview and testing with isolated development database (October 2025)
 
 ### Key Architectural Patterns
 - **Shared Schema Pattern**: Database models, validation schemas, and TypeScript types are defined once and shared.
@@ -69,7 +69,7 @@ Implements a **hybrid authentication system** with **email-based user identifica
 - **User Management System**: Database-connected user switcher, dynamic user loading, and session context switching.
 - **Input Forgiveness**: Automatic cleanup of whitespace and hyphens from ISBN inputs.
 - **Complete Stripe Integration**: $17/year subscription system with secure webhook processing (STRIPE_WEBHOOK_SECRET), comprehensive billing management, subscription lifecycle controls (upgrade/cancel/reset), and real-time status updates via checkout.session.completed events. Environment-specific webhook configuration for development (Replit) and production (shelfie.site) domains. (August 2025)
-- **Dual Authentication System**: Hybrid OAuth implementation using Replit OAuth for development and Google OAuth for production deployments. Supports seamless development workflow while enabling external deployment on platforms like Vercel. Production deployment configured for www.shelfie.site and shelfie.site domains under vanaheim organization. (August 2025)
+- **Simplified Authentication System**: Google OAuth authentication for production with automatic development bypass. Production (Vercel) requires Google OAuth for all requests. Development creates a dev user automatically to enable Replit preview functionality where OAuth fails in iframes. Development database is isolated and only accessible within Replit workspace. Production deployment configured for www.shelfie.site and shelfie.site domains under vanaheim organization. (October 2025)
 
 ## External Dependencies
 
