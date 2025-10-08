@@ -1,9 +1,0 @@
-/server/vite.ts
-/node_modules
-/.env.local
-/.env
-/client/src
-/client/public
-/client/*.config.*
-/client/*.json
-*.log
