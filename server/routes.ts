@@ -17,6 +17,37 @@ function getUserId(req: any): string {
   return req.user?.claims?.sub || req.user?.id;
 }
 
+function collectImageUrls(root: any): string[] {
+  const urls = new Set<string>();
+
+  // Helper: add if looks like an image
+  const addIfImage = (u: any) => {
+    if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
+      urls.add(u);
+    }
+  };
+
+  // 1) Product-level
+  addIfImage(root?.product?.main_image?.link);
+  (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+
+  // images_flat may be a single URL or comma-separated
+  const flat = root?.product?.images_flat;
+  if (typeof flat === 'string') {
+    flat.split(',').map(s => s.trim()).forEach(addIfImage);
+  }
+
+  // 2) Reviews (potential alternative covers in review images)
+  (root?.product?.top_reviews ?? []).forEach((r: any) => {
+    // attached review images
+    (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
+    // video thumbnails (images)
+    (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
+  });
+
+  return Array.from(urls);
+}
+
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
@@ -68,38 +99,6 @@ async function lookupBookByISBN(isbn: string, userId: string) {
 
   const product = data.product;
   
-  // Extract all available cover images using comprehensive approach
-  const collectImageUrls = (root: any) => {
-    const urls = new Set<string>();
-
-    // Helper: add if looks like an image
-    const addIfImage = (u: any) => {
-      if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
-        urls.add(u);
-      }
-    };
-
-    // 1) Product-level
-    addIfImage(root?.product?.main_image?.link);
-    (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
-
-    // images_flat may be a single URL or comma-separated
-    const flat = root?.product?.images_flat;
-    if (typeof flat === 'string') {
-      flat.split(',').map(s => s.trim()).forEach(addIfImage);
-    }
-
-    // 2) Reviews (potential alternative covers in review images)
-    (root?.product?.top_reviews ?? []).forEach((r: any) => {
-      // attached review images
-      (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
-      // video thumbnails (images)
-      (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
-    });
-
-    return Array.from(urls);
-  };
-
   let coverImages = collectImageUrls(data);
   
   // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
@@ -588,40 +587,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Enhanced data extraction
       console.log("Raw Rainforest API response:", JSON.stringify(data, null, 2));
       
-      // Extract all available cover images using comprehensive approach
-      const collectImageUrls = (root: any) => {
-        const urls = new Set<string>();
-
-        // Helper: add if looks like an image
-        const addIfImage = (u: any) => {
-          if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
-            urls.add(u);
-          }
-        };
-
-        // 1) Product-level
-        addIfImage(root?.product?.main_image?.link);
-        (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
-
-        // images_flat may be a single URL or comma-separated
-        const flat = root?.product?.images_flat;
-        if (typeof flat === 'string') {
-          flat.split(',').map(s => s.trim()).forEach(addIfImage);
-        }
-
-        // 2) Reviews (potential alternative covers in review images)
-        (root?.product?.top_reviews ?? []).forEach((r: any) => {
-          // attached review images
-          (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
-          // video thumbnails (images)
-          (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
-          // reviewer avatar (skip these for covers)
-          // addIfImage(r?.profile?.image);
-        });
-
-        return Array.from(urls);
-      };
-
       let coverImages = collectImageUrls(data);
       
       // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
@@ -1066,38 +1031,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const product = data.product;
       
-      // Extract all available cover images using comprehensive approach
-      const collectImageUrls = (root: any) => {
-        const urls = new Set<string>();
-
-        // Helper: add if looks like an image
-        const addIfImage = (u: any) => {
-          if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
-            urls.add(u);
-          }
-        };
-
-        // 1) Product-level
-        addIfImage(root?.product?.main_image?.link);
-        (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
-
-        // images_flat may be a single URL or comma-separated
-        const flat = root?.product?.images_flat;
-        if (typeof flat === 'string') {
-          flat.split(',').map(s => s.trim()).forEach(addIfImage);
-        }
-
-        // 2) Reviews (potential alternative covers in review images)
-        (root?.product?.top_reviews ?? []).forEach((r: any) => {
-          // attached review images
-          (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
-          // video thumbnails (images)
-          (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
-        });
-
-        return Array.from(urls);
-      };
-
       let coverImages = collectImageUrls(data);
       
       // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
@@ -1455,38 +1388,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (data.product) {
               const product = data.product;
               
-              // Extract all available cover images using comprehensive approach
-              const collectImageUrls = (root: any) => {
-                const urls = new Set<string>();
-
-                // Helper: add if looks like an image
-                const addIfImage = (u: any) => {
-                  if (typeof u === 'string' && /\.(avif|webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(u)) {
-                    urls.add(u);
-                  }
-                };
-
-                // 1) Product-level
-                addIfImage(root?.product?.main_image?.link);
-                (root?.product?.images ?? []).forEach((img: any) => addIfImage(img?.link));
-
-                // images_flat may be a single URL or comma-separated
-                const flat = root?.product?.images_flat;
-                if (typeof flat === 'string') {
-                  flat.split(',').map(s => s.trim()).forEach(addIfImage);
-                }
-
-                // 2) Reviews (potential alternative covers in review images)
-                (root?.product?.top_reviews ?? []).forEach((r: any) => {
-                  // attached review images
-                  (r?.images ?? []).forEach((img: any) => addIfImage(img?.link));
-                  // video thumbnails (images)
-                  (r?.videos ?? []).forEach((v: any) => addIfImage(v?.image));
-                });
-
-                return Array.from(urls);
-              };
-
               let coverImages = collectImageUrls(data);
               
               // Extract cover images from different variants (Kindle, Hardcover, Paperback, etc.)
