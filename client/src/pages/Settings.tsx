@@ -4,10 +4,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, ArrowLeft, Save, User, Globe, DollarSign, Ruler, RefreshCw, Database } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { BookOpen, ArrowLeft, Save, User, Globe, DollarSign, Ruler, RefreshCw, Database, Trash2, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { UserPreferences } from "@shared/schema";
+import { UserPreferences, Book } from "@shared/schema";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function Settings() {
@@ -18,6 +20,9 @@ export default function Settings() {
   const [amazonDomain, setAmazonDomain] = useState("amazon.com.au");
   const [currency, setCurrency] = useState("AUD");
   const [measurementUnit, setMeasurementUnit] = useState("metric");
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isSecondConfirmOpen, setIsSecondConfirmOpen] = useState(false);
 
   // Fetch user preferences
   const { data: preferences, isLoading } = useQuery<UserPreferences>({
@@ -130,9 +135,76 @@ export default function Settings() {
   });
 
   // Fetch books count for the refresh section
-  const { data: books = [] } = useQuery({
+  const { data: books = [] } = useQuery<Book[]>({
     queryKey: ['/api/books'],
   });
+
+  // Delete all books mutation
+  const deleteLibraryMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/books/all', {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete library');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Library Deleted",
+        description: data.message || "Your entire library has been deleted.",
+      });
+      
+      // Reset state and close dialogs
+      setDeleteConfirmText("");
+      setIsDeleteDialogOpen(false);
+      setIsSecondConfirmOpen(false);
+      
+      // Invalidate all related queries
+      queryClient.invalidateQueries({ queryKey: ['/api/books'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/details'] });
+    },
+    onError: (error: Error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete library. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleFirstConfirm = () => {
+    if (deleteConfirmText === "DELETE MY LIBRARY") {
+      setIsDeleteDialogOpen(false);
+      setIsSecondConfirmOpen(true);
+    }
+  };
+
+  const handleFinalDelete = () => {
+    deleteLibraryMutation.mutate();
+  };
+
+  const resetDeleteState = () => {
+    setDeleteConfirmText("");
+    setIsDeleteDialogOpen(false);
+    setIsSecondConfirmOpen(false);
+  };
 
   const handleSave = () => {
     updatePreferencesMutation.mutate({
@@ -359,6 +431,121 @@ export default function Settings() {
               {updatePreferencesMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </div>
+
+          {/* Danger Zone Card */}
+          <Card className="border-red-200 dark:border-red-900">
+            <CardHeader>
+              <CardTitle className="flex items-center text-red-600 dark:text-red-400">
+                <AlertTriangle className="h-5 w-5 mr-2" />
+                Danger Zone
+              </CardTitle>
+              <CardDescription className="text-red-600/70 dark:text-red-400/70">
+                Irreversible actions that permanently affect your library
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white">
+                    Delete Entire Library
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                    Permanently delete all {books.length} books from your library. This cannot be undone.
+                  </div>
+                </div>
+                <Button
+                  variant="destructive"
+                  disabled={books.length === 0 || deleteLibraryMutation.isPending}
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  data-testid="button-delete-library"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Library
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* First confirmation dialog - outside the card to prevent unmounting issues */}
+          <AlertDialog open={isDeleteDialogOpen} onOpenChange={(open) => {
+            setIsDeleteDialogOpen(open);
+            if (!open) setDeleteConfirmText("");
+          }}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center text-red-600">
+                  <AlertTriangle className="h-5 w-5 mr-2" />
+                  Delete Your Entire Library?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="space-y-4">
+                  <p>
+                    You are about to permanently delete <strong>{books.length} books</strong> from your library. 
+                    This action cannot be undone.
+                  </p>
+                  <p>
+                    To confirm, please type <strong>DELETE MY LIBRARY</strong> below:
+                  </p>
+                  <Input
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder="Type DELETE MY LIBRARY"
+                    className="mt-2"
+                    data-testid="input-delete-confirm"
+                  />
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setDeleteConfirmText("")}>
+                  Cancel
+                </AlertDialogCancel>
+                <Button
+                  variant="destructive"
+                  onClick={handleFirstConfirm}
+                  disabled={deleteConfirmText !== "DELETE MY LIBRARY"}
+                  data-testid="button-confirm-delete-first"
+                >
+                  Continue
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* Second confirmation dialog */}
+          <AlertDialog open={isSecondConfirmOpen} onOpenChange={(open) => {
+            if (!open) resetDeleteState();
+            else setIsSecondConfirmOpen(open);
+          }}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center text-red-600">
+                  <AlertTriangle className="h-5 w-5 mr-2" />
+                  Final Confirmation
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  <p className="mb-4">
+                    This is your last chance to cancel. Clicking "Delete Everything" will permanently 
+                    remove all {books.length} books from your library.
+                  </p>
+                  <p className="font-semibold text-red-600">
+                    Are you absolutely sure you want to proceed?
+                  </p>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={resetDeleteState}>
+                  No, Keep My Library
+                </AlertDialogCancel>
+                <Button
+                  variant="destructive"
+                  onClick={handleFinalDelete}
+                  disabled={deleteLibraryMutation.isPending}
+                  data-testid="button-confirm-delete-final"
+                >
+                  {deleteLibraryMutation.isPending ? "Deleting..." : "Delete Everything"}
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </main>
     </div>

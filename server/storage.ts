@@ -34,6 +34,7 @@ export interface IStorage {
   updateBookStatus(id: string, status: string, userId?: string): Promise<Book | undefined>;
   updateBookData(id: string, data: Partial<Omit<Book, 'id' | 'isbn' | 'addedAt'>>, userId?: string): Promise<Book | undefined>;
   deleteBook(id: string, userId?: string): Promise<boolean>;
+  deleteAllBooks(userId: string): Promise<number>;
   
   // Scanning queue operations
   addToScanningQueue(item: InsertScanningQueueItem): Promise<ScanningQueueItem>;
@@ -187,6 +188,11 @@ export class DatabaseStorage implements IStorage {
     const conditions = userId ? and(eq(books.id, id), eq(books.userId, userId)) : eq(books.id, id);
     const result = await db.delete(books).where(conditions);
     return (result.rowCount ?? 0) > 0;
+  }
+
+  async deleteAllBooks(userId: string): Promise<number> {
+    const result = await db.delete(books).where(eq(books.userId, userId));
+    return result.rowCount ?? 0;
   }
   
   // Scanning queue operations

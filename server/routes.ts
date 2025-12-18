@@ -1757,6 +1757,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete all books for current user (requires authentication)
+  app.delete("/api/books/all", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getUserId(req);
+      const deletedCount = await storage.deleteAllBooks(userId);
+      
+      // Also clear the user's scanning queue
+      await storage.clearCompletedScanningQueue(userId);
+      
+      // Reset user's book count
+      await storage.updateUserBookCount(userId, 0);
+      
+      console.log(`Deleted ${deletedCount} books for user ${userId}`);
+      
+      res.json({ 
+        message: `Successfully deleted ${deletedCount} books from your library`,
+        deletedCount 
+      });
+    } catch (error) {
+      console.error("Failed to delete all books:", error);
+      res.status(500).json({ message: "Failed to delete library" });
+    }
+  });
+
   // Delete book
   app.delete("/api/books/:id", async (req, res) => {
     try {
